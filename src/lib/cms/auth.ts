@@ -96,6 +96,8 @@ export async function verifySessionToken(
   for (let i = 0; i < expected.length; i++) diff |= expected[i] ^ providedSig[i];
   if (diff !== 0) return null;
 
+  if (revokedSigs.has(sigB64)) return null;
+
   try {
     const payload: SessionPayload = JSON.parse(new TextDecoder().decode(base64UrlDecode(payloadB64)));
     if (typeof payload.exp !== "number" || payload.exp < Math.floor(Date.now() / 1000)) return null;
@@ -111,6 +113,36 @@ export async function verifySessionToken(
 }
 
 export const SESSION_MAX_AGE = SESSION_TTL_SECONDS;
+
+// In-memory set of revoked token signatures. Entries are tagged with their
+// expiry so they can be swept on each revocation, keeping memory bounded.
+// Note: only valid within a single process — a serverless cold-start or a
+// second instance won't see these. Configure Upstash (UPSTASH_REDIS_REST_URL
+// + UPSTASH_REDIS_REST_TOKEN) if cross-instance invalidation is required.
+const revokedSigs = new Map<string, number>(); // sig → exp (unix seconds)
+
+function sweepRevokedSigs(now: number): void {
+  for (const [sig, exp] of revokedSigs) {
+    if (exp <= now) revokedSigs.delete(sig);
+  }
+}
+
+/** Revoke a session token so it is rejected by verifySessionToken. */
+export function revokeSessionToken(token: string): void {
+  const parts = token.split(".");
+  if (parts.length !== 2) return;
+  const [payloadB64, sigB64] = parts;
+  let exp = Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS;
+  try {
+    const payload = JSON.parse(new TextDecoder().decode(base64UrlDecode(payloadB64)));
+    if (typeof payload.exp === "number") exp = payload.exp;
+  } catch {
+    // use default TTL-based expiry
+  }
+  const now = Math.floor(Date.now() / 1000);
+  sweepRevokedSigs(now);
+  revokedSigs.set(sigB64, exp);
+}
 
 /** Reads and verifies the session cookie from an incoming request. */
 export async function getSessionUser(

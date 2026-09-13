@@ -25,6 +25,8 @@ const buckets = new Map<string, Bucket>();
  */
 const MAX_TRACKED_BUCKETS = 5000;
 
+let _warnedNoRedis = false;
+
 function sweepExpiredBuckets(now: number): void {
   for (const [key, bucket] of buckets) {
     if (bucket.resetAt <= now) buckets.delete(key);
@@ -129,6 +131,13 @@ export async function checkRateLimit(key: string, limit: number, windowMs: numbe
     } catch (err) {
       console.error("Rate-Limit: Upstash-Anfrage fehlgeschlagen, Fallback auf In-Memory:", err);
     }
+  } else if (!_warnedNoRedis) {
+    _warnedNoRedis = true;
+    console.warn(
+      "[rate-limit] UPSTASH_REDIS_REST_URL/TOKEN sind nicht gesetzt — der In-Memory-Zähler " +
+      "gilt nur für diese Serverinstanz und setzt sich bei jedem Cold-Start zurück. " +
+      "Für produktive Multi-Instance-Deployments bitte Upstash Redis konfigurieren (siehe README)."
+    );
   }
   return checkRateLimitInMemory(key, limit, windowMs);
 }
