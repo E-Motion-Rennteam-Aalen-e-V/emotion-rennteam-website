@@ -138,13 +138,15 @@ export default function MemberApplicationForm() {
               className="mt-1 w-full rounded-md border border-border bg-surface px-4 py-2.5 text-sm outline-none transition-colors focus:border-accent"
             />
           </div>
-          <div className="flex items-start gap-2.5 sm:col-span-2">
+          <div className="flex flex-col gap-1 sm:col-span-2">
+            <div className="flex items-start gap-2.5">
             <input
               id="member-consent"
               name="consent"
               type="checkbox"
               required
               aria-invalid={Boolean(errors.consent)}
+              aria-describedby={errors.consent ? "member-consent-error" : undefined}
               className="mt-0.5 h-4 w-4 shrink-0 rounded border-border bg-surface accent-[var(--color-accent)]"
             />
             <label htmlFor="member-consent" className="text-xs text-muted">
@@ -155,6 +157,10 @@ export default function MemberApplicationForm() {
               </Link>
               . *
             </label>
+            </div>
+            {errors.consent && (
+              <p id="member-consent-error" className="text-xs text-red-500">{errors.consent}</p>
+            )}
           </div>
           <button
             type="submit"
