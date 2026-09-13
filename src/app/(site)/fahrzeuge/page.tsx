@@ -28,49 +28,51 @@ export default function VehiclesPage() {
       </Reveal>
 
       <div className="relative mt-20">
-        <div className="absolute left-4 top-0 h-full w-px bg-border sm:left-1/2" />
+        <div className="absolute left-4 top-0 h-full w-px bg-border lg:left-1/2" />
 
-        <div className="space-y-16 sm:space-y-24">
-          {vehicles.map((vehicle, i) => (
-            <Reveal
-              key={vehicle.slug}
-              direction={i % 2 === 0 ? "left" : "right"}
-              className={`relative flex flex-col gap-4 sm:flex-row sm:items-center ${
-                i % 2 === 0 ? "sm:flex-row" : "sm:flex-row-reverse"
-              }`}
-            >
-              <span className="absolute left-4 top-6 flex h-3.5 w-3.5 -translate-x-1/2 items-center justify-center sm:left-1/2">
-                {vehicle.current && (
-                  <span
-                    className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-50"
-                    aria-hidden="true"
-                  />
-                )}
-                <span
-                  className={`relative h-3 w-3 rounded-full border-2 ${
-                    vehicle.current ? "border-accent bg-accent" : "border-border bg-background"
-                  }`}
-                />
-              </span>
-
-              <div
-                className={`w-full pl-10 sm:w-1/2 sm:pl-0 ${
-                  i % 2 === 0 ? "sm:pr-12" : "sm:pl-12"
-                }`}
+        <div className="space-y-16 lg:space-y-28">
+          {vehicles.map((vehicle, i) => {
+            const reversed = i % 2 === 1;
+            return (
+              <Reveal
+                key={vehicle.slug}
+                direction={reversed ? "right" : "left"}
+                className="relative"
               >
-                <div className="overflow-hidden rounded-2xl border border-border bg-surface transition-colors hover:border-accent/50">
-                  {vehicle.coverImage && (
-                    <div className="relative aspect-[16/9] w-full">
-                      <Image
-                        src={vehicle.coverImage}
-                        alt={vehicle.name}
-                        fill
-                        sizes="(min-width: 640px) 50vw, 100vw"
-                        className="object-cover"
-                      />
-                    </div>
+                <span className="absolute left-4 top-6 z-10 flex h-3.5 w-3.5 -translate-x-1/2 items-center justify-center lg:left-1/2 lg:top-1/2 lg:-translate-y-1/2">
+                  {vehicle.current && (
+                    <span
+                      className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-50"
+                      aria-hidden="true"
+                    />
                   )}
-                  <div className="p-6 sm:p-8">
+                  <span
+                    className={`relative h-3 w-3 rounded-full border-2 ${
+                      vehicle.current ? "border-accent bg-accent" : "border-border bg-background"
+                    }`}
+                  />
+                </span>
+
+                <div className="grid gap-6 pl-10 lg:grid-cols-2 lg:items-center lg:gap-16 lg:pl-0">
+                  <div className={reversed ? "lg:order-2" : undefined}>
+                    {vehicle.coverImage && (
+                      <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl border border-border">
+                        <Image
+                          src={vehicle.coverImage}
+                          alt={vehicle.name}
+                          fill
+                          sizes="(min-width: 1024px) 50vw, 100vw"
+                          className="object-cover"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  <div
+                    className={`rounded-2xl border border-border bg-surface p-6 transition-colors hover:border-accent/50 sm:p-8 ${
+                      reversed ? "lg:order-1" : ""
+                    }`}
+                  >
                     <div className="flex flex-wrap items-center gap-3">
                       <span className="font-mono text-sm font-semibold text-accent-text">
                         {vehicle.year}
@@ -92,9 +94,9 @@ export default function VehiclesPage() {
                     )}
                   </div>
                 </div>
-              </div>
-            </Reveal>
-          ))}
+              </Reveal>
+            );
+          })}
         </div>
       </div>
     </div>
