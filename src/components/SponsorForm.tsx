@@ -4,8 +4,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { useFormSubmit } from "@/lib/useFormSubmit";
 import HoneypotField from "@/components/HoneypotField";
-
-const TIERS = ["Platin", "Gold", "Silber", "Partner", "Noch unentschlossen"];
+import { SPONSOR_TIERS } from "@/lib/validation";
 
 export default function SponsorForm() {
   const { status, errors, errorMessage, submit } = useFormSubmit("/api/sponsoring");
@@ -117,10 +116,10 @@ export default function SponsorForm() {
             <select
               id="tier"
               name="tier"
-              defaultValue={TIERS[TIERS.length - 1]}
+              defaultValue={SPONSOR_TIERS[SPONSOR_TIERS.length - 1]}
               className="mt-1 w-full rounded-md border border-border bg-surface px-4 py-2.5 text-sm outline-none transition-colors focus:border-accent"
             >
-              {TIERS.map((tier) => (
+              {SPONSOR_TIERS.map((tier) => (
                 <option key={tier} value={tier}>
                   {tier}
                 </option>

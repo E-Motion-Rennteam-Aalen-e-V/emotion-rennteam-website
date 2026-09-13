@@ -32,23 +32,19 @@ Wenn du uns per Kontakt-, Bewerbungs-, Sponsoring- oder Mediakit-Formular Anfrag
 
 Diese Website nutzt zur einheitlichen Darstellung von Schriftarten den Dienst „Google Fonts". Die verwendeten Schriftdateien werden dabei bereits beim Bauen der Website heruntergeladen und lokal auf unserem eigenen Server ausgeliefert. Bei deinem Besuch dieser Website findet daher keine Verbindung zu Servern von Google statt und es werden keine Daten an Google übertragen.
 
-## 7. Kartendienst auf der Kontaktseite
-
-Auf unserer Kontaktseite binden wir eine interaktive Karte ein, um unseren Standort anzuzeigen. Dabei wird die Kartenbibliothek „Leaflet" über das Content Delivery Network „cdnjs" (Betreiber: Cloudflare, Inc.) geladen, und die Kartenkacheln werden vom Anbieter CARTO bezogen (Kartendaten © OpenStreetMap-Mitwirkende). Beim Laden der Kontaktseite wird deine IP-Adresse an diese Anbieter übertragen, damit die Karte angezeigt werden kann. Dies erfolgt auf Grundlage unseres berechtigten Interesses an einer nutzerfreundlichen Standortanzeige (Art. 6 Abs. 1 lit. f DSGVO). Weitere Informationen findest du in den Datenschutzhinweisen von [Cloudflare](https://www.cloudflare.com/privacypolicy/) und [CARTO](https://carto.com/privacy/).
-
-## 8. Verlinkte Social-Media-Profile
+## 7. Verlinkte Social-Media-Profile
 
 Wir verlinken auf dieser Website auf unsere Profile bei Instagram und LinkedIn. Diese Links führen dich auf die jeweilige externe Plattform; erst dort, nicht bereits beim Anklicken des Links auf unserer Website, werden Daten an den jeweiligen Anbieter übertragen. Es gelten die Datenschutzbestimmungen des jeweiligen Anbieters (Meta Platforms Ireland Limited für Instagram, LinkedIn Ireland Unlimited Company für LinkedIn).
 
-## 9. SSL-/TLS-Verschlüsselung
+## 8. SSL-/TLS-Verschlüsselung
 
 Diese Website nutzt aus Sicherheitsgründen eine SSL-/TLS-Verschlüsselung zur Übertragung vertraulicher Inhalte, wie zum Beispiel Anfragen, die du über unsere Formulare an uns sendest. Eine verschlüsselte Verbindung erkennst du daran, dass die Adresszeile deines Browsers von „http://" auf „https://" wechselt und an dem Schloss-Symbol in deiner Browserzeile.
 
-## 10. Hosting
+## 9. Hosting
 
 Diese Website wird bei einem externen Dienstleister gehostet. Die personenbezogenen Daten, die auf dieser Website erfasst werden, werden auf den Servern des Hosters gespeichert. Der Hoster wird die Daten nur insoweit verarbeiten, wie dies zur Erfüllung seiner Leistungspflichten erforderlich ist, und unsere Weisungen bezüglich dieser Daten befolgen. Mit unserem Hoster besteht, soweit erforderlich, ein Vertrag zur Auftragsverarbeitung gemäß Art. 28 DSGVO.
 
-## 11. Deine Rechte
+## 10. Deine Rechte
 
 Du hast jederzeit das Recht auf Auskunft über deine bei uns gespeicherten personenbezogenen Daten, deren Herkunft und Empfänger sowie den Zweck der Datenverarbeitung (Art. 15 DSGVO). Ebenso steht dir ein Recht auf Berichtigung (Art. 16 DSGVO), Löschung (Art. 17 DSGVO), Einschränkung der Verarbeitung (Art. 18 DSGVO), Datenübertragbarkeit (Art. 20 DSGVO) sowie ein Widerspruchsrecht gegen die Verarbeitung deiner Daten (Art. 21 DSGVO) zu. Hast du uns eine Einwilligung erteilt, kannst du diese jederzeit mit Wirkung für die Zukunft widerrufen, ohne dass die Rechtmäßigkeit der bis zum Widerruf erfolgten Verarbeitung berührt wird. Wende dich hierzu an die oben genannte Kontaktadresse.
 

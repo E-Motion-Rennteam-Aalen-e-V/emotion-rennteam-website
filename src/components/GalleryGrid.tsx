@@ -16,6 +16,7 @@ export default function GalleryGrid({ images }: { images: GalleryImage[] }) {
   const active = activeIndex !== null ? images[activeIndex] : null;
   const lastTriggerRef = useRef<HTMLButtonElement | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
+  const dialogRef = useRef<HTMLDivElement | null>(null);
 
   function open(index: number, trigger: HTMLButtonElement) {
     lastTriggerRef.current = trigger;
@@ -43,9 +44,24 @@ export default function GalleryGrid({ images }: { images: GalleryImage[] }) {
     if (activeIndex === null) return;
 
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") close();
-      else if (e.key === "ArrowRight") next();
-      else if (e.key === "ArrowLeft") prev();
+      if (e.key === "Escape") { close(); return; }
+      if (e.key === "ArrowRight") { next(); return; }
+      if (e.key === "ArrowLeft") { prev(); return; }
+      if (e.key === "Tab" && dialogRef.current) {
+        const focusable = Array.from(
+          dialogRef.current.querySelectorAll<HTMLElement>(
+            "button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex=\"-1\"])"
+          )
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey) {
+          if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+        } else {
+          if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+        }
+      }
     }
 
     document.addEventListener("keydown", onKeyDown);
@@ -108,6 +124,7 @@ export default function GalleryGrid({ images }: { images: GalleryImage[] }) {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.25 }}
+              ref={dialogRef}
               className="relative max-h-[85vh] w-full max-w-4xl"
               onClick={(e) => e.stopPropagation()}
             >

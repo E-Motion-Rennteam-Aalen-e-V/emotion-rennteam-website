@@ -122,6 +122,31 @@ fi
 
 # Laeuft schon ein CMS auf Port 3000? Dann wuerde Next.js auf einen anderen
 # Port ausweichen und das App-Fenster ins Leere zeigen.
+# Handelt es sich um einen verwaisten Server aus einem vorherigen Lauf
+# (gleiches Arbeitsverzeichnis), wird er automatisch bereinigt.
+repo_root="$(pwd)"
+if command -v lsof >/dev/null 2>&1 && lsof -iTCP:3000 -sTCP:LISTEN -Pn >/dev/null 2>&1; then
+    stale_pid="$(lsof -tiTCP:3000 -sTCP:LISTEN -Pn 2>/dev/null | head -1)"
+    stale_cwd=""
+    if [ -n "$stale_pid" ]; then
+        stale_cwd="$(lsof -p "$stale_pid" 2>/dev/null | awk '$4=="cwd"{print $NF; exit}')"
+    fi
+    if [ -n "$stale_pid" ] && [ "$stale_cwd" = "$repo_root" ]; then
+        echo "Ein verwaister CMS-Server von einem vorherigen Lauf wurde gefunden"
+        echo "und wird automatisch beendet..."
+        pgid="$(ps -o pgid= -p "$stale_pid" 2>/dev/null | tr -d ' ')"
+        if [ -n "$pgid" ]; then
+            kill -TERM "-$pgid" 2>/dev/null
+            sleep 1
+            if lsof -iTCP:3000 -sTCP:LISTEN -Pn >/dev/null 2>&1; then
+                kill -KILL "-$pgid" 2>/dev/null
+                sleep 1
+            fi
+        fi
+        echo ""
+    fi
+fi
+
 if command -v lsof >/dev/null 2>&1 && lsof -iTCP:3000 -sTCP:LISTEN -Pn >/dev/null 2>&1; then
     echo "[HINWEIS] Auf Port 3000 laeuft bereits ein Programm."
     echo "Vermutlich ist das CMS schon in einem anderen Fenster gestartet."

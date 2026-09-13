@@ -1,13 +1,6 @@
 import LoginForm from "@/components/admin/LoginForm";
 
-// Server-Komponente: liest den konfigurierten CMS-Benutzernamen aus der
-// (nicht versionierten) .env.local und uebergibt ihn als Vorbelegung an das
-// Login-Formular. Es wird nie ein Passwort oder Token an den Client geschickt -
-// nur der ohnehin oeffentlich sichtbare Benutzername, damit beim Start des
-// CMS nur noch das Passwort eingetippt werden muss.
 export default function AdminLoginPage() {
-  const defaultUsername = process.env.CMS_ADMIN_USER ?? "";
-
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-12">
       <div
@@ -26,7 +19,7 @@ export default function AdminLoginPage() {
         className="pointer-events-none absolute -bottom-1/3 right-1/4 h-[50vh] w-[50vh] rounded-full bg-accent-2/20 blur-[120px]"
         aria-hidden
       />
-      <LoginForm defaultUsername={defaultUsername} />
+      <LoginForm />
     </main>
   );
 }
