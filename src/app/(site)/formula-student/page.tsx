@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import Reveal from "@/components/motion/Reveal";
 import DisciplinesChart from "@/components/DisciplinesChart";
@@ -33,6 +34,26 @@ export default function FormulaStudentPage() {
             bauen und auf Rennstrecken testen – Technik trifft Teamgeist. Genau das machen wir mit
             dem E-Motion Rennteam Aalen jedes Jahr aufs Neue.
           </p>
+        </div>
+      </Reveal>
+
+      {/* Hero Image */}
+      <Reveal delay={0.03}>
+        <div className="relative aspect-[21/9] w-full overflow-hidden rounded-2xl border border-border/60">
+          <Image
+            src="/uploads/ert-14-26-rollout-2026.jpg"
+            alt="E-Motion Rennteam ERT 14-26 auf der Strecke"
+            fill
+            priority
+            sizes="(min-width: 1280px) 1280px, 100vw"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+          <div className="absolute bottom-6 left-6 sm:bottom-8 sm:left-8">
+            <span className="rounded-full bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground">
+              ERT 14-26 · Saison 2026
+            </span>
+          </div>
         </div>
       </Reveal>
 

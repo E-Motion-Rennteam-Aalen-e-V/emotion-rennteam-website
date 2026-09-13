@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { getPositions, TEAM_DEPARTMENTS } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
@@ -40,6 +41,38 @@ export default function JoinPage() {
             <p className="mt-1 text-xs text-muted sm:text-sm">{stat.label}</p>
           </div>
         ))}
+      </Reveal>
+
+      <Reveal delay={0.04} className="mt-12">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="relative col-span-2 aspect-[16/9] overflow-hidden rounded-2xl">
+            <Image
+              src="/uploads/rollout-2026/rollout-2026-team-buehne.webp"
+              alt="E-Motion Team beim Rollout 2026"
+              fill
+              sizes="(min-width: 640px) 50vw, 100vw"
+              className="object-cover"
+            />
+          </div>
+          <div className="relative aspect-square overflow-hidden rounded-2xl">
+            <Image
+              src="/uploads/ert-14-26-nightrun-rear.jpg"
+              alt="ERT 14-26 Nightrun"
+              fill
+              sizes="25vw"
+              className="object-cover"
+            />
+          </div>
+          <div className="relative aspect-square overflow-hidden rounded-2xl">
+            <Image
+              src="/uploads/em-fahrzeug-detail.jpg"
+              alt="Fahrzeugdetail"
+              fill
+              sizes="25vw"
+              className="object-cover"
+            />
+          </div>
+        </div>
       </Reveal>
 
       <Reveal delay={0.05} className="mt-14">

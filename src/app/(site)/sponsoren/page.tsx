@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { getSponsors, type Sponsor } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
@@ -20,12 +21,25 @@ export default function SponsorsPage() {
   return (
     <div className="container-page py-20">
       <Reveal>
-        <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Sponsoren</p>
-        <h1 className="mt-2 text-5xl font-extrabold leading-tight tracking-tight sm:text-6xl">Unsere Partner</h1>
-        <p className="mt-4 max-w-2xl text-muted">
-          Ohne die Unterstützung unserer Sponsoren wäre die Entwicklung unseres Fahrzeugs nicht
-          möglich. Vielen Dank an alle Partner!
-        </p>
+        <div className="flex flex-col gap-8 sm:flex-row sm:items-center sm:gap-12">
+          <div className="flex-1">
+            <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Sponsoren</p>
+            <h1 className="mt-2 text-5xl font-extrabold leading-tight tracking-tight sm:text-6xl">Unsere Partner</h1>
+            <p className="mt-4 max-w-2xl text-muted">
+              Ohne die Unterstützung unserer Sponsoren wäre die Entwicklung unseres Fahrzeugs nicht
+              möglich. Vielen Dank an alle Partner!
+            </p>
+          </div>
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl sm:w-80 lg:w-96">
+            <Image
+              src="/uploads/ert-14-26-sponsor-detail.jpg"
+              alt="ERT 14-26 Sponsorenlogos am Fahrzeug"
+              fill
+              sizes="(min-width: 1024px) 384px, (min-width: 640px) 320px, 100vw"
+              className="object-cover"
+            />
+          </div>
+        </div>
       </Reveal>
 
       {TIERS.map((tier, ti) => {
