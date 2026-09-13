@@ -236,24 +236,3 @@ select:focus-visible,
     animation: none !important;
   }
 }
-
-/* Terminal-style typewriter block (technische Daten auf der Fahrzeuge-Seite) */
-.terminal-cursor {
-  animation: terminal-blink 1s step-end infinite;
-}
-
-@keyframes terminal-blink {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .terminal-cursor {
-    animation: none;
-  }
-}

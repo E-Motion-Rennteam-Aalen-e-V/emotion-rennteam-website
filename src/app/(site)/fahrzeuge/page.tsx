@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { getVehicles } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
-import TerminalSpecs from "@/components/TerminalSpecs";
+import VehicleSpecs from "@/components/VehicleSpecs";
 
 export const metadata: Metadata = {
   title: "Fahrzeuge",
@@ -88,7 +88,7 @@ export default function VehiclesPage() {
                     {vehicle.body && <p className="mt-4 text-sm text-muted">{vehicle.body}</p>}
 
                     {vehicle.specs && vehicle.specs.length > 0 && (
-                      <TerminalSpecs specs={vehicle.specs} achievements={vehicle.achievements} />
+                      <VehicleSpecs specs={vehicle.specs} achievements={vehicle.achievements} />
                     )}
                   </div>
                 </div>
