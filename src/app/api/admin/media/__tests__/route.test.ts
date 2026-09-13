@@ -19,6 +19,7 @@ function deleteRequest(body: unknown) {
 }
 
 const sessionUser = { username: "admin", mustChangePassword: false, roles: [] };
+const adminSessionUser = { username: "admin", mustChangePassword: false, roles: ["Admin"] };
 
 describe("GET /api/admin/media", () => {
   afterEach(() => {
@@ -68,8 +69,16 @@ describe("DELETE /api/admin/media", () => {
     expect(response.status).toBe(401);
   });
 
-  it("rejects malformed JSON bodies", async () => {
+  it("rejects when session has insufficient role", async () => {
     vi.spyOn(auth, "getSessionUser").mockResolvedValue(sessionUser);
+
+    const response = await DELETE(deleteRequest({ filename: "a.png" }));
+
+    expect(response.status).toBe(403);
+  });
+
+  it("rejects malformed JSON bodies", async () => {
+    vi.spyOn(auth, "getSessionUser").mockResolvedValue(adminSessionUser);
     const request = new NextRequest("http://localhost/api/admin/media", {
       method: "DELETE",
       headers: { "content-type": "application/json" },
@@ -82,7 +91,7 @@ describe("DELETE /api/admin/media", () => {
   });
 
   it("rejects a filename that resolves outside the uploads directory", async () => {
-    vi.spyOn(auth, "getSessionUser").mockResolvedValue(sessionUser);
+    vi.spyOn(auth, "getSessionUser").mockResolvedValue(adminSessionUser);
     vi.spyOn(media, "resolveUploadPath").mockReturnValue(null);
 
     const response = await DELETE(deleteRequest({ filename: "../../etc/passwd" }));
@@ -91,7 +100,7 @@ describe("DELETE /api/admin/media", () => {
   });
 
   it("returns 404 when the file doesn't exist", async () => {
-    vi.spyOn(auth, "getSessionUser").mockResolvedValue(sessionUser);
+    vi.spyOn(auth, "getSessionUser").mockResolvedValue(adminSessionUser);
     vi.spyOn(media, "resolveUploadPath").mockReturnValue("/tmp/uploads/missing.png");
     vi.spyOn(fs, "unlink").mockRejectedValue(new Error("ENOENT"));
 
@@ -101,7 +110,7 @@ describe("DELETE /api/admin/media", () => {
   });
 
   it("deletes locally and notes the missing GitHub config", async () => {
-    vi.spyOn(auth, "getSessionUser").mockResolvedValue(sessionUser);
+    vi.spyOn(auth, "getSessionUser").mockResolvedValue(adminSessionUser);
     vi.spyOn(media, "resolveUploadPath").mockReturnValue("/tmp/uploads/a.png");
     vi.spyOn(fs, "unlink").mockResolvedValue(undefined);
     vi.spyOn(github, "getGithubConfig").mockReturnValue(null);
@@ -116,7 +125,7 @@ describe("DELETE /api/admin/media", () => {
   });
 
   it("deletes locally and commits the removal to GitHub", async () => {
-    vi.spyOn(auth, "getSessionUser").mockResolvedValue(sessionUser);
+    vi.spyOn(auth, "getSessionUser").mockResolvedValue(adminSessionUser);
     vi.spyOn(media, "resolveUploadPath").mockReturnValue("/tmp/uploads/a.png");
     vi.spyOn(fs, "unlink").mockResolvedValue(undefined);
     vi.spyOn(github, "getGithubConfig").mockReturnValue({
@@ -136,7 +145,7 @@ describe("DELETE /api/admin/media", () => {
   });
 
   it("reports a warning when the local delete succeeds but the GitHub commit fails", async () => {
-    vi.spyOn(auth, "getSessionUser").mockResolvedValue(sessionUser);
+    vi.spyOn(auth, "getSessionUser").mockResolvedValue(adminSessionUser);
     vi.spyOn(media, "resolveUploadPath").mockReturnValue("/tmp/uploads/a.png");
     vi.spyOn(fs, "unlink").mockResolvedValue(undefined);
     vi.spyOn(github, "getGithubConfig").mockReturnValue({

@@ -3,6 +3,7 @@ import { promises as fs } from "node:fs";
 import { getSessionUser } from "@/lib/cms/auth";
 import { deleteFile as githubDeleteFile, getGithubConfig } from "@/lib/cms/github";
 import { listUploadedImages, resolveUploadPath } from "@/lib/cms/media";
+import { canManageUsers } from "@/lib/cms/roles";
 
 export async function GET(request: NextRequest) {
   const session = await getSessionUser(request);
@@ -19,6 +20,7 @@ export async function GET(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   const session = await getSessionUser(request);
   if (!session) return NextResponse.json({ error: "Nicht autorisiert." }, { status: 401 });
+  if (!canManageUsers(session)) return NextResponse.json({ error: "Keine Berechtigung zum Löschen von Dateien." }, { status: 403 });
 
   let filename: string;
   try {
