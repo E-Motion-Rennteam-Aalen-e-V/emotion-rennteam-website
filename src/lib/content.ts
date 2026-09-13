@@ -196,7 +196,9 @@ export function getGallery(): GalleryImage[] {
   const curated = readCollection<GalleryImage>("gallery").sort(
     (a, b) => (a.order ?? 99) - (b.order ?? 99)
   );
-  return [...curated, ...getAutoGalleryImages()];
+  const curatedImages = new Set(curated.map((img) => img.image));
+  const auto = getAutoGalleryImages().filter((img) => !curatedImages.has(img.image));
+  return [...curated, ...auto];
 }
 
 export function getResults(): Result[] {
