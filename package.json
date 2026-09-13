@@ -51,7 +51,6 @@
     },
     "@eslint/eslintrc": {
       "js-yaml": "4.3.2"
-    },
-    "@vitest/mocker": ">=4.1.11"
+    }
   }
 }
