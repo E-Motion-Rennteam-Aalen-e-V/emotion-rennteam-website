@@ -36,9 +36,6 @@ async function syncLocalGitAfterCommit(relPath: string): Promise<void> {
     const { stdout: staged } = await git(["diff", "--cached", "--name-only"]);
     if (!staged.trim()) return; // Nothing actually changed (e.g. re-saving identical content).
 
-    const { stdout: lastSubject } = await git(["log", "-1", "--format=%s"]).catch(() => ({ stdout: "" }));
-    const amend = lastSubject.trim() === CONTENT_SYNC_MARKER;
-
     await git([
       "-c",
       "user.name=CMS Auto-Sync",
@@ -46,7 +43,6 @@ async function syncLocalGitAfterCommit(relPath: string): Promise<void> {
       "user.email=cms-sync@localhost",
       "commit",
       "--quiet",
-      ...(amend ? ["--amend"] : []),
       "-m",
       CONTENT_SYNC_MARKER,
     ]);

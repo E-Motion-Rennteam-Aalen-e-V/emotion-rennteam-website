@@ -29,7 +29,8 @@ function parseStats(page: ReturnType<typeof getPage>) {
 export default function Home() {
   const page = getPage("home");
   const stats = parseStats(page);
-  const vehicle = getVehicles().find((v) => v.current) ?? getVehicles()[0];
+  const vehicles = getVehicles();
+  const vehicle = vehicles.find((v) => v.current) ?? vehicles[0];
 
   return (
     <>
