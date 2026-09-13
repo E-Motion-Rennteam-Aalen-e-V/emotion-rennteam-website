@@ -123,15 +123,25 @@ if [ ! -f ".env.local" ]; then
 fi
 
 # Laeuft schon ein CMS auf Port 3000? Dann wuerde Next.js auf einen anderen
-# Port ausweichen und das App-Fenster ins Leere zeigen.
+# Port ausweichen und das App-Fenster ins Leere zeigen. Veraltete Prozesse
+# (z.B. nach einem Absturz) werden automatisch beendet.
 if command -v lsof >/dev/null 2>&1 && lsof -iTCP:3000 -sTCP:LISTEN -Pn >/dev/null 2>&1; then
-    echo "[HINWEIS] Auf Port 3000 laeuft bereits ein Programm."
-    echo "Vermutlich ist das CMS schon in einem anderen Fenster gestartet."
-    echo ""
-    echo "Bitte das andere CMS-Fenster schliessen und es erneut versuchen."
-    echo ""
-    read -r -p "Zum Beenden Enter druecken..." _
-    exit 1
+    STALE_PIDS=$(lsof -iTCP:3000 -sTCP:LISTEN -Pn -t 2>/dev/null)
+    if [ -n "$STALE_PIDS" ]; then
+        echo "[HINWEIS] Auf Port 3000 laeuft noch ein alter Prozess. Er wird beendet..."
+        echo "$STALE_PIDS" | xargs kill 2>/dev/null || true
+        sleep 1
+        if lsof -iTCP:3000 -sTCP:LISTEN -Pn >/dev/null 2>&1; then
+            echo ""
+            echo "[FEHLER] Port 3000 ist noch belegt und konnte nicht freigegeben werden."
+            echo "Bitte das andere CMS-Fenster manuell schliessen und es erneut versuchen."
+            echo ""
+            read -r -p "Zum Beenden Enter druecken..." _
+            exit 1
+        fi
+        echo "Alter Prozess beendet."
+        echo ""
+    fi
 fi
 
 echo "Der Server wird gestartet. Dieses Fenster waehrend der Nutzung bitte"

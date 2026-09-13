@@ -6,14 +6,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 
-interface LoginFormProps {
-  defaultUsername: string;
-}
-
-function LoginFormInner({ defaultUsername }: LoginFormProps) {
+function LoginFormInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [username, setUsername] = useState(defaultUsername);
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [error, setError] = useState("");
@@ -88,7 +84,6 @@ function LoginFormInner({ defaultUsername }: LoginFormProps) {
               type="password"
               autoComplete="current-password"
               required
-              autoFocus={username.length > 0}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-accent"
@@ -122,10 +117,10 @@ function LoginFormInner({ defaultUsername }: LoginFormProps) {
   );
 }
 
-export default function LoginForm({ defaultUsername }: LoginFormProps) {
+export default function LoginForm() {
   return (
     <Suspense fallback={<div className="relative w-full max-w-md h-64" />}>
-      <LoginFormInner defaultUsername={defaultUsername} />
+      <LoginFormInner />
     </Suspense>
   );
 }
