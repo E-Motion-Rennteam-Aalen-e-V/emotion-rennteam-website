@@ -139,6 +139,9 @@ export default function ContactForm() {
               . *
             </label>
           </div>
+          {errors.consent && (
+            <p role="alert" className="text-xs text-red-500">{errors.consent}</p>
+          )}
           <TurnstileWidget />
           <button
             type="submit"
