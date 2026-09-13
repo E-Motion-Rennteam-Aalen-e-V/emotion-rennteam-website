@@ -174,6 +174,9 @@ export default function MediaKitRequestForm() {
               . *
             </label>
           </div>
+          {errors.consent && (
+            <p role="alert" className="sm:col-span-2 text-xs text-red-500">{errors.consent}</p>
+          )}
           <TurnstileWidget />
           <button
             type="submit"

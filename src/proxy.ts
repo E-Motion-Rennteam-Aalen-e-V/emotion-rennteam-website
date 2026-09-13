@@ -14,7 +14,17 @@ export async function proxy(request: NextRequest) {
   if (isPublic) return NextResponse.next();
 
   const token = request.cookies.get(SESSION_COOKIE)?.value;
-  const session = await verifySessionToken(token);
+  let session: Awaited<ReturnType<typeof verifySessionToken>>;
+  try {
+    session = await verifySessionToken(token);
+  } catch {
+    if (pathname.startsWith("/api/admin")) {
+      return NextResponse.json({ error: "Nicht angemeldet." }, { status: 401 });
+    }
+    const loginUrl = new URL("/admin/login", request.url);
+    loginUrl.searchParams.set("next", pathname);
+    return NextResponse.redirect(loginUrl);
+  }
 
   if (!session) {
     if (pathname.startsWith("/api/admin")) {
