@@ -155,13 +155,15 @@ export default function MediaKitRequestForm() {
             )}
           </div>
 
-          <div className="flex items-start gap-2.5 sm:col-span-2">
+          <div className="flex flex-col gap-1 sm:col-span-2">
+            <div className="flex items-start gap-2.5">
             <input
               id="mk-consent"
               name="consent"
               type="checkbox"
               required
               aria-invalid={Boolean(errors.consent)}
+              aria-describedby={errors.consent ? "mk-consent-error" : undefined}
               className="mt-0.5 h-4 w-4 shrink-0 rounded border-border bg-surface accent-[var(--color-accent)]"
             />
             <label htmlFor="mk-consent" className="text-xs text-muted">
@@ -172,6 +174,10 @@ export default function MediaKitRequestForm() {
               </Link>
               . *
             </label>
+            </div>
+            {errors.consent && (
+              <p id="mk-consent-error" className="text-xs text-red-500">{errors.consent}</p>
+            )}
           </div>
           <button
             type="submit"

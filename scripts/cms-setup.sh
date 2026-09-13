@@ -159,6 +159,19 @@ while true; do
     break
 done
 
+echo ""
+echo "--- Formular-Benachrichtigungen (optional, aber empfohlen) ---"
+echo "Ohne diese URL landen Kontakt-, Bewerbungs- und Sponsoring-Anfragen NUR lokal"
+echo "und kommen nie beim Team an. Nutze z.B. einen Make.com- oder Zapier-Webhook."
+echo "Die URL kann auch spaeter in .env.local eingetragen werden."
+read -r -p "Webhook-URL fuer Formularbenachrichtigungen (leer lassen zum Ueberspringen): " form_webhook_url
+form_webhook_url="$(echo "$form_webhook_url" | xargs || true)"
+if [ -n "$form_webhook_url" ]; then
+    echo "Webhook-URL wird uebernommen."
+else
+    echo "Hinweis: Kein Webhook gesetzt - Formulareingaben werden vorerst nur lokal gepuffert."
+fi
+
 cat > "$env_path" <<EOF
 CMS_ADMIN_USER=$username
 CMS_ADMIN_PASSWORD_HASH=$hash
@@ -167,6 +180,7 @@ GITHUB_TOKEN=$github_token
 GITHUB_OWNER=$github_owner
 GITHUB_REPO=$github_repo
 GITHUB_BRANCH=$github_branch
+FORM_WEBHOOK_URL=$form_webhook_url
 EOF
 
 echo ""

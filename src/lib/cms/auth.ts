@@ -38,9 +38,9 @@ async function hmacKey(secret: string): Promise<CryptoKey> {
 
 function getSecret(): string {
   const secret = process.env.CMS_SESSION_SECRET;
-  if (!secret || secret.length < 16) {
+  if (!secret || secret.length < 32) {
     throw new Error(
-      "CMS_SESSION_SECRET ist nicht gesetzt (oder zu kurz). Bitte einen zufälligen String mit mindestens 16 Zeichen in .env.local eintragen."
+      "CMS_SESSION_SECRET ist nicht gesetzt (oder zu kurz). Bitte einen zufälligen String mit mindestens 32 Zeichen in .env.local eintragen (openssl rand -hex 32)."
     );
   }
   return secret;

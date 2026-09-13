@@ -63,24 +63,23 @@ export default function SponsorCard({ sponsor, index }: { sponsor: Sponsor; inde
   }
 
   if (!style) {
+    const Wrapper = sponsor.website ? "a" : "div";
     return (
-      <a
-        href={sponsor.website ?? "#"}
-        target="_blank"
-        rel="noopener noreferrer"
+      <Wrapper
+        {...(sponsor.website ? { href: sponsor.website, target: "_blank", rel: "noopener noreferrer" } : {})}
         className="flex h-full flex-col items-center justify-center rounded-xl border border-border bg-surface p-8 text-center transition-all duration-300 hover:-translate-y-1 hover:border-accent hover:shadow-[0_0_30px_-10px_rgba(0,113,181,0.35)]"
       >
         <SponsorMark sponsor={sponsor} />
-      </a>
+      </Wrapper>
     );
   }
 
   return (
     <motion.a
       ref={ref}
-      href={sponsor.website ?? "#"}
-      target="_blank"
-      rel="noopener noreferrer"
+      href={sponsor.website || undefined}
+      {...(sponsor.website ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       style={

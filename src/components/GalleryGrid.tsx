@@ -87,6 +87,7 @@ export default function GalleryGrid({ images }: { images: GalleryImage[] }) {
           <StaggerItem key={img.slug}>
             <button
               type="button"
+              aria-label={`Bild öffnen: ${img.title}`}
               onClick={(e) => open(i, e.currentTarget)}
               className="group relative block aspect-[4/3] w-full overflow-hidden rounded-xl border border-border bg-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >

@@ -84,10 +84,24 @@ if [ ! -f "node_modules/.bin/next" ]; then
             echo ""
             echo "Hinweis: \"npm ci\" war nicht moeglich, versuche \"npm install\"..."
             echo ""
-            npm install --no-audit --no-fund
+            if ! npm install --no-audit --no-fund; then
+                echo ""
+                echo "[FEHLER] npm install fehlgeschlagen."
+                echo "Bitte Netzwerkverbindung und verfuegbaren Speicherplatz pruefen."
+                echo ""
+                read -r -p "Zum Beenden Enter druecken..." _
+                exit 1
+            fi
         fi
     else
-        npm install --no-audit --no-fund
+        if ! npm install --no-audit --no-fund; then
+            echo ""
+            echo "[FEHLER] npm install fehlgeschlagen."
+            echo "Bitte Netzwerkverbindung und verfuegbaren Speicherplatz pruefen."
+            echo ""
+            read -r -p "Zum Beenden Enter druecken..." _
+            exit 1
+        fi
     fi
 
     if [ ! -f "node_modules/.bin/next" ]; then

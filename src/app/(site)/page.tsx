@@ -11,7 +11,7 @@ import ScrollScale from "@/components/motion/ScrollScale";
 const DEFAULT_STATS = [
   { value: 50, suffix: "+", label: "Studierende im Team" },
   { value: TEAM_DEPARTMENTS.length, suffix: "", label: "Fachbereiche" },
-  { value: 12, suffix: "+", label: "Jahre Erfahrung" },
+  { value: new Date().getFullYear() - 2009, suffix: "+", label: "Jahre Erfahrung" },
 ];
 
 function parseStats(page: ReturnType<typeof getPage>) {

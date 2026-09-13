@@ -115,7 +115,7 @@ export default function Header({ hiddenIds = [] }: HeaderProps) {
               type="button"
               onClick={() => setMoreOpen((v) => !v)}
               aria-expanded={moreOpen}
-              aria-haspopup="true"
+              aria-haspopup="menu"
               className={`relative flex items-center gap-1 py-1 text-sm font-medium transition-colors ${
                 moreActive ? "text-foreground" : "text-muted hover:text-foreground"
               }`}

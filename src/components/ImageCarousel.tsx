@@ -22,6 +22,7 @@ export default function ImageCarousel() {
 
   useEffect(() => {
     if (!autoPlay) return;
+    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const timer = setInterval(() => {
       setCurrent((prev) => (prev + 1) % CAROUSEL_IMAGES.length);
