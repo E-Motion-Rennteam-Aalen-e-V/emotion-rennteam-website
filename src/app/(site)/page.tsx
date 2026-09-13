@@ -49,7 +49,8 @@ const DEPARTMENT_HIGHLIGHTS = [
 
 export default function Home() {
   const page = getPage("home");
-  const vehicle = getVehicles().find((v) => v.current) ?? getVehicles()[0];
+  const vehicles = getVehicles();
+  const vehicle = vehicles.find((v) => v.current) ?? vehicles[0];
   const bodyParagraphs = page?.body?.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean) ?? [];
 
   return (

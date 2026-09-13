@@ -23,12 +23,12 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ collection: string; slug: string }> }
 ) {
+  const user = await getSessionUser(request);
+  if (!user) return NextResponse.json({ error: "Nicht angemeldet." }, { status: 401 });
+
   const { collection: collectionName, slug } = await params;
   const collection = getCollection(collectionName);
   if (!collection) return NextResponse.json({ error: "Unbekannte Collection." }, { status: 404 });
-
-  const user = await getSessionUser(request);
-  if (!user) return NextResponse.json({ error: "Nicht angemeldet." }, { status: 401 });
 
   if (!isValidSlug(slug)) return NextResponse.json({ error: "Ungültiger Slug." }, { status: 400 });
 
@@ -51,12 +51,12 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ collection: string; slug: string }> }
 ) {
+  const user = await getSessionUser(request);
+  if (!user) return NextResponse.json({ error: "Nicht angemeldet." }, { status: 401 });
+
   const { collection: collectionName, slug } = await params;
   const collection = getCollection(collectionName);
   if (!collection) return NextResponse.json({ error: "Unbekannte Collection." }, { status: 404 });
-
-  const user = await getSessionUser(request);
-  if (!user) return NextResponse.json({ error: "Nicht angemeldet." }, { status: 401 });
 
   if (!isValidSlug(slug)) return NextResponse.json({ error: "Ungültiger Slug." }, { status: 400 });
 

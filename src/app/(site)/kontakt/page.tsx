@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getPage } from "@/lib/content";
 import ContactForm from "@/components/ContactForm";
 import ImageCarousel from "@/components/ImageCarousel";
+import ContactMap from "@/components/ContactMap";
 import Reveal from "@/components/motion/Reveal";
 
 export const metadata: Metadata = {
@@ -68,6 +69,10 @@ export default function ContactPage() {
                 </a>
               </p>
             </div>
+          </div>
+
+          <div className="h-64 rounded-xl border border-border overflow-hidden shadow-lg">
+            <ContactMap />
           </div>
         </Reveal>
       </div>

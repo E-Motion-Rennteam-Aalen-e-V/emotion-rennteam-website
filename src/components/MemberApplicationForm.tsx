@@ -51,7 +51,9 @@ export default function MemberApplicationForm() {
           )}
           <HoneypotField />
           <div>
-            <label htmlFor="member-name" className="text-sm font-medium">Name</label>
+            <label htmlFor="member-name" className="text-sm font-medium">
+              Name <span className="text-accent-text">*</span>
+            </label>
             <input
               id="member-name"
               name="name"
@@ -68,7 +70,9 @@ export default function MemberApplicationForm() {
             )}
           </div>
           <div>
-            <label htmlFor="member-email" className="text-sm font-medium">E-Mail</label>
+            <label htmlFor="member-email" className="text-sm font-medium">
+              E-Mail <span className="text-accent-text">*</span>
+            </label>
             <input
               id="member-email"
               name="email"
