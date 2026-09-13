@@ -26,7 +26,7 @@ interface SessionLike {
   roles?: string[];
 }
 
-function isBreakGlassAdmin(session: SessionLike): boolean {
+export function isBreakGlassAdmin(session: SessionLike): boolean {
   return Boolean(process.env.CMS_ADMIN_USER) && session.username === process.env.CMS_ADMIN_USER;
 }
 

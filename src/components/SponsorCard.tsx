@@ -48,7 +48,7 @@ export default function SponsorCard({ sponsor, index }: { sponsor: Sponsor; inde
   const rotateX = useSpring(rawRotateX, { stiffness: 220, damping: 22 });
   const rotateY = useSpring(rawRotateY, { stiffness: 220, damping: 22 });
 
-  function handleMouseMove(e: MouseEvent<HTMLAnchorElement>) {
+  function handleMouseMove(e: MouseEvent<HTMLElement>) {
     if (!style?.tilt || reduceMotion || !ref.current) return;
     const rect = ref.current.getBoundingClientRect();
     const px = (e.clientX - rect.left) / rect.width - 0.5;
@@ -62,39 +62,66 @@ export default function SponsorCard({ sponsor, index }: { sponsor: Sponsor; inde
     rawRotateY.set(0);
   }
 
+  const plainClassName =
+    "flex h-full flex-col items-center justify-center rounded-xl border border-border bg-surface p-8 text-center transition-all duration-300 hover:-translate-y-1 hover:border-accent hover:shadow-[0_0_30px_-10px_rgba(0,113,181,0.35)]";
+
   if (!style) {
+    if (!sponsor.website) {
+      return (
+        <div className={plainClassName}>
+          <SponsorMark sponsor={sponsor} />
+        </div>
+      );
+    }
     return (
       <a
-        href={sponsor.website ?? "#"}
+        href={sponsor.website}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex h-full flex-col items-center justify-center rounded-xl border border-border bg-surface p-8 text-center transition-all duration-300 hover:-translate-y-1 hover:border-accent hover:shadow-[0_0_30px_-10px_rgba(0,113,181,0.35)]"
+        className={plainClassName}
       >
         <SponsorMark sponsor={sponsor} />
       </a>
     );
   }
 
+  const tierStyle = {
+    rotateX,
+    rotateY,
+    transformPerspective: 800,
+    "--tier-shimmer": style.shimmer,
+    "--tier-glow": style.glow,
+    "--tier-border-glow": style.borderGlow,
+    "--shimmer-delay": `${(index % 6) * 0.35}s`,
+  } as CSSProperties;
+
+  const tierClassName =
+    "sponsor-card--tier group relative flex h-full flex-col items-center justify-center overflow-hidden rounded-xl bg-surface p-8 text-center";
+
+  if (!sponsor.website) {
+    return (
+      <motion.div
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={tierStyle}
+        className={tierClassName}
+      >
+        <span className="sponsor-card__shimmer" aria-hidden="true" />
+        <SponsorMark sponsor={sponsor} />
+      </motion.div>
+    );
+  }
+
   return (
     <motion.a
       ref={ref}
-      href={sponsor.website ?? "#"}
+      href={sponsor.website}
       target="_blank"
       rel="noopener noreferrer"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      style={
-        {
-          rotateX,
-          rotateY,
-          transformPerspective: 800,
-          "--tier-shimmer": style.shimmer,
-          "--tier-glow": style.glow,
-          "--tier-border-glow": style.borderGlow,
-          "--shimmer-delay": `${(index % 6) * 0.35}s`,
-        } as CSSProperties
-      }
-      className="sponsor-card--tier group relative flex h-full flex-col items-center justify-center overflow-hidden rounded-xl bg-surface p-8 text-center"
+      style={tierStyle}
+      className={tierClassName}
     >
       <span className="sponsor-card__shimmer" aria-hidden="true" />
       <SponsorMark sponsor={sponsor} />

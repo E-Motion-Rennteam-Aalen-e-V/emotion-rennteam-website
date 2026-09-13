@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 
 const CAROUSEL_IMAGES = [
   "/uploads/em-fahrzeug-detail.jpg",
@@ -18,7 +18,8 @@ const CAROUSEL_IMAGES = [
 
 export default function ImageCarousel() {
   const [current, setCurrent] = useState(0);
-  const [autoPlay, setAutoPlay] = useState(true);
+  const prefersReducedMotion = useReducedMotion();
+  const [autoPlay, setAutoPlay] = useState(!prefersReducedMotion);
 
   useEffect(() => {
     if (!autoPlay) return;

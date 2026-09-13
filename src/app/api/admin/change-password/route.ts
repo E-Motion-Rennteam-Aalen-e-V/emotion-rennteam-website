@@ -10,6 +10,7 @@ import {
   CredentialsError,
 } from "@/lib/cms/credentialsRepo";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+import { isBreakGlassAdmin } from "@/lib/cms/roles";
 
 export async function POST(request: NextRequest) {
   const sessionSecret = process.env.CMS_SESSION_SECRET;
@@ -48,11 +49,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Das Passwort muss mindestens 8 Zeichen lang sein." }, { status: 400 });
   }
 
-  // Session-Nutzer ist entweder lokal (.cms-users.json) oder ein Zugang aus
-  // der Online-Benutzerverwaltung (Rollen im Session-Token gesetzt). Ist der
-  // Nutzername lokal unbekannt und die Online-Benutzerverwaltung aktiv, wird
-  // dort geaendert - das deckt sowohl den Hauptadministrator (kein Passwort-
-  // Wechsel hier vorgesehen) als auch entfernte Zugaenge ab.
+  // Break-glass admin authenticates via CMS_ADMIN_PASSWORD_HASH env var;
+  // the password can only be changed by updating that env var directly.
+  if (isBreakGlassAdmin(session)) {
+    return NextResponse.json(
+      { error: "Das Passwort des Notfall-Admins kann nur über die Umgebungsvariable CMS_ADMIN_PASSWORD_HASH geändert werden." },
+      { status: 400 }
+    );
+  }
+
   const isLocalUser = Boolean(findUser(session.username));
 
   if (isLocalUser) {

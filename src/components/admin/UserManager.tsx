@@ -44,6 +44,7 @@ export default function UserManager({
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
   const [busyUser, setBusyUser] = useState<string | null>(null);
+  const [showTempPassword, setShowTempPassword] = useState(false);
 
   // Die Online-Benutzerverwaltung erzwingt eine strengere Passwort-Richtlinie
   // (mind. 11 Zeichen, 3 von 4 Zeichenklassen) als die lokale Legacy-Liste
@@ -211,16 +212,27 @@ export default function UserManager({
             <label htmlFor="new-temp-password" className="mb-1.5 block text-sm font-medium text-foreground">
               Temporäres Passwort
             </label>
-            <input
-              id="new-temp-password"
-              type="text"
-              required
-              minLength={passwordMinLength}
-              value={temporaryPassword}
-              onChange={(e) => setTemporaryPassword(e.target.value)}
-              className="w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-accent"
-              placeholder={passwordPolicyHint}
-            />
+            <div className="relative">
+              <input
+                id="new-temp-password"
+                type={showTempPassword ? "text" : "password"}
+                required
+                minLength={passwordMinLength}
+                value={temporaryPassword}
+                onChange={(e) => setTemporaryPassword(e.target.value)}
+                className="w-full rounded-lg border border-border bg-background px-3.5 py-2.5 pr-10 text-sm text-foreground outline-none transition-colors focus:border-accent"
+                placeholder={passwordPolicyHint}
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowTempPassword((v) => !v)}
+                aria-label={showTempPassword ? "Passwort verbergen" : "Passwort anzeigen"}
+                className="absolute inset-y-0 right-0 flex items-center px-3 text-muted hover:text-foreground"
+              >
+                {showTempPassword ? "🙈" : "👁"}
+              </button>
+            </div>
           </div>
 
           {remote && (
@@ -267,7 +279,7 @@ export default function UserManager({
             <p className="font-semibold">Benutzer &quot;{createdInfo.username}&quot; wurde angelegt.</p>
             <p className="mt-1">
               Zugangsdaten für die erste Anmeldung: Benutzername <strong>{createdInfo.username}</strong>, Passwort{" "}
-              <strong>{createdInfo.password}</strong>. Bitte sicher übermitteln – nach dem ersten Login vergibt die
+              <PasswordReveal password={createdInfo.password} />. Bitte sicher übermitteln – nach dem ersten Login vergibt die
               Person selbst ein neues Passwort, das nur sie kennt.
             </p>
           </div>
@@ -375,5 +387,22 @@ export default function UserManager({
         </div>
       </div>
     </div>
+  );
+}
+
+function PasswordReveal({ password }: { password: string }) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <span className="inline-flex items-center gap-1 align-middle">
+      <strong>{visible ? password : "•".repeat(password.length)}</strong>
+      <button
+        type="button"
+        onClick={() => setVisible((v) => !v)}
+        aria-label={visible ? "Passwort verbergen" : "Passwort anzeigen"}
+        className="text-xs text-emerald-400 underline hover:text-emerald-200"
+      >
+        {visible ? "verbergen" : "anzeigen"}
+      </button>
+    </span>
   );
 }

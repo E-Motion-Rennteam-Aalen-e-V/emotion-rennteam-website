@@ -163,6 +163,7 @@ export default function MediaKitRequestForm() {
               type="checkbox"
               required
               aria-invalid={Boolean(errors.consent)}
+              aria-describedby={errors.consent ? "mk-consent-error" : undefined}
               className="mt-0.5 h-4 w-4 shrink-0 rounded border-border bg-surface accent-[var(--color-accent)]"
             />
             <label htmlFor="mk-consent" className="text-xs text-muted">
@@ -175,7 +176,7 @@ export default function MediaKitRequestForm() {
             </label>
           </div>
           {errors.consent && (
-            <p role="alert" className="sm:col-span-2 text-xs text-red-500">{errors.consent}</p>
+            <p id="mk-consent-error" role="alert" className="sm:col-span-2 text-xs text-red-500">{errors.consent}</p>
           )}
           <TurnstileWidget />
           <button
