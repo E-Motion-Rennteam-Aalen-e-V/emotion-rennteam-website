@@ -177,7 +177,7 @@ export default function VehicleSpecs({
 }) {
   return (
     <div className="mt-6">
-      <div className="grid grid-cols-2 items-start gap-3">{specs.map(renderSpec)}</div>
+      <div className="grid grid-cols-2 gap-3">{specs.map(renderSpec)}</div>
 
       {achievements && achievements.length > 0 && (
         <CardShell className="mt-3">

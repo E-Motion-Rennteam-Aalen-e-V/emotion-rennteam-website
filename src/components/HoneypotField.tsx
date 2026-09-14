@@ -17,7 +17,7 @@ export default function HoneypotField() {
     <div className="sr-only" aria-hidden="true">
       <label htmlFor="website">Firmenwebsite (bitte freilassen)</label>
       <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />
-      <input type="hidden" name="formRenderedAt" value={renderedAt} readOnly />
+      <input type="hidden" name="formRenderedAt" defaultValue={String(renderedAt)} />
     </div>
   );
 }

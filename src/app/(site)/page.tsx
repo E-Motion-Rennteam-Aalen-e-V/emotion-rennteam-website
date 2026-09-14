@@ -187,6 +187,48 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="overflow-hidden py-16">
+        <Reveal>
+          <div className="container-page mb-8">
+            <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">
+              Wettbewerbe & Momente
+            </p>
+            <h2 className="mt-1 text-2xl font-extrabold tracking-tight sm:text-3xl">
+              Auf der Strecke zuhause
+            </h2>
+          </div>
+        </Reveal>
+        <div className="flex gap-3 overflow-x-auto px-4 pb-4 sm:px-8 lg:px-0 lg:container-page lg:grid lg:grid-cols-3 lg:overflow-visible lg:pb-0">
+          <div className="relative aspect-[4/3] w-72 flex-none overflow-hidden rounded-2xl lg:w-auto">
+            <Image
+              src="/uploads/ert-14-26-studio.jpg"
+              alt="ERT 14-26 Studio"
+              fill
+              sizes="(min-width: 1024px) 33vw, 288px"
+              className="object-cover transition-transform duration-700 hover:scale-105"
+            />
+          </div>
+          <div className="relative aspect-[4/3] w-72 flex-none overflow-hidden rounded-2xl lg:w-auto">
+            <Image
+              src="/uploads/rollout-2026/rollout-2026-buehne-enthuellung.webp"
+              alt="Rollout 2026 Enthüllung"
+              fill
+              sizes="(min-width: 1024px) 33vw, 288px"
+              className="object-cover transition-transform duration-700 hover:scale-105"
+            />
+          </div>
+          <div className="relative aspect-[4/3] w-72 flex-none overflow-hidden rounded-2xl lg:w-auto">
+            <Image
+              src="/uploads/ert-12-24-track.jpg"
+              alt="ERT auf der Rennstrecke"
+              fill
+              sizes="(min-width: 1024px) 33vw, 288px"
+              className="object-cover transition-transform duration-700 hover:scale-105"
+            />
+          </div>
+        </div>
+      </section>
+
       <section className="container-page py-24 text-center">
         <Reveal>
           <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Unsere Sponsoren</h2>

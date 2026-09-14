@@ -18,6 +18,9 @@ const csp = [
   "img-src 'self' data:",
   "font-src 'self'",
   "connect-src 'self'",
+  // ContactMap creates a blob: iframe to render the Leaflet map locally
+  // without loading external scripts into the main document.
+  "frame-src blob:",
   "object-src 'none'",
   "frame-ancestors 'none'",
   "base-uri 'self'",

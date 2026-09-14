@@ -5,10 +5,11 @@ import { forwardRef, useState } from "react";
 
 interface ImageWithFallbackProps extends Omit<ImageProps, "onError"> {
   fallback?: React.ReactNode;
+  onImageError?: () => void;
 }
 
 const ImageWithFallback = forwardRef<HTMLImageElement, ImageWithFallbackProps>(
-  function ImageWithFallback({ fallback, alt, ...props }, ref) {
+  function ImageWithFallback({ fallback, alt, onImageError, ...props }, ref) {
     const [hasError, setHasError] = useState(false);
 
     if (hasError || !props.src) {
@@ -32,7 +33,7 @@ const ImageWithFallback = forwardRef<HTMLImageElement, ImageWithFallbackProps>(
       );
     }
 
-    return <Image {...props} ref={ref} alt={alt} onError={() => setHasError(true)} />;
+    return <Image {...props} ref={ref} alt={alt} onError={() => { setHasError(true); onImageError?.(); }} />;
   }
 );
 

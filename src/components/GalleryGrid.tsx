@@ -18,9 +18,11 @@ type GalleryImage = {
 function GalleryThumbnail({
   src,
   priority,
+  onError,
 }: {
   src: string;
   priority: boolean;
+  onError?: () => void;
 }) {
   const [loaded, setLoaded] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
@@ -47,12 +49,13 @@ function GalleryThumbnail({
         }`}
         priority={priority}
         onLoad={() => setLoaded(true)}
+        onImageError={onError}
       />
     </>
   );
 }
 
-export default function GalleryGrid({ images }: { images: GalleryImage[] }) {
+export default function GalleryGrid({ images, onImageError }: { images: GalleryImage[]; onImageError?: () => void }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const active = activeIndex !== null ? images[activeIndex] : null;
   const lastTriggerRef = useRef<HTMLButtonElement | null>(null);
@@ -144,7 +147,7 @@ export default function GalleryGrid({ images }: { images: GalleryImage[] }) {
             >
               {/* alt="" - the caption span below already gives this button an accessible
                   name via img.title; a non-empty alt here would announce it twice. */}
-              <GalleryThumbnail src={img.image} priority={i < 3} />
+              <GalleryThumbnail src={img.image} priority={i < 3} onError={onImageError} />
               <div className="absolute inset-0 flex items-end bg-gradient-to-t from-background/80 via-transparent to-transparent p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                 <span className="text-sm font-semibold text-foreground">{img.title}</span>
               </div>
