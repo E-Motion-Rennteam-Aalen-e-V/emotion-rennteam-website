@@ -34,7 +34,8 @@ function readCollection<T>(collection: string): (T & { slug: string; fileMtime?:
   return items;
 }
 
-export { TEAM_DEPARTMENTS, TEAM_SEASONS, DEFAULT_SEASON } from "@/lib/team-departments";
+export { TEAM_DEPARTMENTS, TEAM_SEASONS, DEFAULT_SEASON, TEAM_STRUCTURE } from "@/lib/team-departments";
+export { DEFAULT_TEAM_SEASON } from "@/lib/team-seasons";
 
 export type TeamMember = {
   name: string;

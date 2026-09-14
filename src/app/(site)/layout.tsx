@@ -11,7 +11,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <main id="main-content" className="flex-1">
         <PageTransition>{children}</PageTransition>
       </main>
-      <Footer hiddenIds={hiddenIds} />
+      <Footer />
     </>
   );
 }

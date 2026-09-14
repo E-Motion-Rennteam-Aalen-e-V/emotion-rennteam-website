@@ -20,7 +20,7 @@ export default async function RootNotFound() {
       <main id="main-content" className="flex-1">
         <NotFoundContent />
       </main>
-      <Footer hiddenIds={hiddenIds} />
+      <Footer />
     </>
   );
 }

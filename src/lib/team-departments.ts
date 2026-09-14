@@ -40,3 +40,30 @@ export type TeamSeason = (typeof TEAM_SEASONS)[number];
 
 /** The season shown by default (current active season). */
 export const DEFAULT_SEASON: TeamSeason = "ERT-14/26";
+
+export const TEAM_STRUCTURE = [
+  { category: "Board", departments: ["Board"] },
+  {
+    category: "Workshop",
+    departments: [
+      "Workshop",
+      "Aerodynamics",
+      "Chassis and Ergonomics",
+      "Suspension and Steering Systems",
+      "Powertrain",
+      "Electrics",
+      "Vehicle Performance",
+      "Driverless",
+    ],
+  },
+  {
+    category: "Media and Marketing",
+    departments: [
+      "Media and Marketing",
+      "Business Plan / Statistics",
+      "Sponsoring",
+      "Event Management",
+      "Finance",
+    ],
+  },
+] as const;

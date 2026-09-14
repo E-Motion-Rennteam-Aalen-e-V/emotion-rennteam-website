@@ -2,7 +2,7 @@
 // admin UI (list/edit forms) and the content-loading helpers key off this.
 
 import { TEAM_DEPARTMENTS, TEAM_SEASONS } from "@/lib/team-departments";
-import { SPONSOR_CONTENT_TIERS } from "@/lib/validation";
+import { SPONSOR_TIERS_BASE as SPONSOR_CONTENT_TIERS } from "@/lib/sponsor-tiers";
 
 export type FieldType =
   | "string"
