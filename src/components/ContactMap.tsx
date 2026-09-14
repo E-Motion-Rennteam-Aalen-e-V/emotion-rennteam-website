@@ -8,7 +8,7 @@ export default function ContactMap() {
         height="100%"
         style={{ border: 0 }}
         loading="lazy"
-        referrerPolicy="no-referrer"
+        referrerPolicy="strict-origin-when-cross-origin"
       />
     </div>
   );
