@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCollection } from "@/lib/cms/collections";
-import { getItem, saveItem, deleteItem, isValidSlug, ValidationError } from "@/lib/cms/content";
+import { getItem, getItemMtime, saveItem, deleteItem, isValidSlug, ValidationError } from "@/lib/cms/content";
 import { getSessionUser } from "@/lib/cms/auth";
+
+function makeETag(mtime: number): string {
+  return `"${mtime.toString(16)}"`;
+}
 
 export async function GET(
   request: NextRequest,
@@ -14,9 +18,14 @@ export async function GET(
   const collection = getCollection(collectionName);
   if (!collection) return NextResponse.json({ error: "Unbekannte Collection." }, { status: 404 });
 
-  const item = await getItem(collectionName, slug);
+  const [item, mtime] = await Promise.all([
+    getItem(collectionName, slug),
+    getItemMtime(collectionName, slug),
+  ]);
   if (!item) return NextResponse.json({ error: "Eintrag nicht gefunden." }, { status: 404 });
-  return NextResponse.json({ collection, item });
+  const res = NextResponse.json({ collection, item });
+  if (mtime !== null) res.headers.set("ETag", makeETag(mtime));
+  return res;
 }
 
 export async function PUT(
@@ -31,6 +40,19 @@ export async function PUT(
   if (!collection) return NextResponse.json({ error: "Unbekannte Collection." }, { status: 404 });
 
   if (!isValidSlug(slug)) return NextResponse.json({ error: "Ungültiger Slug." }, { status: 400 });
+
+  // Optimistic concurrency: if the client sends If-Match and the file has
+  // been modified since, reject with 412 to prevent last-write-wins data loss.
+  const ifMatch = request.headers.get("If-Match");
+  if (ifMatch) {
+    const mtime = await getItemMtime(collectionName, slug);
+    if (mtime !== null && makeETag(mtime) !== ifMatch) {
+      return NextResponse.json(
+        { error: "Konflikt: Der Eintrag wurde zwischenzeitlich von jemand anderem geändert. Bitte die Seite neu laden." },
+        { status: 412 }
+      );
+    }
+  }
 
   let body: { data?: Record<string, unknown>; body?: string };
   try {

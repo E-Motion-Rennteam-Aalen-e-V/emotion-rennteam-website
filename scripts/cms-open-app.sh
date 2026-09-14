@@ -24,17 +24,29 @@ fi
 open_macos() {
     local chrome_app="/Applications/Google Chrome.app"
     local edge_app="/Applications/Microsoft Edge.app"
+    local firefox_app="/Applications/Firefox.app"
     local safari_app="/Applications/Safari.app"
     if [ -d "$chrome_app" ]; then
         open -na "Google Chrome" --args "--app=$loading_url" "--window-size=1360,900"
     elif [ -d "$edge_app" ]; then
         open -na "Microsoft Edge" --args "--app=$loading_url" "--window-size=1360,900"
+    elif [ -d "$firefox_app" ]; then
+        # Firefox: --ssb (Site-Specific Browser) opens a minimal app window.
+        # Falls back gracefully if --ssb is unavailable (older Firefox).
+        open -a Firefox "$loading_url" --args --ssb || open -a Firefox "$loading_url"
     elif [ -d "$safari_app" ]; then
-        # Safari unterstuetzt kein App-Modus-Fenster — normaler Tab als Fallback.
-        echo "Tipp: Chrome oder Edge installieren fuer ein App-Fenster ohne Browser-Leisten."
-        open -a Safari "$loading_url"
+        # Safari hat keinen App-Fenster-Modus. Neues Fenster oeffnen und die
+        # Lesezeichenleiste ausblenden — immer noch besser als nichts.
+        echo "Tipp: Google Chrome oder Microsoft Edge installieren fuer ein App-Fenster ohne Browser-Leisten."
+        osascript -e "
+            tell application \"Safari\"
+                activate
+                make new window
+                set URL of front document to \"$loading_url\"
+                set bounds of front window to {100, 50, 1460, 950}
+            end tell
+        " 2>/dev/null || open -a Safari "$loading_url"
     else
-        # Unbekannter Standardbrowser.
         open "$loading_url"
     fi
 }

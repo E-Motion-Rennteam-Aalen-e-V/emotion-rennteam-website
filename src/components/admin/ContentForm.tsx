@@ -25,6 +25,8 @@ interface Props {
   initialSlug?: string;
   initialData?: Record<string, unknown>;
   initialBody?: string;
+  /** mtime of the file at load time; sent as If-Match to detect concurrent edits. */
+  initialMtime?: number;
   onSaved: (result: SaveResult) => void;
   onDeleted?: (result: DeleteResult) => void;
   onDirtyChange?: (dirty: boolean) => void;
@@ -63,6 +65,7 @@ export default function ContentForm({
   initialSlug,
   initialData,
   initialBody,
+  initialMtime,
   onSaved,
   onDeleted,
   onDirtyChange,
@@ -162,9 +165,13 @@ export default function ContentForm({
       const payload = { slug, data, body: bField ? body : undefined };
       const url = mode === "create" ? `/api/admin/content/${collectionName}` : `/api/admin/content/${collectionName}/${initialSlug}`;
       const method = mode === "create" ? "POST" : "PUT";
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (mode === "edit" && initialMtime !== undefined) {
+        headers["If-Match"] = `"${initialMtime.toString(16)}"`;
+      }
       const res = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify(payload),
       });
       const responseData = await res.json();

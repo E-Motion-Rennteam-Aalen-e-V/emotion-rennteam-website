@@ -9,6 +9,7 @@ interface Item {
   slug: string;
   data: Record<string, unknown>;
   body: string;
+  mtime?: number;
 }
 
 interface WriteResult {
@@ -403,6 +404,7 @@ export default function CollectionExplorer({
                     initialSlug={item.slug}
                     initialData={item.data}
                     initialBody={item.body}
+                    initialMtime={item.mtime}
                     onDirtyChange={setPanelDirty}
                     onSaved={(result) => {
                       setNotice(noticeForWriteResult(result, "gespeichert"));

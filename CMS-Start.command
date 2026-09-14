@@ -4,6 +4,26 @@
 
 cd "$(dirname "$0")"
 
+script_dir_abs="$(cd "$(dirname "$0")" && pwd -P)"
+if echo "$script_dir_abs" | grep -q "AppTranslocation"; then
+    echo "============================================"
+    echo "  E-Motion Rennteam Aalen - Redaktions-CMS"
+    echo "============================================"
+    echo ""
+    echo "[FEHLER] App-Translocation erkannt."
+    echo ""
+    echo "macOS hat diesen Ordner in einen schreibgeschuetzten Bereich"
+    echo "verlegt, weil er direkt aus dem Downloads-Ordner oder einem"
+    echo "DMG ausgefuehrt wurde."
+    echo ""
+    echo "Loesung: Den Ordner ins Programme-Verzeichnis oder den Desktop"
+    echo "verschieben (Finder > Ablegen in 'Programme') und danach erneut"
+    echo "starten."
+    echo ""
+    read -r -p "Zum Beenden Enter druecken..." _
+    exit 1
+fi
+
 # Node.js via nvm oder Homebrew einbinden, bevor wir nach "node" suchen.
 # Finder-gestartete Prozesse erben nur den System-PATH, nicht die Shell-
 # Konfiguration aus ~/.zshrc oder ~/.bash_profile.

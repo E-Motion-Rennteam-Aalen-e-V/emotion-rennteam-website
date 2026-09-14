@@ -55,6 +55,8 @@ export interface ContentItem {
   slug: string;
   data: Record<string, unknown>;
   body: string;
+  /** File mtime in ms (for ETag-based optimistic concurrency). */
+  mtime?: number;
 }
 
 export interface SaveResult {
@@ -105,9 +107,10 @@ export async function listItems(collectionName: string): Promise<ContentItem[]> 
   const results = await Promise.all(
     files.map(async (file) => {
       try {
-        const raw = await fs.readFile(path.join(dir, file), "utf-8");
+        const filePath = path.join(dir, file);
+        const [raw, stat] = await Promise.all([fs.readFile(filePath, "utf-8"), fs.stat(filePath)]);
         const parsed = matter(raw);
-        return { slug: file.replace(/\.md$/, ""), data: parsed.data, body: parsed.content.trim() };
+        return { slug: file.replace(/\.md$/, ""), data: parsed.data, body: parsed.content.trim(), mtime: stat.mtimeMs };
       } catch (error) {
         console.error(`[cms] Ueberspringe defekte Datei ${collectionName}/${file}:`, error);
         return null;
@@ -124,9 +127,22 @@ export async function getItem(collectionName: string, slug: string): Promise<Con
   if (!isValidSlug(slug)) return null;
   const filePath = path.join(/* turbopackIgnore: true */ ROOT, collection.path, `${slug}.md`);
   try {
-    const raw = await fs.readFile(filePath, "utf-8");
+    const [raw, stat] = await Promise.all([fs.readFile(filePath, "utf-8"), fs.stat(filePath)]);
     const parsed = matter(raw);
-    return { slug, data: parsed.data, body: parsed.content.trim() };
+    return { slug, data: parsed.data, body: parsed.content.trim(), mtime: stat.mtimeMs };
+  } catch {
+    return null;
+  }
+}
+
+/** Returns the file mtime (ms since epoch) for ETag generation, or null if not found. */
+export async function getItemMtime(collectionName: string, slug: string): Promise<number | null> {
+  const collection = getCollection(collectionName);
+  if (!collection || !isValidSlug(slug)) return null;
+  const filePath = path.join(/* turbopackIgnore: true */ ROOT, collection.path, `${slug}.md`);
+  try {
+    const stat = await fs.stat(filePath);
+    return stat.mtimeMs;
   } catch {
     return null;
   }
