@@ -33,6 +33,12 @@ export async function POST(request: NextRequest) {
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "Keine Datei übermittelt." }, { status: 400 });
   }
+  if (file.type === "image/svg+xml") {
+    return NextResponse.json(
+      { error: "SVG-Dateien werden aus Sicherheitsgründen nicht unterstützt. Bitte JPG, PNG, WebP oder GIF verwenden." },
+      { status: 400 }
+    );
+  }
   if (!ALLOWED_TYPES.has(file.type)) {
     return NextResponse.json({ error: "Nur Bilddateien (JPG, PNG, WebP, GIF) sind erlaubt." }, { status: 400 });
   }

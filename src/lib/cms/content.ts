@@ -171,6 +171,27 @@ function validateRequiredFields(
   }
 }
 
+// URL fields (linkedin, website) must not contain javascript:/data:/vbscript:
+// URIs — if ever rendered as <a href> they'd execute arbitrary code.
+const UNSAFE_URL_PREFIX = /^\s*(?:javascript|data|vbscript)\s*:/i;
+const URL_FIELD_NAMES = new Set(["linkedin", "website", "href", "url"]);
+
+function validateUrlFields(
+  collection: CollectionDef,
+  data: Record<string, unknown>
+): void {
+  for (const field of collection.fields) {
+    if (!URL_FIELD_NAMES.has(field.name)) continue;
+    const value = data[field.name];
+    if (typeof value !== "string" || !value.trim()) continue;
+    if (UNSAFE_URL_PREFIX.test(value)) {
+      throw new ValidationError(
+        `Ungültige URL im Feld "${field.label}": javascript:, data: und vbscript: sind nicht erlaubt.`
+      );
+    }
+  }
+}
+
 export async function saveItem(
   collectionName: string,
   slug: string,
@@ -182,6 +203,7 @@ export async function saveItem(
   if (!collection) throw new Error(`Unbekannte Collection: ${collectionName}`);
   if (!isValidSlug(slug)) throw new Error(`Ungültiger Slug: "${slug}"`);
   validateRequiredFields(collection, data, body);
+  validateUrlFields(collection, data);
   const relPath = path.join(collection.path, `${slug}.md`).split(path.sep).join("/");
   const content = serialize(data, body);
 

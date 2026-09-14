@@ -132,6 +132,11 @@ export default function ImageUploadField({
   const [pickerOpen, setPickerOpen] = useState(false);
 
   async function handleFile(file: File) {
+    if (file.size > 8 * 1024 * 1024) {
+      setError("Datei zu groß – maximal 8 MB erlaubt.");
+      setShowUploadHint(true);
+      return;
+    }
     setUploading(true);
     setError("");
     setWarning("");
@@ -192,7 +197,7 @@ export default function ImageUploadField({
               disabled={uploading}
               className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-accent disabled:opacity-60"
             >
-              {uploading ? "Lädt hoch…" : "Bild hochladen"}
+              {uploading ? "Lädt hoch…" : "Bild hochladen (max. 8 MB)"}
             </button>
             <button
               type="button"

@@ -8,6 +8,8 @@ export default function LogoutButton() {
   const [loading, setLoading] = useState(false);
 
   async function handleLogout() {
+    const isDirty = (window as unknown as Record<string, unknown>).__cmsDirty;
+    if (isDirty && !window.confirm("Ungespeicherte Änderungen verwerfen und abmelden?")) return;
     setLoading(true);
     await fetch("/api/admin/logout", { method: "POST" });
     router.push("/admin/login");

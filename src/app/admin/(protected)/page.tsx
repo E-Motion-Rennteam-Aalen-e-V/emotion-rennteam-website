@@ -9,8 +9,13 @@ const ALLOWED_MEDIA_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".gi
 
 async function countUploads(): Promise<number> {
   try {
-    const entries = await fs.readdir(path.join(process.cwd(), "public", "uploads"), { withFileTypes: true });
-    return entries.filter((e) => e.isFile() && ALLOWED_MEDIA_EXTENSIONS.has(path.extname(e.name).toLowerCase())).length;
+    const entries = await fs.readdir(path.join(process.cwd(), "public", "uploads"), {
+      withFileTypes: true,
+      recursive: true,
+    });
+    return entries.filter(
+      (e) => e.isFile() && ALLOWED_MEDIA_EXTENSIONS.has(path.extname(e.name).toLowerCase())
+    ).length;
   } catch {
     return 0;
   }

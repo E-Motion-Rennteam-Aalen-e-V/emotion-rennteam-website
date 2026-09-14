@@ -25,6 +25,9 @@ const csp = [
   "font-src 'self'",
   "connect-src 'self'",
   "object-src 'none'",
+  // The ContactMap embeds an OpenStreetMap iframe. frame-ancestors stays
+  // 'none' (nobody may embed us), but frame-src must allow OSM.
+  "frame-src https://www.openstreetmap.org",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",

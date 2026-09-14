@@ -156,6 +156,24 @@ while true; do
             j|J) continue ;;
         esac
     fi
+
+    # Branch-Existenz pruefen (nur wenn Token gueltig und curl verfuegbar)
+    if [ "$status" = "OK" ] && command -v curl >/dev/null 2>&1; then
+        branch_http="$(curl -s -o /dev/null -w '%{http_code}' --max-time 8 \
+            -H "Authorization: Bearer $github_token" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$github_owner/$github_repo/branches/$github_branch" \
+            2>/dev/null || echo "000")"
+        if [ "$branch_http" = "404" ]; then
+            echo "Hinweis: Branch '$github_branch' existiert noch nicht im Repository."
+            echo "Er wird beim ersten Commit automatisch angelegt."
+        elif [ "$branch_http" != "200" ]; then
+            echo "Hinweis: Branch-Pruefung nicht moeglich (Status $branch_http) - wird trotzdem uebernommen."
+        else
+            echo "Branch '$github_branch' gefunden."
+        fi
+    fi
     break
 done
 

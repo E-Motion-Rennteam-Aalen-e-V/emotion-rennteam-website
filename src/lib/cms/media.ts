@@ -38,7 +38,8 @@ async function walk(dir: string, depth: number): Promise<UploadedFile[]> {
     if (!ALLOWED_EXTENSIONS.has(ext)) continue;
     const stat = await fs.stat(abs);
     const relative = path.relative(UPLOADS_DIR, abs).split(path.sep).join("/");
-    results.push({ name: relative, path: `/uploads/${relative}`, size: stat.size, mtime: stat.mtimeMs });
+    const encodedRelative = relative.split("/").map(encodeURIComponent).join("/");
+    results.push({ name: relative, path: `/uploads/${encodedRelative}`, size: stat.size, mtime: stat.mtimeMs });
   }
   return results;
 }

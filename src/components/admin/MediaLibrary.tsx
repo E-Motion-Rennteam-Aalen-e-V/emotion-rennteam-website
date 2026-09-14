@@ -43,6 +43,10 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
   }, [copiedPath]);
 
   async function uploadFile(file: File) {
+    if (file.size > 8 * 1024 * 1024) {
+      setNotice({ kind: "error", message: "Datei zu groß – maximal 8 MB erlaubt." });
+      return;
+    }
     setUploading(true);
     setNotice(null);
     let res: Response | undefined;
@@ -165,7 +169,7 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
         <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
           <div className="rounded-2xl border-2 border-dashed border-accent px-16 py-12 text-center">
             <p className="text-2xl font-bold text-accent-text">Bild hier ablegen</p>
-            <p className="mt-1 text-sm text-muted">JPG, PNG, WebP oder GIF</p>
+            <p className="mt-1 text-sm text-muted">JPG, PNG, WebP oder GIF · max. 8 MB</p>
           </div>
         </div>
       )}
@@ -206,7 +210,7 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
       {files.length === 0 && !dragOver && (
         <div className="mb-4 rounded-xl border-2 border-dashed border-border p-8 text-center text-sm text-muted transition-colors hover:border-accent">
           <p className="font-medium text-foreground">Bilder hier ablegen oder oben hochladen</p>
-          <p className="mt-1">JPG, PNG, WebP und GIF werden unterstützt</p>
+          <p className="mt-1">JPG, PNG, WebP und GIF (max. 8 MB) werden unterstützt</p>
         </div>
       )}
 

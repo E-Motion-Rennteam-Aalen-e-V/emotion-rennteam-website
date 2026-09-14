@@ -106,6 +106,14 @@ export default function CollectionExplorer({
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
   }, [panelDirty]);
 
+  // Expose dirty state so LogoutButton and other top-level controls can
+  // guard against navigating away with unsaved changes. Cleaned up when
+  // this component unmounts so stale flags never linger.
+  useEffect(() => {
+    (window as unknown as Record<string, unknown>).__cmsDirty = panelDirty;
+    return () => { (window as unknown as Record<string, unknown>).__cmsDirty = false; };
+  }, [panelDirty]);
+
   // Re-fetches the list after a save/create/delete inside the panel so it
   // reflects the change without a full page reload. Never called from an
   // effect (only from these user-triggered callbacks), so there's no
@@ -174,7 +182,9 @@ export default function CollectionExplorer({
   }
 
   function openDuplicate(item: Item) {
+    if (panelDirty && !window.confirm("Ungespeicherte Änderungen verwerfen?")) return;
     setNotice(null);
+    setPanelDirty(false);
     setPanel({ mode: "create-from", sourceSlug: item.slug });
   }
 
