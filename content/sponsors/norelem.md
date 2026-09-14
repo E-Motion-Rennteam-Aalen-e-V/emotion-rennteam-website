@@ -1,7 +1,8 @@
 ---
 name: norelem
-tier: Silber
-website: "https://www.norelem.de"
+tier: Partner
+website: ''
+logo: /uploads/1789066366439-norelem.webp
 ---
 
 Liefert Normteile für Konstruktion und Fertigung unseres Fahrzeugs.

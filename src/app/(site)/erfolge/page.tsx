@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { getResults, getPage } from "@/lib/content";
+import Image from "next/image";
+import { getResults } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 
 export const metadata: Metadata = {
@@ -11,19 +12,31 @@ export const metadata: Metadata = {
 
 export default function ResultsPage() {
   const results = getResults();
-  const page = getPage("results");
 
   return (
     <div className="container-page py-20">
       <Reveal>
-        <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Timeline</p>
-        <h1 className="mt-2 text-5xl font-extrabold tracking-tight sm:text-6xl">
-          {page?.heroTitle ?? "Unsere Historie"}
-        </h1>
-        <p className="mt-4 max-w-2xl text-muted">
-          {page?.heroSubtitle ??
-            "Von der Teamgründung bis zu unseren besten Wettbewerbsergebnissen – eine Zeitreise durch die Geschichte des E-Motion Rennteams. Seit 2012 sind wir bei internationalen Formula-Student-Events angetreten und landeten dabei immer wieder in den Top 5 einzelner Disziplinen und in der Gesamtwertung unter den besten 10 Teams."}
-        </p>
+        <div className="flex flex-col gap-8 sm:flex-row sm:items-center sm:gap-12">
+          <div className="flex-1">
+            <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Timeline</p>
+            <h1 className="mt-2 text-5xl font-extrabold leading-tight tracking-tight sm:text-6xl">Unsere Historie</h1>
+            <p className="mt-4 max-w-2xl text-muted">
+              Von der Teamgründung bis zu unseren besten Wettbewerbsergebnissen – eine Zeitreise
+              durch die Geschichte des E-Motion Rennteams. Seit 2012 sind wir bei internationalen
+              Formula-Student-Events angetreten und landeten dabei immer wieder in den Top 5
+              einzelner Disziplinen und in der Gesamtwertung unter den besten 10 Teams.
+            </p>
+          </div>
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl sm:w-80 lg:w-96">
+            <Image
+              src="/uploads/rollout-2026/rollout-2026-team-buehne.webp"
+              alt="E-Motion Team auf der Bühne beim Rollout 2026"
+              fill
+              sizes="(min-width: 1024px) 384px, (min-width: 640px) 320px, 100vw"
+              className="object-cover"
+            />
+          </div>
+        </div>
       </Reveal>
 
       <div className="relative mt-16">

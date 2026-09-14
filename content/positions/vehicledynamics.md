@@ -1,6 +1,6 @@
 ---
-title: "Teammitglied Vehicle Dynamics"
-department: "Vehicle Dynamics"
+title: "Teammitglied Vehicle Performance"
+department: "Vehicle Performance"
 commitment: "ab 5 Std./Woche"
 ---
 

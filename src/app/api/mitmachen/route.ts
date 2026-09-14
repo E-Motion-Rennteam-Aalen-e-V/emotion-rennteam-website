@@ -42,10 +42,15 @@ export async function POST(request: NextRequest) {
   }
 
   if (!result.isBot) {
-    await deliverFormSubmission("mitmachen", {
-      ...result.data,
-      skills: result.data.skills.join(", ") || "–",
-    });
+    try {
+      await deliverFormSubmission("mitmachen", {
+        ...result.data,
+        skills: result.data.skills.join(", ") || "–",
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Interner Fehler.";
+      return NextResponse.json({ ok: false, error: message }, { status: 503 });
+    }
   }
 
   return NextResponse.json({ ok: true });

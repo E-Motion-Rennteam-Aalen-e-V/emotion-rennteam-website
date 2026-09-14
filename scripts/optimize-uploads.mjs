@@ -18,9 +18,20 @@ const TARGETS = [
   { dir: "public/uploads/Team wdp", maxDimension: 2000, quality: 82 },
   // Individual member portraits: rendered at 300x300 (2x retina = 600px).
   { dir: "public/uploads/single-bilder-upload", maxDimension: 900, quality: 82 },
+  // Gallery photos: grid shows them at 33vw, the lightbox up to 90vw -
+  // 2000px covers both comfortably even on large desktop screens. These
+  // come straight off the camera (4640x6960 / ~32MP), so decoding them on
+  // every Next/image optimizer cache miss was the main cause of slow
+  // gallery loads.
+  { dir: "public/uploads/FSAA 2026 wedp", maxDimension: 2000, quality: 82 },
+  { dir: "public/uploads/FSG 2026 wedp", maxDimension: 2000, quality: 82 },
+  // Loose CMS uploads directly under public/uploads (team portraits,
+  // vehicle photos). Sponsor logos also live here but are already tiny, so
+  // they're left untouched by the size check below.
+  { dir: "public/uploads", maxDimension: 1600, quality: 82 },
 ];
 
-const IMAGE_EXTENSIONS = new Set([".jpg", ".jpeg", ".png"]);
+const IMAGE_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp"]);
 
 async function optimizeFile(path, maxDimension, quality) {
   const image = sharp(path);
@@ -37,10 +48,13 @@ async function optimizeFile(path, maxDimension, quality) {
     withoutEnlargement: true,
   });
 
+  const ext = extname(path).toLowerCase();
   const buffer =
-    extname(path).toLowerCase() === ".png"
+    ext === ".png"
       ? await resized.png({ quality, compressionLevel: 9 }).toBuffer()
-      : await resized.jpeg({ quality, mozjpeg: true }).toBuffer();
+      : ext === ".webp"
+        ? await resized.webp({ quality }).toBuffer()
+        : await resized.jpeg({ quality, mozjpeg: true }).toBuffer();
 
   await writeFile(path, buffer);
   const after = buffer.length;

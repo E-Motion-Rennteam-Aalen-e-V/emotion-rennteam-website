@@ -26,6 +26,10 @@ export default function HeroContent({
   title: string;
   subtitle: string;
 }) {
+  const lastSpace = title.lastIndexOf(" ");
+  const titleFirstLine = lastSpace === -1 ? title : title.slice(0, lastSpace);
+  const titleLastLine = lastSpace === -1 ? "" : title.slice(lastSpace + 1);
+
   return (
     <motion.div
       initial="hidden"
@@ -41,9 +45,17 @@ export default function HeroContent({
       </motion.p>
       <motion.h1
         variants={item}
-        className="mx-auto text-6xl font-extrabold leading-[1.05] tracking-tight sm:text-7xl lg:text-8xl"
+        className="mx-auto text-6xl font-extrabold leading-[1.2] tracking-tight sm:text-7xl lg:text-8xl"
       >
-        <span className="text-gradient-accent">{title}</span>
+        <span className="text-gradient-accent">
+          {titleFirstLine}
+          {titleLastLine && (
+            <>
+              <br />
+              {titleLastLine}
+            </>
+          )}
+        </span>
       </motion.h1>
       <motion.p variants={item} className="mx-auto mt-7 max-w-2xl text-xl text-muted">
         {subtitle}

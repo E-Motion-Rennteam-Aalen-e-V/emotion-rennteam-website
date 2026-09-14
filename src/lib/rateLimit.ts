@@ -71,7 +71,7 @@ export function _getTrackedBucketCountForTesting(): number {
  * Best-effort client IP extraction behind a single trusted reverse proxy
  * (e.g. Vercel's edge network). `x-forwarded-for` is a comma-separated list
  * that each hop *appends* to rather than replaces, so a client can freely
- * set their own value before the request reaches the proxy - only the
+ * set their own value before the request reaches the proxy — only the
  * *last* entry is the one the trusted proxy itself added and is safe to
  * key rate limits on. Taking the first (leftmost, client-controlled) entry
  * would let anyone bypass rate limiting simply by sending a different

@@ -1,7 +1,8 @@
 ---
 name: Altium
-tier: Gold
-website: "https://www.altium.com"
+tier: Partner
+website: ''
+logo: /uploads/1789064436855-altium.webp
 ---
 
 Stellt uns Software für das Design unserer Leiterplatten zur Verfügung.

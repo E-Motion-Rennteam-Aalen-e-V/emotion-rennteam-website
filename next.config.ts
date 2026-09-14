@@ -24,6 +24,9 @@ const csp = [
   "img-src 'self' data:",
   "font-src 'self'",
   "connect-src 'self'",
+  // ContactMap creates a blob: iframe to render the Leaflet map locally
+  // without loading external scripts into the main document.
+  "frame-src blob:",
   "object-src 'none'",
   // The ContactMap embeds an OpenStreetMap iframe. frame-ancestors stays
   // 'none' (nobody may embed us), but frame-src must allow OSM.
@@ -101,6 +104,14 @@ const nextConfig: NextConfig = {
         headers: [
           { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
         ],
+      },
+      {
+        // Belt-and-suspenders alongside robots.txt: a disallow rule alone
+        // doesn't stop a search engine from indexing a URL it finds linked
+        // elsewhere, just from crawling it. This header blocks indexing
+        // outright for the admin CMS, which has no business in search results.
+        source: "/admin/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
       },
     ];
   },

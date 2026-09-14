@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
 import { getBlogPosts } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
@@ -8,15 +8,9 @@ import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 export const metadata: Metadata = {
   title: "Blog",
   description:
-    "Der Blog des E-Motion Rennteams Aalen: Einblicke in Werkstatt, Teamalltag und die Entwicklung unserer Formula-Student-Fahrzeuge.",
+    "Einblicke aus dem Teamalltag des E-Motion Rennteams Aalen – Werkstatt, Onboarding und Geschichten hinter dem Fahrzeug.",
   alternates: { canonical: "/blog" },
 };
-
-function formatDate(iso: string): string {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return "";
-  return date.toLocaleDateString("de-DE", { day: "2-digit", month: "long", year: "numeric" });
-}
 
 export default function BlogPage() {
   const posts = getBlogPosts();
@@ -25,48 +19,51 @@ export default function BlogPage() {
     <div className="container-page py-20">
       <Reveal>
         <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Blog</p>
-        <h1 className="mt-2 text-5xl font-extrabold tracking-tight sm:text-6xl">
-          Einblicke aus dem Team
+        <h1 className="mt-2 text-5xl font-extrabold leading-tight tracking-tight sm:text-6xl">
+          Einblicke ins Team
         </h1>
         <p className="mt-4 max-w-2xl text-muted">
-          Geschichten aus der Werkstatt, dem Teamalltag und der Entwicklung unserer Fahrzeuge –
-          direkt aus erster Hand.
+          Geschichten aus der Werkstatt, dem Onboarding neuer Mitglieder und dem Alltag hinter
+          unserem Rennwagen.
         </p>
       </Reveal>
 
       {posts.length === 0 ? (
-        <p className="mt-14 text-muted">Es sind noch keine Beiträge vorhanden.</p>
+        <p className="mt-14 text-sm text-muted">Aktuell sind keine Blogbeiträge verfügbar.</p>
       ) : (
         <StaggerGroup className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {posts.map((post) => (
             <StaggerItem key={post.slug}>
               <Link
                 href={`/blog/${post.slug}`}
-                className="group flex h-full flex-col overflow-hidden rounded-xl border border-border bg-surface transition-colors hover:border-accent/50"
+                className="group block h-full overflow-hidden rounded-2xl border border-border bg-surface transition-colors hover:border-accent/60"
               >
                 {post.coverImage && (
                   <div className="relative aspect-[16/9] w-full overflow-hidden">
                     <Image
                       src={post.coverImage}
-                      alt=""
+                      alt={post.title}
                       fill
                       sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   </div>
                 )}
-                <div className="flex flex-1 flex-col p-6">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-accent-text">
-                    {formatDate(post.date)}
-                    {post.author ? ` · ${post.author}` : ""}
-                  </p>
-                  <h2 className="mt-2 text-lg font-semibold">{post.title}</h2>
+                <div className="p-6">
+                  <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-accent-text">
+                    <time dateTime={post.date}>
+                      {new Date(post.date).toLocaleDateString("de-DE", {
+                        day: "2-digit",
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </time>
+                    {post.author && <span className="text-muted">· {post.author}</span>}
+                  </div>
+                  <h2 className="mt-2 text-lg font-bold leading-snug">{post.title}</h2>
                   {post.excerpt && (
-                    <p className="mt-2 flex-1 text-sm text-muted">{post.excerpt}</p>
+                    <p className="mt-2 text-sm text-muted">{post.excerpt}</p>
                   )}
-                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-accent-text transition-all group-hover:gap-2">
-                    Weiterlesen <span aria-hidden>&rarr;</span>
-                  </span>
                 </div>
               </Link>
             </StaggerItem>

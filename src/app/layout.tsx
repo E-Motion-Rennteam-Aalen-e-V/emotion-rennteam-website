@@ -1,15 +1,24 @@
 import type React from "react";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type React from "react";
+import { Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import MotionProvider from "@/components/MotionProvider";
 import CookieConsent from "@/components/CookieConsent";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import { getOrganizationJsonLdScript } from "@/lib/structuredData";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+const airstrike = localFont({
+  src: "../fonts/airstrike.ttf",
+  variable: "--font-heading",
+  display: "swap",
+});
+
+const lato = localFont({
+  src: "../fonts/LatoSemibold.ttf",
+  variable: "--font-body",
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
@@ -48,7 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="de"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${airstrike.variable} ${lato.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <script

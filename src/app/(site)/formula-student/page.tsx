@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { getPage } from "@/lib/content";
-import { renderMarkdown } from "@/lib/markdown";
+import Image from "next/image";
+import Link from "next/link";
 import Reveal from "@/components/motion/Reveal";
 import DisciplinesChart from "@/components/DisciplinesChart";
 import FSTimeline from "@/components/FormulaStudent/FSTimeline";
@@ -15,10 +15,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/formula-student" },
 };
 
-export default async function FormulaStudentPage() {
-  const page = getPage("formula-student");
-  const bodyHtml = page?.body ? await renderMarkdown(page.body) : "";
-
+export default function FormulaStudentPage() {
   return (
     <div className="container-page space-y-20 py-20">
       {/* Hero */}
@@ -28,26 +25,37 @@ export default async function FormulaStudentPage() {
             <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">
               Formula Student
             </p>
-            <h1 className="mt-2 text-5xl font-extrabold tracking-tight sm:text-6xl">
-              {page?.heroTitle ?? "Studierendenteams bauen Rennwagen"}
+            <h1 className="mt-2 text-5xl font-extrabold leading-tight tracking-tight sm:text-6xl">
+              Studierendenteams bauen Rennwagen
             </h1>
           </div>
           <p className="max-w-xl text-base text-muted">
-            {page?.heroSubtitle ??
-              "Ein internationaler Konstruktionswettbewerb, in dem Teams Elektrorennwagen entwickeln, bauen und auf Rennstrecken testen – Technik trifft Teamgeist."}
+            Ein internationaler Konstruktionswettbewerb, in dem Teams Elektrorennwagen entwickeln,
+            bauen und auf Rennstrecken testen – Technik trifft Teamgeist. Genau das machen wir mit
+            dem E-Motion Rennteam Aalen jedes Jahr aufs Neue.
           </p>
         </div>
       </Reveal>
 
-      {/* Editorial-Text aus dem CMS */}
-      {bodyHtml && (
-        <Reveal delay={0.03}>
-          <div
-            className="prose prose-sm max-w-2xl text-muted [&_a]:text-accent-text [&_a]:underline [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-foreground"
-            dangerouslySetInnerHTML={{ __html: bodyHtml }}
+      {/* Hero Image */}
+      <Reveal delay={0.03}>
+        <div className="relative aspect-[21/9] w-full overflow-hidden rounded-2xl border border-border/60">
+          <Image
+            src="/uploads/ert-14-26-rollout-2026.jpg"
+            alt="E-Motion Rennteam ERT 14-26 auf der Strecke"
+            fill
+            priority
+            sizes="(min-width: 1280px) 1280px, 100vw"
+            className="object-cover"
           />
-        </Reveal>
-      )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+          <div className="absolute bottom-6 left-6 sm:bottom-8 sm:left-8">
+            <span className="rounded-full bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground">
+              ERT 14-26 · Saison 2026
+            </span>
+          </div>
+        </div>
+      </Reveal>
 
       {/* Stats */}
       <Reveal delay={0.05}>
@@ -105,6 +113,32 @@ export default async function FormulaStudentPage() {
             </p>
           </div>
           <FSCompetitions />
+        </div>
+      </Reveal>
+
+      {/* CTA */}
+      <Reveal delay={0.3}>
+        <div className="rounded-2xl border border-border bg-surface/50 p-8 text-center sm:p-12">
+          <h2 className="text-2xl font-bold sm:text-3xl">Lust, selbst mitzubauen?</h2>
+          <p className="mx-auto mt-3 max-w-xl text-sm text-muted">
+            Beim E-Motion Rennteam Aalen setzen wir Formula Student in die Praxis um – vom
+            CAD-Modell bis zur Zieldurchfahrt. Wir suchen laufend Studierende aus allen
+            Fachrichtungen.
+          </p>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
+            <Link
+              href="/mitmachen"
+              className="inline-flex items-center gap-1.5 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition-all hover:gap-2.5"
+            >
+              Offene Positionen ansehen <span aria-hidden>&rarr;</span>
+            </Link>
+            <Link
+              href="/team"
+              className="inline-flex items-center gap-1 text-sm font-semibold text-accent-text transition-all hover:gap-2 hover:underline"
+            >
+              Unser Team kennenlernen <span aria-hidden>&rarr;</span>
+            </Link>
+          </div>
         </div>
       </Reveal>
     </div>

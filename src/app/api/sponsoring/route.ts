@@ -42,7 +42,12 @@ export async function POST(request: NextRequest) {
   }
 
   if (!result.isBot) {
-    await deliverFormSubmission("sponsoring", result.data);
+    try {
+      await deliverFormSubmission("sponsoring", result.data);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Interner Fehler.";
+      return NextResponse.json({ ok: false, error: message }, { status: 503 });
+    }
   }
 
   return NextResponse.json({ ok: true });

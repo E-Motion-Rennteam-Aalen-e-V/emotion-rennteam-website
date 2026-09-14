@@ -1,7 +1,8 @@
 ---
 name: EDAG
-tier: Gold
-website: "https://www.edag.com"
+tier: Silber
+website: ''
+logo: /uploads/1789065328041-edag.webp
 ---
 
 Engineering-Partner mit Expertise in Fahrzeugentwicklung und Konstruktion.

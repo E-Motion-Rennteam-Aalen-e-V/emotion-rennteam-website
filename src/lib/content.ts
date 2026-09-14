@@ -170,36 +170,54 @@ export function getBlogPostBySlug(slug: string): BlogPost | undefined {
   return getBlogPosts().find((post) => post.slug === slug);
 }
 
-const GALLERY_UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "galerie-upload");
+const GALLERY_UPLOAD_DIRS = [
+  { path: "galerie-upload", album: "Weitere Bilder" },
+  { path: "FS Bofingen ERT1325", album: "FS Bofingen ERT1325" },
+  { path: "Fotos Ferdiand ERT1325", album: "Fotos Ferdiand ERT1325" },
+  { path: "Rollout ERT 1325", album: "Rollout ERT 1325" },
+  { path: "FSAA 2026 wedp", album: "FSAA 2026" },
+  { path: "FSG 2026 wedp", album: "FSG 2026" },
+  { path: "Team wdp", album: "Team" },
+  { path: "rollout-2026", album: "Rollout 2026" },
+  { path: "single-bilder-upload", album: "Einzelbilder" },
+];
 const IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp"];
 
 function getAutoGalleryImages(): GalleryImage[] {
-  if (!fs.existsSync(GALLERY_UPLOAD_DIR)) return [];
+  const images: GalleryImage[] = [];
 
-  return fs
-    .readdirSync(GALLERY_UPLOAD_DIR)
-    .filter((file) => IMAGE_EXTENSIONS.includes(path.extname(file).toLowerCase()))
-    .map((file) => {
-      const title = path
-        .basename(file, path.extname(file))
-        .replace(/[-_]+/g, " ")
-        .replace(/\s+/g, " ")
-        .trim()
-        .replace(/^./, (c) => c.toUpperCase());
-      return {
-        title: title || "Foto",
-        image: `/uploads/galerie-upload/${file}`,
-        album: "Weitere Bilder",
-        slug: `auto-${file}`,
-      };
-    });
+  for (const dir of GALLERY_UPLOAD_DIRS) {
+    const fullPath = path.join(process.cwd(), "public", "uploads", dir.path);
+    if (!fs.existsSync(fullPath)) continue;
+
+    fs.readdirSync(fullPath)
+      .filter((file) => IMAGE_EXTENSIONS.includes(path.extname(file).toLowerCase()))
+      .forEach((file) => {
+        const title = path
+          .basename(file, path.extname(file))
+          .replace(/[-_]+/g, " ")
+          .replace(/\s+/g, " ")
+          .trim()
+          .replace(/^./, (c) => c.toUpperCase());
+        images.push({
+          title: title || "Foto",
+          image: `/uploads/${encodeURIComponent(dir.path)}/${encodeURIComponent(file)}`,
+          album: dir.album,
+          slug: `auto-${dir.path}-${file}`,
+        });
+      });
+  }
+
+  return images;
 }
 
 export function getGallery(): GalleryImage[] {
   const curated = readCollection<GalleryImage>("gallery").sort(
     (a, b) => (a.order ?? 99) - (b.order ?? 99)
   );
-  return [...curated, ...getAutoGalleryImages()];
+  const curatedImages = new Set(curated.map((img) => img.image));
+  const auto = getAutoGalleryImages().filter((img) => !curatedImages.has(img.image));
+  return [...curated, ...auto];
 }
 
 export function getResults(): Result[] {

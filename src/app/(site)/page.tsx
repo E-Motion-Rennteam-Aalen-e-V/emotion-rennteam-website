@@ -26,11 +26,45 @@ function parseStats(page: ReturnType<typeof getPage>) {
   });
 }
 
+const DEPARTMENT_HIGHLIGHTS = [
+  {
+    icon: "🔋",
+    title: "Elektrotechnik",
+    description: "Batteriesystem, Leistungselektronik und Hochvolt-Sicherheit des Fahrzeugs.",
+  },
+  {
+    icon: "🛞",
+    title: "Fahrwerk",
+    description: "Radaufhängung, Lenkung und Fahrdynamik-Abstimmung auf der Strecke.",
+  },
+  {
+    icon: "🌬️",
+    title: "Aerodynamik",
+    description: "Abtrieb und Luftwiderstand per CFD-Simulation und Flügeldesign optimiert.",
+  },
+  {
+    icon: "💻",
+    title: "Software",
+    description: "Fahrzeugsoftware, Sensorik und Datenauswertung für jede Teststrecke.",
+  },
+  {
+    icon: "⚙️",
+    title: "Powertrain",
+    description: "Motoren, Getriebe und Antriebsstrang – von der Auslegung bis zum Prüfstand.",
+  },
+  {
+    icon: "📣",
+    title: "Marketing & Sponsoring",
+    description: "Öffentlichkeitsarbeit, Partnerbetreuung und der Auftritt des Teams nach außen.",
+  },
+];
+
 export default function Home() {
   const page = getPage("home");
   const stats = parseStats(page);
   const vehicles = getVehicles();
   const vehicle = vehicles.find((v) => v.current) ?? vehicles[0];
+  const bodyParagraphs = page?.body?.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean) ?? [];
 
   return (
     <>
@@ -76,6 +110,26 @@ export default function Home() {
         </div>
       </section>
 
+      {bodyParagraphs.length > 0 && (
+        <section className="container-page py-24">
+          <Reveal>
+            <div className="mx-auto max-w-3xl space-y-5 text-center">
+              <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">
+                Über uns
+              </p>
+              {bodyParagraphs.map((paragraph, i) => (
+                <p
+                  key={i}
+                  className={i === 0 ? "text-lg text-foreground" : "text-base text-muted"}
+                >
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+          </Reveal>
+        </section>
+      )}
+
       {vehicle && (
         <section className="container-page py-28 text-center">
           <Reveal>
@@ -108,6 +162,86 @@ export default function Home() {
         </section>
       )}
 
+      <section className="border-t border-border/60 bg-background/40 py-28">
+        <div className="container-page">
+          <Reveal>
+            <div className="mx-auto max-w-2xl text-center">
+              <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">
+                Fachbereiche
+              </p>
+              <h2 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
+                Ein Fahrzeug, {TEAM_DEPARTMENTS.length} Fachteams
+              </h2>
+              <p className="mt-4 text-lg text-muted">
+                Von der Konstruktion bis zum Marketing – jedes Fachteam trägt seinen Teil zum
+                fertigen Rennwagen bei.
+              </p>
+            </div>
+          </Reveal>
+          <StaggerGroup className="mx-auto mt-12 grid max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {DEPARTMENT_HIGHLIGHTS.map((dept) => (
+              <StaggerItem key={dept.title}>
+                <div className="h-full rounded-xl border border-border bg-surface p-6 transition-colors hover:border-accent/60">
+                  <div className="text-2xl">{dept.icon}</div>
+                  <h3 className="mt-3 font-semibold">{dept.title}</h3>
+                  <p className="mt-1.5 text-sm text-muted">{dept.description}</p>
+                </div>
+              </StaggerItem>
+            ))}
+          </StaggerGroup>
+          <Reveal delay={0.1} className="mt-10 text-center">
+            <Link
+              href="/team"
+              className="inline-flex items-center gap-1 text-sm font-semibold text-accent-text transition-all hover:gap-2 hover:underline"
+            >
+              Das ganze Team kennenlernen <span aria-hidden>&rarr;</span>
+            </Link>
+          </Reveal>
+        </div>
+      </section>
+
+      <section className="overflow-hidden py-16">
+        <Reveal>
+          <div className="container-page mb-8">
+            <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">
+              Wettbewerbe & Momente
+            </p>
+            <h2 className="mt-1 text-2xl font-extrabold tracking-tight sm:text-3xl">
+              Auf der Strecke zuhause
+            </h2>
+          </div>
+        </Reveal>
+        <div className="flex gap-3 overflow-x-auto px-4 pb-4 sm:px-8 lg:px-0 lg:container-page lg:grid lg:grid-cols-3 lg:overflow-visible lg:pb-0">
+          <div className="relative aspect-[4/3] w-72 flex-none overflow-hidden rounded-2xl lg:w-auto">
+            <Image
+              src="/uploads/ert-14-26-studio.jpg"
+              alt="ERT 14-26 Studio"
+              fill
+              sizes="(min-width: 1024px) 33vw, 288px"
+              className="object-cover transition-transform duration-700 hover:scale-105"
+            />
+          </div>
+          <div className="relative aspect-[4/3] w-72 flex-none overflow-hidden rounded-2xl lg:w-auto">
+            <Image
+              src="/uploads/rollout-2026/rollout-2026-buehne-enthuellung.webp"
+              alt="Rollout 2026 Enthüllung"
+              fill
+              sizes="(min-width: 1024px) 33vw, 288px"
+              className="object-cover transition-transform duration-700 hover:scale-105"
+            />
+          </div>
+          <div className="relative aspect-[4/3] w-72 flex-none overflow-hidden rounded-2xl lg:w-auto">
+            <Image
+              src="/uploads/ert-12-24-track.jpg"
+              alt="ERT auf der Rennstrecke"
+              fill
+              sizes="(min-width: 1024px) 33vw, 288px"
+              className="object-cover transition-transform duration-700 hover:scale-105"
+            />
+          </div>
+        </div>
+      </section>
+
       <section className="container-page py-24 text-center">
         <Reveal>
           <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Unsere Sponsoren</h2>
@@ -122,6 +256,26 @@ export default function Home() {
             Zu unseren Sponsoren <span aria-hidden>&rarr;</span>
           </Link>
         </Reveal>
+      </section>
+
+      <section className="border-t border-border/60 bg-surface/40 py-24 text-center">
+        <div className="container-page">
+          <Reveal>
+            <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
+              Werde Teil des Teams
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-lg text-muted">
+              Egal ob Technik, Marketing oder Business Plan – wir suchen laufend motivierte
+              Studierende, die mit uns den nächsten Boliden bauen.
+            </p>
+            <Link
+              href="/mitmachen"
+              className="mt-8 inline-flex items-center gap-1.5 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition-all hover:gap-2.5"
+            >
+              Offene Positionen ansehen <span aria-hidden>&rarr;</span>
+            </Link>
+          </Reveal>
+        </div>
       </section>
     </>
   );

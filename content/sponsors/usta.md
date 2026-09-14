@@ -1,8 +1,8 @@
 ---
 name: UStA Aalen
-tier: Partner
-logo: "/Sponsoren-Logo/Usta-Logo.png"
-website: "https://www.usta-aalen.de"
+tier: Silber
+logo: /Sponsoren-Logo/Usta-Logo.png
+website: ''
 ---
 
 Unabhängige Studierendenschaft der Hochschule Aalen.

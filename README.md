@@ -71,6 +71,7 @@ serverseitig on-demand (`ƒ`).
 | `/kontakt` | Kontaktformular & Anfahrt (Karte) |
 | `/impressum`, `/datenschutz` | Rechtliche Pflichtseiten |
 | `/sitemap.xml`, `/robots.txt` | SEO-Metadaten |
+| `/admin` (& `/admin/*`) | Redaktions-CMS (Login-geschützt, siehe unten) |
 
 **Formular-Backends** (`src/app/api/`): `contact`, `mitmachen`, `sponsoring`,
 `mediakit` — jeweils mit serverseitiger Validierung, Rate-Limiting und
@@ -102,12 +103,25 @@ Turbopack, statisch generierte Startseite):
 
 Redaktionelle Inhalte (Team, Fahrzeuge, Sponsoren, News, Blog, Galerie,
 Erfolge, offene Positionen, Seitentexte) liegen als Markdown-Dateien in
-`content/` und werden versioniert im Repository gepflegt — kein CMS, keine
-Datenbank, keine Laufzeit-Abhängigkeit auf einen Redaktions-Server.
+`content/` und werden zur Build-Zeit gelesen — keine Datenbank, keine
+Laufzeit-Abhängigkeit auf einen externen Server.
 
-Ein separates Redaktionssystem (Login, Editor, GitHub-Commits) existiert
-unabhängig davon im `cms-app`-Branch als eigenes Deployment. Dadurch enthält
-die öffentliche Website selbst keinen Admin-/Login-Code.
+Zusätzlich ist unter `/admin` ein Redaktions-CMS in die Website integriert
+(Login, Inhalte-Editor, Medienbibliothek, Nutzerverwaltung). Gespeichert
+wird lokal **und** — sofern konfiguriert — als Commit direkt ins
+GitHub-Repository, sodass Änderungen über das CMS genau die gleichen
+Markdown-Dateien in `content/` versionieren wie ein manueller Commit.
+
+**Benötigte Umgebungsvariablen** (in `.env.local` bzw. den
+Projekteinstellungen des Hosting-Anbieters):
+
+| Variable | Zweck |
+| :-- | :-- |
+| `CMS_SESSION_SECRET` | Zufälliger String (≥16 Zeichen) zum Signieren der Login-Session. Pflicht, sonst ist kein Login möglich. |
+| `CMS_ADMIN_USER` | Benutzername des Hauptadministrators. |
+| `CMS_ADMIN_PASSWORD_HASH` | Passwort-Hash des Hauptadministrators, erzeugt mit `node scripts/cms-hash-password.mjs "passwort"`. |
+| `GITHUB_TOKEN`, `GITHUB_OWNER`, `GITHUB_REPO` | Optional. Wenn gesetzt, committet das CMS jede Änderung automatisch ins Repository. Ohne diese Variablen werden Änderungen nur lokal auf dem Server gespeichert (nicht persistent auf den meisten Hosting-Plattformen). |
+| `FORM_WEBHOOK_URL` | Optional. Ziel-Webhook (z. B. Slack/Teams-Incoming-Webhook oder eigener E-Mail-Relay) für Kontakt-/Bewerbungs-/Sponsoring-/Mediakit-Formulare. Ohne diese Variable landen Einsendungen nur im Server-Log. |
 
 ## 🍎 macOS-Installation (CMS-App)
 

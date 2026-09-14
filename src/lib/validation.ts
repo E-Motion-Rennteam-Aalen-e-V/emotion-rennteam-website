@@ -6,6 +6,7 @@
  */
 
 import { TEAM_DEPARTMENTS } from "@/lib/team-departments";
+import { SPONSOR_TIERS_BASE } from "@/lib/sponsor-tiers";
 
 export type FieldErrors = Record<string, string>;
 
@@ -236,11 +237,7 @@ export type SponsorFormData = {
   message: string;
 };
 
-/** Tiers accepted as field values in sponsor content files. */
-export const SPONSOR_CONTENT_TIERS = ["Platin", "Gold", "Silber", "Partner"] as const;
-
-/** Tiers shown in the sponsor inquiry form; includes the undecided option. */
-export const SPONSOR_TIERS = [...SPONSOR_CONTENT_TIERS, "Noch unentschlossen"] as const;
+export const SPONSOR_TIERS = [...SPONSOR_TIERS_BASE, "Noch unentschlossen"] as const;
 
 export function validateSponsorForm(body: unknown): ValidationResult<SponsorFormData> {
   const data = asRecord(body);

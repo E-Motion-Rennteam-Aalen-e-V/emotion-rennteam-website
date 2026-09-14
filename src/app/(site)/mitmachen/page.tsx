@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { getPage, getPositions, getTeam, TEAM_DEPARTMENTS } from "@/lib/content";
+import Image from "next/image";
+import { getPositions, getTeam, TEAM_DEPARTMENTS } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import MemberApplicationForm from "@/components/MemberApplicationForm";
@@ -14,11 +15,10 @@ export const metadata: Metadata = {
 
 export default function JoinPage() {
   const positions = getPositions();
-  const page = getPage("join");
-  const teamCount = getTeam().length;
+  const memberCount = getTeam().length;
   const stats = [
     { value: "Seit 2009", label: "Am Start" },
-    { value: teamCount > 0 ? String(teamCount) : "50+", label: "Aktive Mitglieder" },
+    { value: String(memberCount), label: "Aktive Mitglieder" },
     { value: String(TEAM_DEPARTMENTS.length), label: "Fachbereiche" },
   ];
 
@@ -26,12 +26,10 @@ export default function JoinPage() {
     <div className="container-page py-20">
       <Reveal>
         <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Mitmachen</p>
-        <h1 className="mt-2 text-5xl font-extrabold tracking-tight sm:text-6xl">
-          {page?.heroTitle ?? "Werde Teil des Teams"}
-        </h1>
+        <h1 className="mt-2 text-5xl font-extrabold leading-tight tracking-tight sm:text-6xl">Werde Teil des Teams</h1>
         <p className="mt-4 max-w-2xl text-muted">
-          {page?.heroSubtitle ??
-            "Egal ob Chassis, Electrics, Driverless oder Sponsoring – bei uns lernst du, Theorie in ein reales Projekt zu übersetzen. Keine Vorerfahrung nötig, nur Motivation."}
+          Egal ob Chassis, Electrics, Driverless oder Sponsoring – bei uns lernst du,
+          Theorie in ein reales Projekt zu übersetzen. Keine Vorerfahrung nötig, nur Motivation.
         </p>
       </Reveal>
 
@@ -44,6 +42,38 @@ export default function JoinPage() {
             <p className="mt-1 text-xs text-muted sm:text-sm">{stat.label}</p>
           </div>
         ))}
+      </Reveal>
+
+      <Reveal delay={0.04} className="mt-12">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="relative col-span-2 aspect-[16/9] overflow-hidden rounded-2xl">
+            <Image
+              src="/uploads/rollout-2026/rollout-2026-team-buehne.webp"
+              alt="E-Motion Team beim Rollout 2026"
+              fill
+              sizes="(min-width: 640px) 50vw, 100vw"
+              className="object-cover"
+            />
+          </div>
+          <div className="relative aspect-square overflow-hidden rounded-2xl">
+            <Image
+              src="/uploads/ert-14-26-nightrun-rear.jpg"
+              alt="ERT 14-26 Nightrun"
+              fill
+              sizes="25vw"
+              className="object-cover"
+            />
+          </div>
+          <div className="relative aspect-square overflow-hidden rounded-2xl">
+            <Image
+              src="/uploads/em-fahrzeug-detail.jpg"
+              alt="Fahrzeugdetail"
+              fill
+              sizes="25vw"
+              className="object-cover"
+            />
+          </div>
+        </div>
       </Reveal>
 
       <Reveal delay={0.05} className="mt-14">
