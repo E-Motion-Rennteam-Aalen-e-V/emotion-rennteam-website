@@ -42,7 +42,17 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
     return () => clearTimeout(id);
   }, [copiedPath]);
 
+  const ALLOWED_UPLOAD_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+
   async function uploadFile(file: File) {
+    if (file.type === "image/svg+xml" || file.name.toLowerCase().endsWith(".svg")) {
+      setNotice({ kind: "error", message: "SVG-Dateien werden aus Sicherheitsgründen nicht unterstützt. Bitte JPG, PNG, WebP oder GIF verwenden." });
+      return;
+    }
+    if (!ALLOWED_UPLOAD_TYPES.has(file.type)) {
+      setNotice({ kind: "error", message: "Nur Bilddateien (JPG, PNG, WebP, GIF) sind erlaubt." });
+      return;
+    }
     if (file.size > 8 * 1024 * 1024) {
       setNotice({ kind: "error", message: "Datei zu groß – maximal 8 MB erlaubt." });
       return;

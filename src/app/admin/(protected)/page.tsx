@@ -1,12 +1,10 @@
 import Link from "next/link";
-import { promises as fs } from "node:fs";
 import path from "node:path";
 import { collections } from "@/lib/cms/collections";
 import { listItems } from "@/lib/cms/content";
 import { getGithubConfig } from "@/lib/cms/github";
+import { listUploadedImages } from "@/lib/cms/media";
 import { existsSync } from "node:fs";
-
-const ALLOWED_MEDIA_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif"]);
 
 function countPendingSubmissions(): number {
   const file = path.join(process.cwd(), ".pending-form-submissions.jsonl");
@@ -19,24 +17,10 @@ function countPendingSubmissions(): number {
   }
 }
 
-async function countUploads(): Promise<number> {
-  try {
-    const entries = await fs.readdir(path.join(process.cwd(), "public", "uploads"), {
-      withFileTypes: true,
-      recursive: true,
-    });
-    return entries.filter(
-      (e) => e.isFile() && ALLOWED_MEDIA_EXTENSIONS.has(path.extname(e.name).toLowerCase())
-    ).length;
-  } catch {
-    return 0;
-  }
-}
-
 export default async function AdminDashboard() {
   const [counts, mediaCount] = await Promise.all([
     Promise.all(collections.map((c) => listItems(c.name).then((items) => items.length))),
-    countUploads(),
+    listUploadedImages().then((files) => files.length),
   ]);
   const githubConnected = Boolean(getGithubConfig());
   const webhookConfigured = Boolean(process.env.FORM_WEBHOOK_URL);

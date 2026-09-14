@@ -32,14 +32,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const newsEntries = getNews().map((post) => ({
     url: `${SITE_URL}/news/${post.slug}`,
-    lastModified: new Date(post.date),
+    lastModified: post.fileMtime ?? new Date(post.date),
     changeFrequency: "monthly" as const,
     priority: 0.4,
   }));
 
   const blogEntries = getBlogPosts().map((post) => ({
     url: `${SITE_URL}/blog/${post.slug}`,
-    lastModified: new Date(post.date),
+    lastModified: post.fileMtime ?? new Date(post.date),
     changeFrequency: "monthly" as const,
     priority: 0.4,
   }));

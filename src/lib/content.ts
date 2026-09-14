@@ -9,20 +9,24 @@ const CONTENT_DIR = path.join(process.cwd(), "content");
 // gesamte Collection - und damit die Live-Seite fuer alle Besucher - zum
 // Absturz bringen. Defekte Eintraege werden uebersprungen und geloggt statt
 // den Fehler weiterzuwerfen.
-function readCollection<T>(collection: string): (T & { slug: string })[] {
+function readCollection<T>(collection: string): (T & { slug: string; fileMtime?: Date })[] {
   const dir = path.join(CONTENT_DIR, collection);
   if (!fs.existsSync(dir)) return [];
 
-  const items: (T & { slug: string; body: string })[] = [];
+  const items: (T & { slug: string; body: string; fileMtime?: Date })[] = [];
   for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".md"))) {
     try {
-      const raw = fs.readFileSync(path.join(dir, file), "utf8");
+      const abs = path.join(dir, file);
+      const raw = fs.readFileSync(abs, "utf8");
       const { data, content } = matter(raw);
+      let fileMtime: Date | undefined;
+      try { fileMtime = fs.statSync(abs).mtime; } catch { /* ignore */ }
       items.push({
         ...(data as T),
         slug: file.replace(/\.md$/, ""),
         body: content,
-      } as T & { slug: string; body: string });
+        fileMtime,
+      } as T & { slug: string; body: string; fileMtime?: Date });
     } catch (error) {
       console.error(`[content] Ueberspringe defekte Datei ${collection}/${file}:`, error);
     }
