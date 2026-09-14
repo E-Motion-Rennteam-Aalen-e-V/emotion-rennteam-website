@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 export default function GlobalError({ reset }: { reset: () => void }) {
   return (
     <html lang="de">
@@ -40,7 +42,7 @@ export default function GlobalError({ reset }: { reset: () => void }) {
           >
             Erneut versuchen
           </button>
-          <a
+          <Link
             href="/"
             style={{
               padding: "0.6rem 1.25rem",
@@ -54,7 +56,7 @@ export default function GlobalError({ reset }: { reset: () => void }) {
             }}
           >
             Zurück zur Startseite
-          </a>
+          </Link>
         </div>
       </body>
     </html>

@@ -4,13 +4,13 @@ import { collections } from "@/lib/cms/collections";
 import { listItems } from "@/lib/cms/content";
 import { getGithubConfig } from "@/lib/cms/github";
 import { listUploadedImages } from "@/lib/cms/media";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 
 function countPendingSubmissions(): number {
   const file = path.join(process.cwd(), ".pending-form-submissions.jsonl");
   if (!existsSync(file)) return 0;
   try {
-    const lines = require("node:fs").readFileSync(file, "utf-8").trim().split("\n").filter(Boolean);
+    const lines = readFileSync(file, "utf-8").trim().split("\n").filter(Boolean);
     return lines.length;
   } catch {
     return 0;
