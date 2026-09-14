@@ -51,7 +51,7 @@ describe("getVehicles", () => {
 });
 
 describe("getSponsors", () => {
-  const TIER_ORDER = ["Platin", "Gold", "Silber", "Partner"];
+  const TIER_ORDER = ["Platin", "Gold", "Silber", "Bronze", "Partner"];
 
   it("only uses the documented tier values", () => {
     for (const sponsor of getSponsors()) {
