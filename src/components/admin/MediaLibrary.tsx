@@ -58,8 +58,8 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
       setNotice({
         kind: data.committedToGithub ? "ok" : "warning",
         message: data.committedToGithub
-          ? `Hochgeladen und auf GitHub gesichert: ${data.path}`
-          : data.warning || `Hochgeladen: ${data.path}`,
+          ? `Hochgeladen und auf GitHub gesichert: ${data.publicPath}`
+          : data.warning || `Hochgeladen: ${data.publicPath}`,
       });
       await refresh();
     } catch {
@@ -100,9 +100,11 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
   async function handleDrop(e: React.DragEvent) {
     e.preventDefault();
     setDragOver(false);
-    const file = e.dataTransfer.files?.[0];
-    if (!file) return;
-    await uploadFile(file);
+    const files = Array.from(e.dataTransfer.files ?? []);
+    if (!files.length) return;
+    for (const file of files) {
+      await uploadFile(file);
+    }
   }
 
   async function handleDelete(filename: string) {
@@ -194,14 +196,6 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
         </div>
       </div>
 
-      {/* Direkter Upload läuft über den Server und wird per GitHub-Commit ins
-          Repo geschrieben (siehe saveUploadedImage) — dabei kommt es bei
-          manchen Dateien öfter zu Konvertierungs-/Commit-Fehlern. */}
-      <p className="mb-4 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3.5 py-2.5 text-sm text-amber-300">
-        Bei Upload-Fehlern hier: Bild lieber direkt im GitHub-Repo unter{" "}
-        <code className="font-mono">public/uploads/</code> hochladen.
-      </p>
-
       {/* Drop zone hint when library is empty */}
       {files.length === 0 && !dragOver && (
         <div className="mb-4 rounded-xl border-2 border-dashed border-border p-8 text-center text-sm text-muted transition-colors hover:border-accent">
@@ -211,18 +205,25 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
       )}
 
       {notice && (
-        <p
-          role="status"
-          className={`mb-4 rounded-lg border px-3.5 py-2.5 text-sm ${
-            notice.kind === "ok"
-              ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
-              : notice.kind === "warning"
-                ? "border-amber-500/30 bg-amber-500/10 text-amber-300"
-                : "border-red-500/30 bg-red-500/10 text-red-400"
-          }`}
-        >
-          {notice.message}
-        </p>
+        <>
+          <p
+            role="status"
+            className={`mb-2 rounded-lg border px-3.5 py-2.5 text-sm ${
+              notice.kind === "ok"
+                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+                : notice.kind === "warning"
+                  ? "border-amber-500/30 bg-amber-500/10 text-amber-300"
+                  : "border-red-500/30 bg-red-500/10 text-red-400"
+            }`}
+          >
+            {notice.message}
+          </p>
+          {notice.kind === "error" && (
+            <p className="mb-4 text-xs text-muted">
+              Tipp: Bild direkt im GitHub-Repo unter <code className="font-mono">public/uploads/</code> hochladen.
+            </p>
+          )}
+        </>
       )}
 
       {files.length >= 6 && (

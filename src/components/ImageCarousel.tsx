@@ -4,16 +4,16 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 
-const CAROUSEL_IMAGES = [
-  "/uploads/em-fahrzeug-detail.jpg",
-  "/uploads/ert-14-26-nightrun-rear.jpg",
-  "/uploads/em-fahrzeug-buehne.jpg",
-  "/uploads/ert-12-24-track.jpg",
-  "/uploads/em-fahrzeug-heckfluegel.jpg",
-  "/uploads/ert-14-26-frontwing-detail.jpg",
-  "/uploads/ert-14-26-nightrun-cone.jpg",
-  "/uploads/ert-14-26-sponsor-detail.jpg",
-  "/uploads/ert-14-26-nightrun-street.jpg",
+const CAROUSEL_IMAGES: { src: string; alt: string }[] = [
+  { src: "/uploads/em-fahrzeug-detail.jpg", alt: "E-Motion Fahrzeug Detailansicht" },
+  { src: "/uploads/ert-14-26-nightrun-rear.jpg", alt: "ERT-14-26 Heckansicht beim Nightrun" },
+  { src: "/uploads/em-fahrzeug-buehne.jpg", alt: "E-Motion Fahrzeug auf der Präsentationsbühne" },
+  { src: "/uploads/ert-12-24-track.jpg", alt: "ERT-12-24 auf der Rennstrecke" },
+  { src: "/uploads/em-fahrzeug-heckfluegel.jpg", alt: "Heckflügel des E-Motion Fahrzeugs" },
+  { src: "/uploads/ert-14-26-frontwing-detail.jpg", alt: "Frontflügel-Detail des ERT-14-26" },
+  { src: "/uploads/ert-14-26-nightrun-cone.jpg", alt: "ERT-14-26 beim Nightrun mit Pylone" },
+  { src: "/uploads/ert-14-26-sponsor-detail.jpg", alt: "Sponsoren-Logos am ERT-14-26" },
+  { src: "/uploads/ert-14-26-nightrun-street.jpg", alt: "ERT-14-26 beim Nightrun auf der Straße" },
 ];
 
 export default function ImageCarousel() {
@@ -58,8 +58,8 @@ export default function ImageCarousel() {
           transition={{ duration: 0.6 }}
         >
           <Image
-            src={CAROUSEL_IMAGES[current]}
-            alt={`E-Motion Rennteam Bild ${current + 1}`}
+            src={CAROUSEL_IMAGES[current].src}
+            alt={CAROUSEL_IMAGES[current].alt}
             fill
             sizes="(min-width: 1024px) 50vw, 100vw"
             className="object-cover"

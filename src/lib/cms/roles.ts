@@ -3,11 +3,11 @@
 // gehalten wie im credentials-repo-Paket selbst - neue Rollen lassen sich
 // hier ergänzen, ohne das Paket anfassen zu muessen.
 
-/** Uneingeschraenkter Zugang: verwaltet Inhalte, Benutzer UND andere Admins/Superadmins. Phase 1: Denny. */
+/** Uneingeschraenkter Zugang: verwaltet Inhalte, Benutzer UND andere Admins/Superadmins. */
 export const ROLE_SUPERADMIN = "superadmin";
-/** Voller Content-Zugriff + darf Benutzer anlegen, aber keine Admin-/Superadmin-Zugaenge antasten. Phase 1: Linda. */
+/** Voller Content-Zugriff + darf Benutzer anlegen, aber keine Admin-/Superadmin-Zugaenge antasten. */
 export const ROLE_ADMIN = "Admin";
-/** Nur Zugriff auf die Sponsoring-Inhalte. Phase 1: Florian. */
+/** Nur Zugriff auf die Sponsoring-Inhalte. */
 export const ROLE_SPONSORING = "Sponsoring-Management";
 
 /** Rollen, die im CMS-Panel bei der Anlage/Bearbeitung eines Zugangs zur Auswahl stehen. */

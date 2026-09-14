@@ -47,7 +47,9 @@ export default function TeamByGeneration({
 
       <div className="mt-14 space-y-14">
         {departments.map((department, di) => {
-          const members = generationTeam.filter((member) => member.department === department);
+          const members = generationTeam.filter(
+            (member) => member.department === department || (!member.department && di === 0)
+          );
           const banner = departmentImages[department];
           return (
             <Reveal key={`${activeGeneration}-${department}`} delay={di * 0.03}>

@@ -63,7 +63,7 @@ export default function SponsorCard({ sponsor, index }: { sponsor: Sponsor; inde
   }
 
   const plainClassName =
-    "flex h-full flex-col items-center justify-center rounded-xl border border-border bg-surface p-8 text-center transition-all duration-300 hover:-translate-y-1 hover:border-accent hover:shadow-[0_0_30px_-10px_rgba(0,113,181,0.35)]";
+    "group flex h-full flex-col items-center justify-center rounded-xl border border-border bg-surface p-8 text-center transition-all duration-300 hover:-translate-y-1 hover:border-accent hover:shadow-[0_0_30px_-10px_rgba(0,113,181,0.35)]";
 
   if (!style) {
     if (!sponsor.website) {
@@ -78,9 +78,10 @@ export default function SponsorCard({ sponsor, index }: { sponsor: Sponsor; inde
         href={sponsor.website}
         target="_blank"
         rel="noopener noreferrer"
-        className={plainClassName}
+        className={`${plainClassName} relative`}
       >
         <SponsorMark sponsor={sponsor} />
+        <ExternalLinkBadge />
       </a>
     );
   }
@@ -125,7 +126,26 @@ export default function SponsorCard({ sponsor, index }: { sponsor: Sponsor; inde
     >
       <span className="sponsor-card__shimmer" aria-hidden="true" />
       <SponsorMark sponsor={sponsor} />
+      <ExternalLinkBadge />
     </motion.a>
+  );
+}
+
+function ExternalLinkBadge() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 16 16"
+      fill="currentColor"
+      aria-hidden="true"
+      className="absolute right-2.5 top-2.5 z-10 h-3 w-3 opacity-0 transition-opacity duration-200 group-hover:opacity-50 text-foreground"
+    >
+      <path
+        fillRule="evenodd"
+        d="M4.75 2a.75.75 0 0 0 0 1.5h5.44L2.22 11.47a.75.75 0 1 0 1.06 1.06L11.25 4.56v5.44a.75.75 0 0 0 1.5 0V2.75A.75.75 0 0 0 12 2H4.75Z"
+        clipRule="evenodd"
+      />
+    </svg>
   );
 }
 
