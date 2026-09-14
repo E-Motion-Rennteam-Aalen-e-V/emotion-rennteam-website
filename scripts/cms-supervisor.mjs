@@ -118,8 +118,32 @@ async function preWarmRoutes() {
   }
 }
 
+// CMS_PRODUCTION=true baut einmalig einen Produktions-Build und startet dann
+// `npm start`. Im Standard-Entwicklungsmodus (CMS_PRODUCTION nicht gesetzt)
+// laeuft Turbopack/Next.js dev - wie bisher. Der Build-Schritt kann beim
+// ersten Start mehrere Minuten dauern; danach ist `npm start` deutlich
+// schneller und verbraucht weniger Ressourcen.
+const useProduction = process.env.CMS_PRODUCTION === "true";
+
 function startServer() {
-  child = spawn("npm", ["run", "dev", "--", "-p", port], {
+  let args;
+  if (useProduction) {
+    // Build first (blocking, da der Server sonst .next/ nicht vorfindet), dann start.
+    const build = spawnSync("npm", ["run", "build"], {
+      cwd: repoRoot,
+      stdio: "inherit",
+      shell: isWin,
+    });
+    if (build.status !== 0) {
+      process.stderr.write("[cms-supervisor] npm run build fehlgeschlagen — fallback auf dev\n");
+      args = ["run", "dev", "--", "-p", port];
+    } else {
+      args = ["run", "start", "--", "-p", port];
+    }
+  } else {
+    args = ["run", "dev", "--", "-p", port];
+  }
+  child = spawn("npm", args, {
     cwd: repoRoot,
     stdio: "inherit",
     shell: isWin,

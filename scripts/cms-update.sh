@@ -95,7 +95,7 @@ if [ "$(git log -1 --format=%s 2>/dev/null)" = "$CONTENT_SYNC_MARKER" ] \
 fi
 
 # Inhalte, die ueber das CMS gespeichert werden, landen als Commit auf dem in
-# .env.local konfigurierten GITHUB_BRANCH (Standard: main) - nicht
+# .env.local konfigurierten GITHUB_BRANCH (Standard: website) - nicht
 # zwingend auf dem Branch, von dem diese CMS-Installation selbst laeuft
 # (typischerweise cms-app, ein separates Deployment). Ohne diesen Abgleich
 # zeigt die lokale content/-Kopie dieser Installation zunehmend veraltete

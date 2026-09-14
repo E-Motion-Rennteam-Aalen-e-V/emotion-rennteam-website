@@ -75,6 +75,8 @@ if [ "$needs_terminal" = true ]; then
     escaped_dir="${escaped_dir//$'\r'/}"
     escaped_dir="${escaped_dir//\\/\\\\}"
     escaped_dir="${escaped_dir//\"/\\\"}"
+    escaped_dir="${escaped_dir//\$/\\\$}"   # $ wuerde in nicht-quoted heredoc expandiert
+    escaped_dir="${escaped_dir//\`/\\\`}"   # Backtick = Command-Substitution
     osascript <<OSA
 tell application "Terminal"
     activate
@@ -135,6 +137,8 @@ if ! kill -0 "$server_pid" 2>/dev/null; then
     message=$(printf 'Das CMS konnte nicht gestartet werden.\n\n%s\n\nDetails in: %s' "$tail_log" "$LOG")
     escaped_message=${message//\\/\\\\}
     escaped_message=${escaped_message//\"/\\\"}
+    escaped_message=${escaped_message//\$/\\\$}
+    escaped_message=${escaped_message//\`/\\\`}
     osascript -e "display dialog \"$escaped_message\" with title \"E-Motion CMS\" buttons {\"OK\"} with icon caution"
     exit 1
 fi
