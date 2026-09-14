@@ -63,11 +63,19 @@ export default function SponsorCard({ sponsor }: { sponsor: Sponsor }) {
   }
 
   if (!style) {
+    if (!sponsor.website) {
+      return (
+        <div className="flex h-full flex-col items-center justify-center rounded-xl border border-border bg-surface p-8 text-center">
+          <SponsorMark sponsor={sponsor} />
+        </div>
+      );
+    }
     return (
       <a
-        href={sponsor.website ?? "#"}
+        href={sponsor.website}
         target="_blank"
         rel="noopener noreferrer"
+        aria-label={`${sponsor.name} (öffnet in neuem Tab)`}
         className="flex h-full flex-col items-center justify-center rounded-xl border border-border bg-surface p-8 text-center transition-all duration-300 hover:-translate-y-1 hover:border-accent hover:shadow-[0_0_30px_-10px_rgba(0,113,181,0.35)]"
       >
         <SponsorMark sponsor={sponsor} />
@@ -75,12 +83,31 @@ export default function SponsorCard({ sponsor }: { sponsor: Sponsor }) {
     );
   }
 
+  if (!sponsor.website) {
+    return (
+      <div
+        style={
+          {
+            "--tier-shimmer": style.shimmer,
+            "--tier-glow": style.glow,
+            "--tier-border-glow": style.borderGlow,
+          } as CSSProperties
+        }
+        className="sponsor-card--tier group relative flex h-full flex-col items-center justify-center overflow-hidden rounded-xl bg-surface p-8 text-center"
+      >
+        <span className="sponsor-card__shimmer" aria-hidden="true" />
+        <SponsorMark sponsor={sponsor} />
+      </div>
+    );
+  }
+
   return (
     <motion.a
       ref={ref}
-      href={sponsor.website ?? "#"}
+      href={sponsor.website}
       target="_blank"
       rel="noopener noreferrer"
+      aria-label={`${sponsor.name} (öffnet in neuem Tab)`}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       style={

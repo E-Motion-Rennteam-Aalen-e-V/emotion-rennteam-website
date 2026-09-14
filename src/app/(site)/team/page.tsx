@@ -177,12 +177,12 @@ export default async function TeamPage({
                               </div>
                               <div className="mt-4 flex items-center justify-between">
                                 <h4 className="font-sans font-semibold leading-normal">{member.name}</h4>
-                                {member.linkedin && (
+                                {member.linkedin && /^https:\/\/(www\.)?linkedin\.com\//.test(member.linkedin) && (
                                   <a
                                     href={member.linkedin}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    aria-label={`${member.name} auf LinkedIn`}
+                                    aria-label={`${member.name} auf LinkedIn (öffnet in neuem Tab)`}
                                     className="text-muted transition-colors hover:text-accent-text"
                                   >
                                     <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">

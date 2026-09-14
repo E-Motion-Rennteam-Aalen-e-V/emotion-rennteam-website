@@ -1,12 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import GalleryGrid from "@/components/GalleryGrid";
 
-function ImageLoadNotice() {
-  const [dismissed, setDismissed] = useState(false);
-  if (dismissed) return null;
-
+function ImageLoadNotice({ onDismiss }: { onDismiss: () => void }) {
   return (
     <div className="mb-6 flex items-start gap-3 rounded-xl border border-accent/30 bg-accent/10 px-4 py-3.5 sm:items-center">
       <svg
@@ -33,7 +30,7 @@ function ImageLoadNotice() {
       </button>
       <button
         type="button"
-        onClick={() => setDismissed(true)}
+        onClick={onDismiss}
         aria-label="Hinweis schließen"
         className="shrink-0 text-muted transition-colors hover:text-foreground"
       >
@@ -56,18 +53,28 @@ export default function GalleryAlbumPicker({
   albums: { name: string; images: GalleryImage[] }[];
 }) {
   const [selected, setSelected] = useState(albums[0]?.name ?? "");
+  const [hasLoadError, setHasLoadError] = useState(false);
+  const [noticeDismissed, setNoticeDismissed] = useState(false);
   const active = albums.find((album) => album.name === selected) ?? albums[0];
+
+  const handleImageError = useCallback(() => setHasLoadError(true), []);
 
   return (
     <div>
-      <ImageLoadNotice />
+      {hasLoadError && !noticeDismissed && (
+        <ImageLoadNotice onDismiss={() => setNoticeDismissed(true)} />
+      )}
       <label htmlFor="album-select" className="text-sm font-medium">
         Album auswählen
       </label>
       <select
         id="album-select"
         value={selected}
-        onChange={(e) => setSelected(e.target.value)}
+        onChange={(e) => {
+          setSelected(e.target.value);
+          setHasLoadError(false);
+          setNoticeDismissed(false);
+        }}
         className="mt-2 w-full max-w-sm rounded-md border border-border bg-surface px-4 py-2.5 text-sm outline-none transition-colors focus:border-accent sm:w-auto"
       >
         {albums.map((album) => (
@@ -77,7 +84,7 @@ export default function GalleryAlbumPicker({
         ))}
       </select>
 
-      {active && <GalleryGrid images={active.images} />}
+      {active && <GalleryGrid images={active.images} onImageError={handleImageError} />}
     </div>
   );
 }
