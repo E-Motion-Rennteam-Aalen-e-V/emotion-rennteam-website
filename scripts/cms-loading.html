@@ -27,24 +27,29 @@
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+  .card {
+    width: min(380px, 90vw);
     -webkit-user-select: none;
     user-select: none;
   }
-  .card {
-    width: min(420px, 90vw);
+  .head {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
   }
   .mark {
-    width: 56px;
-    height: 56px;
-    margin: 0 auto 28px;
-    border-radius: 16px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+    border-radius: 14px;
     background: linear-gradient(135deg, var(--accent), var(--accent-2));
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 22px;
+    font-size: 19px;
     box-shadow: 0 8px 30px -8px rgba(74, 99, 247, 0.55);
   }
   h1 {
@@ -56,61 +61,73 @@
   .sub {
     font-size: 13px;
     color: var(--muted);
-    margin: 0 0 32px;
+    margin: 0;
+  }
+  .status-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 28px;
+    min-height: 16px;
   }
   .spinner {
-    width: 28px;
-    height: 28px;
-    margin: 0 auto 18px;
+    width: 13px;
+    height: 13px;
+    flex: none;
     border-radius: 50%;
-    border: 2.5px solid var(--border);
+    border: 2px solid var(--border);
     border-top-color: var(--accent);
     animation: spin 0.8s linear infinite;
   }
+  .spinner.hidden { display: none; }
   @keyframes spin {
     to { transform: rotate(360deg); }
   }
   .status {
-    font-size: 14px;
-    font-weight: 500;
-    min-height: 20px;
-    transition: opacity 0.25s ease;
-  }
-  .hint {
-    margin-top: 10px;
     font-size: 12.5px;
     color: var(--muted);
-    min-height: 16px;
+  }
+  .error .status { color: var(--danger); }
+  .hint {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+    min-height: 14px;
   }
   .retry {
     display: none;
-    margin-top: 22px;
+    margin-top: 14px;
+    text-align: center;
   }
   .retry.visible { display: block; }
   .retry a {
     display: inline-block;
-    padding: 8px 16px;
+    padding: 7px 14px;
     border-radius: 8px;
     border: 1px solid var(--border);
     background: var(--surface-2);
     color: var(--foreground);
     text-decoration: none;
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 500;
   }
   .retry a:hover { border-color: var(--accent); }
-  .error .spinner { display: none; }
-  .error .mark { box-shadow: 0 8px 30px -8px rgba(248, 113, 113, 0.45); }
-  .error .status { color: var(--danger); }
 </style>
 </head>
 <body>
   <div class="card" id="card">
-    <div class="mark">EM</div>
-    <h1>E-Motion Rennteam Aalen</h1>
-    <p class="sub">Redaktions-CMS</p>
-    <div class="spinner" id="spinner"></div>
-    <p class="status" id="status">Kurzes Update wird geprüft – einen Moment bitte…</p>
+    <div class="head">
+      <div class="mark">EM</div>
+      <h1>E-Motion Rennteam Aalen</h1>
+      <p class="sub">Redaktions-CMS</p>
+    </div>
+
+    <div class="status-row">
+      <div class="spinner" id="spinner"></div>
+      <p class="status" id="status">Verbinde mit Server…</p>
+    </div>
     <p class="hint" id="hint">&nbsp;</p>
     <div class="retry" id="retry">
       <a id="retryLink" href="http://localhost:3000/admin/login">Trotzdem öffnen</a>
@@ -118,31 +135,49 @@
   </div>
 
   <script>
-    // Polls the local CMS server until it responds, then hands off to the
-    // real app. Deliberately avoids fetch()/XHR: this file is opened via
-    // file://, and browsers block cross-origin fetch from a file:// page
-    // even for a same-machine http://localhost target. A plain <img> load
-    // has no such restriction (only *reading* the pixels would need CORS),
-    // and a full-page navigation at the end is never CORS-restricted either.
+    // Reiner Lade-Splash, keine eigene Login-Maske: fruehere Versionen
+    // zeigten hier schon ein Passwortfeld zum Vorab-Eintippen, aber das
+    // konnte nie wirklich einloggen (der Tastatur-Fokus/Wert geht beim
+    // Sprung auf die echte Seite ohnehin verloren, siehe Git-Historie) - das
+    // sorgte nur fuer Verwirrung ("ich habe mein Passwort eingegeben und
+    // nichts ist passiert"). Stattdessen jetzt: sobald der Server antwortet,
+    // wird IMMER automatisch zur echten Login-Seite weitergeleitet, ganz
+    // ohne Klick.
+    //
+    // Probing uses fetch(TARGET, { mode: "no-cors" }) rather than reading
+    // the response: this file is opened via file://, and browsers block
+    // *reading* a cross-origin response body/status without CORS headers -
+    // but a "no-cors" request is still sent and its promise still resolves
+    // once the server actually answers, which is all that's needed here to
+    // know the page is ready. A full-page navigation at the end is never
+    // CORS-restricted either way.
     (function () {
       var PORT = 3000;
       var TARGET = "http://localhost:" + PORT + "/admin/login";
-      var PING = "http://localhost:" + PORT + "/favicon.ico?_=";
       var statusEl = document.getElementById("status");
       var hintEl = document.getElementById("hint");
       var cardEl = document.getElementById("card");
       var retryEl = document.getElementById("retry");
+      var spinnerEl = document.getElementById("spinner");
       document.getElementById("retryLink").href = TARGET;
 
       var startedAt = Date.now();
       var handedOff = false;
+      var probing = false;
       var messages = [
-        [0, "Kurzes Update wird geprüft – einen Moment bitte…"],
-        [6000, "Server wird gestartet…"],
+        [0, "Verbinde mit Server…"],
         [16000, "Fast fertig – die erste Seite wird vorbereitet…"],
-        [35000, "Das dauert gerade ungewöhnlich lange…"],
+        [35000, "Noch kein Server – bitte Terminal auf Fehler prüfen…"],
       ];
       var currentMessage = -1;
+
+      function goToRealLogin() {
+        if (handedOff) return;
+        handedOff = true;
+        statusEl.textContent = "Bereit.";
+        spinnerEl.classList.add("hidden");
+        window.location.replace(TARGET);
+      }
 
       function tick() {
         var elapsed = Date.now() - startedAt;
@@ -154,31 +189,43 @@
           }
         }
         if (elapsed >= 35000) {
-          hintEl.textContent = "Beim allerersten Start kann die Installation ein paar Minuten dauern.";
+          hintEl.textContent = "Beim ersten Start nach npm-Installation kann es länger dauern.";
           retryEl.classList.add("visible");
         }
-        if (elapsed >= 120000 && !handedOff) {
+        if (elapsed >= 60000 && !handedOff) {
           cardEl.classList.add("error");
+          spinnerEl.classList.add("hidden");
           statusEl.textContent = "Der Server antwortet nicht.";
           hintEl.textContent = "Bitte das Terminal-/Konsolenfenster auf Fehlermeldungen prüfen.";
           return;
         }
 
-        // Only onload counts as "ready": favicon.ico is a real file Next.js
-        // serves once it's actually up, so a successful image load means
-        // there's a real server behind that port. onerror fires just as
-        // fast for "connection refused" as for a broken response, so it
-        // must NOT be treated as ready - it just means "try again".
-        var probe = new Image();
-        probe.onload = function () {
-          if (handedOff) return;
-          handedOff = true;
-          statusEl.textContent = "Bereit.";
-          window.location.replace(TARGET);
-        };
-        probe.src = PING + Date.now();
+        // Probes the REAL target page (not just favicon.ico): next dev/
+        // Turbopack compiles each route lazily on its first request, so
+        // pinging only favicon.ico used to mean the redirect below hit an
+        // as-yet-uncompiled /admin/login and the browser sat on a blank tab
+        // for that compile - invisible extra wait, not covered by this
+        // spinner. Fetching TARGET itself here means that compile happens
+        // *while this branded splash is still showing*, and the eventual
+        // redirect below lands on an already-warm, instantly-ready page.
+        // mode: "no-cors" is required (file:// -> http://localhost is
+        // cross-origin) and is enough: the promise only needs to resolve to
+        // prove the server actually answered, the opaque response body is
+        // never read. Guarded by `probing` so a slow first compile doesn't
+        // pile up overlapping requests - only one probe in flight at a time.
+        if (!probing) {
+          probing = true;
+          fetch(TARGET, { mode: "no-cors", cache: "no-store" })
+            .then(goToRealLogin)
+            .catch(function () {
+              // Connection refused - server not listening yet, try again.
+            })
+            .finally(function () {
+              probing = false;
+            });
+        }
 
-        if (!handedOff) setTimeout(tick, 700);
+        if (!handedOff) setTimeout(tick, 400);
       }
 
       tick();

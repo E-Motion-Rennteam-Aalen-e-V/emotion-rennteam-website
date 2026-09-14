@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useSyncExternalStore } from "react";
 
 const COOKIE_NAME = "cookie-consent";
@@ -47,9 +48,16 @@ function writeConsentCookie(value: "accepted" | "declined") {
 }
 
 export default function CookieConsent() {
+  const pathname = usePathname();
   const consent = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const visible = consent === undefined;
 
+  // The notice is about cookies the public marketing site sets - it has
+  // nothing to do with the separate internal CMS, and its fixed
+  // bottom-of-viewport banner can otherwise overlap and block real UI there
+  // (e.g. an editor form's Speichern button) for anyone who hasn't answered
+  // it yet in that browser.
+  if (pathname?.startsWith("/admin")) return null;
   if (!visible) return null;
 
   return (

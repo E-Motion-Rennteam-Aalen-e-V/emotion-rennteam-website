@@ -28,9 +28,9 @@ const STATIC_ROUTES: {
   { path: "/mediakit", priority: 0.4, changeFrequency: "yearly" },
   { path: "/erfolge", priority: 0.6, changeFrequency: "monthly" },
   { path: "/mitmachen", priority: 0.7, changeFrequency: "monthly" },
-  { path: "/kontakt", priority: 0.5, changeFrequency: "yearly" },
-  { path: "/blog", priority: 0.6, changeFrequency: "weekly" },
   { path: "/news", priority: 0.6, changeFrequency: "weekly" },
+  { path: "/blog", priority: 0.6, changeFrequency: "weekly" },
+  { path: "/kontakt", priority: 0.5, changeFrequency: "yearly" },
   { path: "/impressum", priority: 0.2, changeFrequency: "yearly" },
   { path: "/datenschutz", priority: 0.2, changeFrequency: "yearly" },
 ];
@@ -43,19 +43,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: route.priority,
   }));
 
-  const blogEntries = getBlogPosts().map((post) => ({
-    url: `${SITE_URL}/blog/${post.slug}`,
-    lastModified: new Date(post.date),
-    changeFrequency: "monthly" as const,
-    priority: 0.5,
-  }));
-
   const newsEntries = getNews().map((post) => ({
     url: `${SITE_URL}/news/${post.slug}`,
-    lastModified: new Date(post.date),
+    lastModified: post.fileMtime ?? new Date(post.date),
     changeFrequency: "monthly" as const,
-    priority: 0.5,
+    priority: 0.4,
   }));
 
-  return [...staticEntries, ...blogEntries, ...newsEntries];
+  const blogEntries = getBlogPosts().map((post) => ({
+    url: `${SITE_URL}/blog/${post.slug}`,
+    lastModified: post.fileMtime ?? new Date(post.date),
+    changeFrequency: "monthly" as const,
+    priority: 0.4,
+  }));
+
+  return [...staticEntries, ...newsEntries, ...blogEntries];
 }

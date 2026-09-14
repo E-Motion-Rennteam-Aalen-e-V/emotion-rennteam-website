@@ -1,16 +1,17 @@
 import Link from "next/link";
-import { promises as fs } from "node:fs";
 import path from "node:path";
 import { collections } from "@/lib/cms/collections";
 import { listItems } from "@/lib/cms/content";
 import { getGithubConfig } from "@/lib/cms/github";
+import { listUploadedImages } from "@/lib/cms/media";
+import { existsSync } from "node:fs";
 
-const ALLOWED_MEDIA_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif"]);
-
-async function countUploads(): Promise<number> {
+function countPendingSubmissions(): number {
+  const file = path.join(process.cwd(), ".pending-form-submissions.jsonl");
+  if (!existsSync(file)) return 0;
   try {
-    const entries = await fs.readdir(path.join(process.cwd(), "public", "uploads"), { withFileTypes: true });
-    return entries.filter((e) => e.isFile() && ALLOWED_MEDIA_EXTENSIONS.has(path.extname(e.name).toLowerCase())).length;
+    const lines = require("node:fs").readFileSync(file, "utf-8").trim().split("\n").filter(Boolean);
+    return lines.length;
   } catch {
     return 0;
   }
@@ -19,9 +20,11 @@ async function countUploads(): Promise<number> {
 export default async function AdminDashboard() {
   const [counts, mediaCount] = await Promise.all([
     Promise.all(collections.map((c) => listItems(c.name).then((items) => items.length))),
-    countUploads(),
+    listUploadedImages().then((files) => files.length),
   ]);
   const githubConnected = Boolean(getGithubConfig());
+  const webhookConfigured = Boolean(process.env.FORM_WEBHOOK_URL);
+  const pendingSubmissions = webhookConfigured ? 0 : countPendingSubmissions();
 
   return (
     <div>
@@ -44,6 +47,21 @@ export default async function AdminDashboard() {
             : "GitHub-Anbindung ist nicht konfiguriert (GITHUB_TOKEN / GITHUB_OWNER / GITHUB_REPO fehlen). Änderungen werden nur lokal gespeichert und nicht auf GitHub gesichert."}
         </p>
       </div>
+
+      {!webhookConfigured && (
+        <div className="mb-6 flex items-start gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
+          <span aria-hidden>!</span>
+          <p>
+            <strong>FORM_WEBHOOK_URL nicht konfiguriert</strong> – Kontakt-, Bewerbungs- und Sponsoring-Anfragen
+            werden nicht zugestellt, sondern nur lokal in{" "}
+            <code className="font-mono">.pending-form-submissions.jsonl</code> gepuffert.
+            {pendingSubmissions > 0 && (
+              <> Aktuell {pendingSubmissions} ausstehende Einreichung{pendingSubmissions !== 1 ? "en" : ""}.</>
+            )}{" "}
+            Einen Webhook (z.B. Make.com oder Zapier) in <code className="font-mono">.env.local</code> eintragen.
+          </p>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {collections.map((c, i) => (

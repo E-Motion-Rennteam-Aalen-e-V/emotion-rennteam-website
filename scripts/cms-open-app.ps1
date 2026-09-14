@@ -4,7 +4,7 @@
 #
 # Das Fenster oeffnet sofort eine lokale Ladeseite (scripts/cms-loading.html)
 # statt zu warten, bis der Server bereit ist - die Ladeseite selbst wartet
-# (mit sichtbarer Rueckmeldung: "Kurzes Update wird geprueft...") und leitet
+# (mit sichtbarer Rueckmeldung: "Server wird gestartet...") und leitet
 # automatisch weiter, sobald der Server tatsaechlich antwortet. So sieht die
 # Person sofort ein Fenster, statt auf einen leeren Bildschirm zu starren.
 

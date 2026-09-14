@@ -76,14 +76,60 @@ Write-Host "Damit Speicherungen automatisch als Commit ins GitHub-Repository ges
 Write-Host "Ohne Token werden Aenderungen NUR lokal auf diesem PC gespeichert."
 Write-Host "Token erstellen: https://github.com/settings/tokens (fine-grained, 'Contents: Read and write')"
 Write-Host "(Der Token wird beim Einfuegen sichtbar - das ist normal, damit Copy-Paste zuverlaessig funktioniert.)"
-$githubToken = Read-Host "GitHub Personal Access Token (leer lassen zum Ueberspringen)"
-$githubToken = $githubToken.Trim()
+
+# Prueft den Token sofort gegen die GitHub-API, statt ihn blind zu
+# akzeptieren - sonst faellt ein falsch eingefuegter oder zu schwach
+# berechtigter Token erst Wochen spaeter beim ersten echten Speichern auf,
+# als kryptisches "(401)" ohne jeden Hinweis, was zu tun ist.
+function Test-GithubToken([string]$token, [string]$owner, [string]$repo) {
+    $headers = @{
+        Authorization        = "Bearer $token"
+        Accept               = "application/vnd.github+json"
+        "X-GitHub-Api-Version" = "2022-11-28"
+    }
+
+    # /repos/{owner}/{repo} alone doesn't prove the token is valid: for a
+    # PUBLIC repo (like this one), GitHub serves that endpoint's basic
+    # metadata even with no/garbage auth, since anyone can read it
+    # anonymously. /user has no such loophole - it returns "who am I" and
+    # always requires genuinely valid auth, so check that first.
+    try {
+        Invoke-WebRequest -Uri "https://api.github.com/user" -Headers $headers -UseBasicParsing -ErrorAction Stop | Out-Null
+    } catch {
+        $status = $null
+        if ($_.Exception.Response) { $status = [int]$_.Exception.Response.StatusCode }
+        if ($status -eq 401 -or $status -eq 403) {
+            return @{ Ok = $false; Message = "Token ist UNGUELTIG, abgelaufen oder wurde falsch eingefuegt (Status $status)." }
+        }
+        return @{ Ok = $null; Message = "Token konnte nicht geprueft werden (evtl. keine Internetverbindung) - wird trotzdem uebernommen." }
+    }
+
+    try {
+        $response = Invoke-WebRequest -Uri "https://api.github.com/repos/$owner/$repo" -Headers $headers -UseBasicParsing -ErrorAction Stop
+        $data = $response.Content | ConvertFrom-Json
+        if ($data.permissions -and -not $data.permissions.push) {
+            return @{ Ok = $false; Message = "Token ist gueltig, hat aber KEINE Schreibrechte fuer '$owner/$repo' (Berechtigung 'Contents: Read and write' fehlt)." }
+        }
+        return @{ Ok = $true; Message = "Token gueltig, Schreibzugriff auf '$owner/$repo' bestaetigt." }
+    } catch {
+        $status = $null
+        if ($_.Exception.Response) { $status = [int]$_.Exception.Response.StatusCode }
+        if ($status -eq 404 -or $status -eq 403) {
+            return @{ Ok = $false; Message = "Token ist gueltig, aber Repository '$owner/$repo' wurde nicht gefunden oder der Token hat keinen Zugriff darauf (Status $status)." }
+        }
+        return @{ Ok = $null; Message = "Token konnte nicht vollstaendig geprueft werden - wird trotzdem uebernommen." }
+    }
+}
 
 $githubOwner = "Hudnur111"
 $githubRepo = "Website---E-Motion-Rennteam-Aalen-"
-$githubBranch = "main"
+$githubBranch = "website"
+$githubToken = ""
 
-if (-not [string]::IsNullOrWhiteSpace($githubToken)) {
+while ($true) {
+    $githubToken = (Read-Host "GitHub Personal Access Token (leer lassen zum Ueberspringen)").Trim()
+    if ([string]::IsNullOrWhiteSpace($githubToken)) { break }
+
     $ownerInput = Read-Host "GitHub-Benutzer/Organisation (Enter fuer '$githubOwner')"
     if (-not [string]::IsNullOrWhiteSpace($ownerInput)) { $githubOwner = $ownerInput.Trim() }
 
@@ -92,6 +138,21 @@ if (-not [string]::IsNullOrWhiteSpace($githubToken)) {
 
     $branchInput = Read-Host "Branch, in den committet wird (Enter fuer '$githubBranch')"
     if (-not [string]::IsNullOrWhiteSpace($branchInput)) { $githubBranch = $branchInput.Trim() }
+
+    Write-Host "Token wird geprueft..."
+    $result = Test-GithubToken -token $githubToken -owner $githubOwner -repo $githubRepo
+    if ($result.Ok -eq $true) {
+        Write-Host $result.Message -ForegroundColor Green
+        break
+    } elseif ($result.Ok -eq $null) {
+        Write-Host $result.Message -ForegroundColor Yellow
+        break
+    } else {
+        Write-Host $result.Message -ForegroundColor Red
+        $retry = Read-Host "Token erneut eingeben? (j/n, 'n' uebernimmt ihn trotzdem)"
+        if ($retry -match '^[jJ]') { continue }
+        break
+    }
 }
 
 $lines = @(

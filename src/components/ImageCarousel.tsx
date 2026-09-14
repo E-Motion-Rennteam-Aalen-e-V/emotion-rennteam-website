@@ -5,15 +5,15 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 
 const CAROUSEL_IMAGES = [
-  "/uploads/em-fahrzeug-detail.jpg",
-  "/uploads/ert-14-26-nightrun-rear.jpg",
-  "/uploads/em-fahrzeug-buehne.jpg",
-  "/uploads/ert-12-24-track.jpg",
-  "/uploads/em-fahrzeug-heckfluegel.jpg",
-  "/uploads/ert-14-26-frontwing-detail.jpg",
-  "/uploads/ert-14-26-nightrun-cone.jpg",
-  "/uploads/ert-14-26-sponsor-detail.jpg",
-  "/uploads/ert-14-26-nightrun-street.jpg",
+  { src: "/uploads/em-fahrzeug-detail.jpg", alt: "Detailansicht des E-Motion-Fahrzeugs" },
+  { src: "/uploads/ert-14-26-nightrun-rear.jpg", alt: "ERT 14-26 beim Nachtlauf — Heckansicht" },
+  { src: "/uploads/em-fahrzeug-buehne.jpg", alt: "E-Motion-Fahrzeug auf der Präsentationsbühne" },
+  { src: "/uploads/ert-12-24-track.jpg", alt: "ERT 12-24 auf der Rennstrecke" },
+  { src: "/uploads/em-fahrzeug-heckfluegel.jpg", alt: "Heckflügel-Detail des E-Motion-Fahrzeugs" },
+  { src: "/uploads/ert-14-26-frontwing-detail.jpg", alt: "Frontflügel-Detail des ERT 14-26" },
+  { src: "/uploads/ert-14-26-nightrun-cone.jpg", alt: "ERT 14-26 beim Nachtlauf — Slalomkegel" },
+  { src: "/uploads/ert-14-26-sponsor-detail.jpg", alt: "Sponsorenlogos auf der Fahrzeugkarosserie" },
+  { src: "/uploads/ert-14-26-nightrun-street.jpg", alt: "ERT 14-26 beim Nachtlauf auf der Strecke" },
 ];
 
 export default function ImageCarousel() {
@@ -22,6 +22,7 @@ export default function ImageCarousel() {
 
   useEffect(() => {
     if (!autoPlay) return;
+    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const timer = setInterval(() => {
       setCurrent((prev) => (prev + 1) % CAROUSEL_IMAGES.length);
@@ -57,10 +58,9 @@ export default function ImageCarousel() {
           transition={{ duration: 0.6 }}
         >
           <Image
-            src={CAROUSEL_IMAGES[current]}
-            alt=""
+            src={CAROUSEL_IMAGES[current].src}
+            alt={CAROUSEL_IMAGES[current].alt}
             fill
-            sizes="(min-width: 1024px) 50vw, 100vw"
             className="object-cover"
             priority
           />

@@ -123,6 +123,67 @@ Projekteinstellungen des Hosting-Anbieters):
 | `GITHUB_TOKEN`, `GITHUB_OWNER`, `GITHUB_REPO` | Optional. Wenn gesetzt, committet das CMS jede Änderung automatisch ins Repository. Ohne diese Variablen werden Änderungen nur lokal auf dem Server gespeichert (nicht persistent auf den meisten Hosting-Plattformen). |
 | `FORM_WEBHOOK_URL` | Optional. Ziel-Webhook (z. B. Slack/Teams-Incoming-Webhook oder eigener E-Mail-Relay) für Kontakt-/Bewerbungs-/Sponsoring-/Mediakit-Formulare. Ohne diese Variable landen Einsendungen nur im Server-Log. |
 
+## 🍎 macOS-Installation (CMS-App)
+
+> Dieser Abschnitt gilt für den `CMS-App-MacOs`-Branch (das macOS-App-Bundle).
+
+### Schritt-für-Schritt-Anleitung
+
+1. **Ordner aus Downloads verschieben** — Vor dem ersten Start den
+   entpackten Ordner aus `~/Downloads` heraus bewegen, z. B. auf den
+   Schreibtisch oder nach `~/Programme`. macOS sperrt Apps, die direkt
+   aus dem Download-Ordner gestartet werden (Gatekeeper „App Translocation").
+
+2. **App starten** — Doppelklick auf `E-Motion CMS.app` oder auf
+   `CMS-Start_macos.command`.
+
+3. **„App ist beschädigt"-Fehler (Apple Silicon)** — Einmalig im Terminal:
+   ```bash
+   xattr -cr "E-Motion CMS.app"
+   ```
+   Danach die App erneut starten.
+
+4. **Skripte nicht ausführbar** — Falls `.command`-Dateien beim Doppelklick
+   nicht starten:
+   ```bash
+   chmod +x CMS-Start_macos.command CMS-Start.command
+   ```
+
+5. **Node.js nicht gefunden** — Das Startskript sucht automatisch nach nvm
+   (`~/.nvm`) und Homebrew (`/opt/homebrew/bin`). Falls Node.js trotzdem
+   nicht erkannt wird: im Terminal `node --version` prüfen, dann ggf.
+   Node.js von https://nodejs.org neu installieren (LTS-Version).
+
+---
+
+## 🔐 Betrieb & Sicherheitshinweise (Produktion)
+
+Checkliste vor dem Go-Live des `cms-app`-Deployments:
+
+- **`FORM_WEBHOOK_URL` setzen.** Ohne diese Variable werden Formular-
+  Einsendungen (Kontakt, Bewerbung, Sponsoring, Mediakit) nicht live
+  zugestellt, sondern nur lokal in `.pending-form-submissions.jsonl`
+  gepuffert (siehe `src/lib/formDelivery.ts`) — inklusive eines lauten
+  `console.error`, damit das in jedem Log-/Monitoring-System auffällt.
+  Diese Datei ist ein Notfall-Fallback, kein Ersatz für einen echten
+  Webhook: sie sollte regelmäßig geprüft/geleert werden.
+- **TLS/Reverse-Proxy zwingend.** `next.config.ts` setzt strikte
+  Security-Header inkl. HSTS und `upgrade-insecure-requests`. Läuft
+  `next start` direkt ohne TLS-terminierenden Reverse-Proxy davor, sperren
+  Browser sich nach dem ersten Aufruf selbst auf HTTPS ein — auch wenn nur
+  HTTP verfügbar ist.
+- **Rate-Limiting ist In-Memory** (`src/lib/rateLimit.ts`, bewusst
+  dokumentiert). Es schützt zuverlässig einen einzelnen, langlebigen
+  Node-Prozess, greift aber pro Instanz separat, sobald mehrere
+  Server-/Container-Instanzen parallel laufen. Bei Multi-Instanz-Hosting
+  auf einen gemeinsamen Store (z. B. Redis/Upstash) umstellen.
+- **`.cms-users.json` ist lokal, nicht verschlüsselt und nicht
+  versioniert** (siehe `src/lib/cms/users.ts`). Setzt einen persistenten
+  Server mit eigenem, geschütztem Dateisystem voraus — auf ephemeren/
+  serverless Hosts gehen zusätzlich angelegte CMS-Benutzer bei jedem
+  Deploy verloren; der Haupt-Administrator (`CMS_ADMIN_USER`/
+  `CMS_ADMIN_PASSWORD_HASH`) ist davon nicht betroffen.
+
 ## 📁 Projektstruktur
 
 ```

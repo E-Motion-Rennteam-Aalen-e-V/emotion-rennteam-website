@@ -1,3 +1,4 @@
+import type React from "react";
 import type { Metadata } from "next";
 import type React from "react";
 import { Geist_Mono } from "next/font/google";

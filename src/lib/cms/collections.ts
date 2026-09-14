@@ -1,9 +1,8 @@
 // Single source of truth for the editable content collections. Both the
 // admin UI (list/edit forms) and the content-loading helpers key off this.
 
-import { TEAM_DEPARTMENTS } from "@/lib/team-departments";
-import { TEAM_SEASONS } from "@/lib/team-seasons";
-import { SPONSOR_TIERS_BASE } from "@/lib/sponsor-tiers";
+import { TEAM_DEPARTMENTS, TEAM_SEASONS } from "@/lib/team-departments";
+import { SPONSOR_CONTENT_TIERS } from "@/lib/validation";
 
 export type FieldType =
   | "string"
@@ -47,16 +46,22 @@ export const collections: CollectionDef[] = [
         name: "department",
         label: "Abteilung",
         type: "select",
+        required: true,
+        // Muss exakt den Werten aus TEAM_DEPARTMENTS entsprechen - die
+        // Team-Seite filtert Mitglieder strikt nach diesen Strings
+        // (team.filter(member => member.department === department)). Ein
+        // hier abweichender Wert fuehrt dazu, dass ein gespeichertes
+        // Mitglied auf /team in keiner Abteilungs-Sektion auftaucht, ohne
+        // dass ein Fehler angezeigt wird.
         options: [...TEAM_DEPARTMENTS],
       },
       {
         name: "season",
-        label: "Saison / Fahrzeug-Generation",
+        label: "Saison",
         type: "select",
         options: [...TEAM_SEASONS],
-        required: true,
       },
-      { name: "photo", label: "Foto", type: "image", required: true },
+      { name: "photo", label: "Foto", type: "image" },
       { name: "linkedin", label: "LinkedIn-URL", type: "string" },
       { name: "body", label: "Kurzbeschreibung", type: "richText" },
       { name: "order", label: "Reihenfolge", type: "number" },
@@ -94,7 +99,7 @@ export const collections: CollectionDef[] = [
         name: "tier",
         label: "Sponsoring-Stufe",
         type: "select",
-        options: [...SPONSOR_TIERS_BASE],
+        options: [...SPONSOR_CONTENT_TIERS],
         required: true,
       },
       { name: "logo", label: "Logo", type: "image" },
@@ -171,6 +176,7 @@ export const collections: CollectionDef[] = [
         name: "album",
         label: "Album",
         type: "string",
+        required: true,
       },
       { name: "order", label: "Reihenfolge", type: "number" },
     ],

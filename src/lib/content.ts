@@ -4,26 +4,37 @@ import matter from "gray-matter";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
 
-function readCollection<T>(collection: string): (T & { slug: string })[] {
+// Eine einzelne beschaedigte Markdown-Datei (kaputtes YAML-Frontmatter,
+// liegengebliebene Git-Konflikt-Marker, halber Schreibvorgang) darf nie die
+// gesamte Collection - und damit die Live-Seite fuer alle Besucher - zum
+// Absturz bringen. Defekte Eintraege werden uebersprungen und geloggt statt
+// den Fehler weiterzuwerfen.
+function readCollection<T>(collection: string): (T & { slug: string; fileMtime?: Date })[] {
   const dir = path.join(CONTENT_DIR, collection);
   if (!fs.existsSync(dir)) return [];
 
-  return fs
-    .readdirSync(dir)
-    .filter((file) => file.endsWith(".md"))
-    .map((file) => {
-      const raw = fs.readFileSync(path.join(dir, file), "utf8");
+  const items: (T & { slug: string; body: string; fileMtime?: Date })[] = [];
+  for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".md"))) {
+    try {
+      const abs = path.join(dir, file);
+      const raw = fs.readFileSync(abs, "utf8");
       const { data, content } = matter(raw);
-      return {
+      let fileMtime: Date | undefined;
+      try { fileMtime = fs.statSync(abs).mtime; } catch { /* ignore */ }
+      items.push({
         ...(data as T),
         slug: file.replace(/\.md$/, ""),
         body: content,
-      } as T & { slug: string; body: string };
-    });
+        fileMtime,
+      } as T & { slug: string; body: string; fileMtime?: Date });
+    } catch (error) {
+      console.error(`[content] Ueberspringe defekte Datei ${collection}/${file}:`, error);
+    }
+  }
+  return items;
 }
 
-export { TEAM_DEPARTMENTS, TEAM_STRUCTURE } from "@/lib/team-departments";
-export { TEAM_SEASONS, DEFAULT_TEAM_SEASON } from "@/lib/team-seasons";
+export { TEAM_DEPARTMENTS, TEAM_SEASONS, DEFAULT_SEASON } from "@/lib/team-departments";
 
 export type TeamMember = {
   name: string;
@@ -65,12 +76,19 @@ export type NewsPost = {
   coverImage?: string;
   body: string;
   slug: string;
+  fileMtime?: Date;
 };
 
 export type Page = {
   title: string;
   heroTitle?: string;
   heroSubtitle?: string;
+  stats?: { label: string; value: string }[];
+  departmentDescriptions?: { label: string; value: string }[];
+  address?: string;
+  email?: string;
+  phone?: string;
+  socialMedia?: string;
   body: string;
   slug: string;
 };
@@ -83,6 +101,7 @@ export type BlogPost = {
   coverImage?: string;
   body: string;
   slug: string;
+  fileMtime?: Date;
 };
 
 export type GalleryImage = {

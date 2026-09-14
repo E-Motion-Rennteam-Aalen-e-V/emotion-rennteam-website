@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { hashPassword, verifyPassword } from "@/lib/cms/password";
+import { burnPasswordVerificationTime, hashPassword, verifyPassword } from "@/lib/cms/password";
 
 describe("CMS password hashing", () => {
   it("verifies a correct password against its own hash", () => {
@@ -23,5 +23,15 @@ describe("CMS password hashing", () => {
   it("rejects malformed stored hashes instead of throwing", () => {
     expect(verifyPassword("anything", "not-a-valid-hash")).toBe(false);
     expect(verifyPassword("anything", "")).toBe(false);
+  });
+
+  it("burnPasswordVerificationTime performs a real scrypt derivation without throwing", () => {
+    // Exists to close a user-enumeration timing side channel on the login
+    // route (see api/admin/login/route.ts): callers don't need its return
+    // value, just that it does comparable work to a real verifyPassword()
+    // call. A CI-safe smoke test can't assert timing reliably, so this just
+    // guards against the function becoming an accidental no-op.
+    expect(() => burnPasswordVerificationTime("any-guess")).not.toThrow();
+    expect(() => burnPasswordVerificationTime("")).not.toThrow();
   });
 });

@@ -32,6 +32,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env*.example
 
 # vercel
 .vercel
@@ -40,6 +41,19 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .env.local
+
+# CMS: lokal angelegte Zusatz-Benutzer (Passwort-Hashes, nie versionieren)
+/.cms-users.json
+
+# CMS: Laufzeit-Status des Auto-Update-Supervisors (scripts/cms-supervisor.mjs)
+/.cms-update-status.json
+/.cms-update-trigger
+
+# CMS: Log der macOS-App (E-Motion CMS.app/Contents/MacOS/cms-launcher)
+/.cms-launcher.log
+
+# Formulare: lokaler Fallback, falls FORM_WEBHOOK_URL fehlt oder unerreichbar ist
+/.pending-form-submissions.jsonl
 
 # tinacms
 /tina/__generated__

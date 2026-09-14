@@ -15,6 +15,11 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # Fails the build on new high/critical-severity advisories in
+      # dependencies. Moderate findings (currently: a dev-only vitest/mocker
+      # advisory that doesn't affect the shipped app) are left as warnings
+      # so CI isn't blocked on issues with no real fix available yet.
+      - run: npm audit --audit-level=high
       - run: npm run lint
       - run: npm run test
       - run: npm run build

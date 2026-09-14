@@ -22,13 +22,7 @@ function guessName(filename: string): string {
     .join(" ");
 }
 
-function LibraryPickerModal({
-  onSelect,
-  onClose,
-}: {
-  onSelect: (path: string) => void;
-  onClose: () => void;
-}) {
+function LibraryPickerModal({ onSelect, onClose }: { onSelect: (path: string) => void; onClose: () => void }) {
   const [files, setFiles] = useState<MediaFile[] | null>(null);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
@@ -99,18 +93,17 @@ function LibraryPickerModal({
                 onClick={() => onSelect(file.path)}
                 className="group overflow-hidden rounded-lg border border-border text-left transition-colors hover:border-accent"
               >
-                <div className="relative aspect-square w-full bg-surface-2">
-                  <Image
+                <div className="aspect-square overflow-hidden bg-surface-2">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src={file.path}
-                    alt={file.name}
-                    fill
-                    sizes="200px"
-                    className="object-cover"
-                    unoptimized
+                    alt=""
+                    className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                    loading="lazy"
                   />
                 </div>
-                <p className="truncate px-1.5 py-1 text-[11px] font-medium text-foreground">
-                  {guessName(file.name)}
+                <p className="truncate px-1.5 py-1 text-[11px] font-medium text-foreground" title={file.name}>
+                  {guessName(file.name.split("/").pop() ?? file.name)}
                 </p>
               </button>
             ))}
@@ -130,14 +123,20 @@ export default function ImageUploadField({
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
-  const [pickerOpen, setPickerOpen] = useState(false);
   // Kept separate so a hard failure (nothing uploaded, red) never looks the
   // same as a soft warning (upload succeeded, e.g. "not committed to
   // GitHub", amber) — they used to share one field and one color.
   const [error, setError] = useState("");
   const [warning, setWarning] = useState("");
+  const [showUploadHint, setShowUploadHint] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   async function handleFile(file: File) {
+    if (file.size > 8 * 1024 * 1024) {
+      setError("Datei zu groß – maximal 8 MB erlaubt.");
+      setShowUploadHint(true);
+      return;
+    }
     setUploading(true);
     setError("");
     setWarning("");
@@ -148,12 +147,14 @@ export default function ImageUploadField({
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || "Upload fehlgeschlagen.");
+        setShowUploadHint(true);
         return;
       }
       onChange(data.publicPath);
-      if (data.warning) setWarning(data.warning);
+      if (data.warning) { setWarning(data.warning); setShowUploadHint(true); }
     } catch {
       setError("Verbindung zum Server fehlgeschlagen.");
+      setShowUploadHint(true);
     } finally {
       setUploading(false);
     }
@@ -161,6 +162,13 @@ export default function ImageUploadField({
 
   return (
     <div>
+      {showUploadHint && (
+        <p className="mb-2 rounded-md border border-amber-500/30 bg-amber-500/10 px-2.5 py-1.5 text-[11px] text-amber-300">
+          Bei Upload-Fehlern: Bild lieber direkt im GitHub-Repo unter{" "}
+          <code className="font-mono">public/uploads/</code> hochladen und danach hier aus der
+          Mediathek wählen.
+        </p>
+      )}
       <div className="flex items-center gap-4">
         <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-surface-2">
           {value ? (
@@ -189,13 +197,12 @@ export default function ImageUploadField({
               disabled={uploading}
               className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-accent disabled:opacity-60"
             >
-              {uploading ? "Lädt hoch…" : "Bild hochladen"}
+              {uploading ? "Lädt hoch…" : "Bild hochladen (max. 8 MB)"}
             </button>
             <button
               type="button"
               onClick={() => setPickerOpen(true)}
-              disabled={uploading}
-              className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-accent disabled:opacity-60"
+              className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-accent"
             >
               Aus Mediathek wählen
             </button>
@@ -211,15 +218,7 @@ export default function ImageUploadField({
           )}
         </div>
       </div>
-      {error && (
-        <div role="alert" className="mt-2 rounded-md border border-red-500/30 bg-red-500/10 p-2.5 text-xs text-red-400">
-          <p>{error}</p>
-          <p className="mt-1 text-red-300/80">
-            Workaround: Bild direkt im GitHub-Repo unter <code>public/uploads/</code> hochladen und
-            danach hier über „Aus Mediathek wählen&rdquo; verknüpfen.
-          </p>
-        </div>
-      )}
+      {error && <p role="alert" className="mt-2 text-xs text-red-400">{error}</p>}
       {warning && <p className="mt-2 text-xs text-amber-400">{warning}</p>}
       {pickerOpen && (
         <LibraryPickerModal

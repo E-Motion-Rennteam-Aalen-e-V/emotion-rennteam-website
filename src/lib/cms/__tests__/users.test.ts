@@ -8,7 +8,17 @@ vi.mock("node:fs", () => {
   const writeFileSync = vi.fn((_path: string, contents: string) => {
     fakeFile = contents;
   });
-  return { existsSync, readFileSync, writeFileSync, default: { existsSync, readFileSync, writeFileSync } };
+  // writeStore() now writes to a temp path and renameSync()s it into place
+  // for atomicity - the temp write above already lands in `fakeFile`, so the
+  // rename is a no-op here (the mock doesn't model distinct file paths).
+  const renameSync = vi.fn(() => {});
+  return {
+    existsSync,
+    readFileSync,
+    writeFileSync,
+    renameSync,
+    default: { existsSync, readFileSync, writeFileSync, renameSync },
+  };
 });
 
 import { deleteUser, findUser, listUsers, setUserPassword, upsertUser } from "@/lib/cms/users";

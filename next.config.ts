@@ -8,9 +8,15 @@ import type { NextConfig } from "next";
 // is almost entirely statically generated, so that trade isn't worth it for
 // a defense-in-depth header — this follows Next's documented "Without
 // Nonces" baseline CSP instead: https://nextjs.org/docs/app/guides/content-security-policy
+
+// Next.js/Turbopack's dev server (React Fast Refresh, stack-trace
+// symbolication) relies on eval(), so the dev-only CSP needs 'unsafe-eval'.
+// Production never uses eval() (see Next's CSP docs) and stays without it.
+const isDev = process.env.NODE_ENV !== "production";
+
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
   // React/framer-motion set inline `style` attributes at render time, so
   // style-src needs 'unsafe-inline' too. CSS injection is a much
   // lower-severity risk than script injection.
@@ -22,10 +28,20 @@ const csp = [
   // without loading external scripts into the main document.
   "frame-src blob:",
   "object-src 'none'",
+  // The ContactMap embeds an OpenStreetMap iframe. frame-ancestors stays
+  // 'none' (nobody may embed us), but frame-src must allow OSM.
+  "frame-src https://www.openstreetmap.org",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",
-  "upgrade-insecure-requests",
+  // Rewrites every http:// subresource/navigation on the page to https://.
+  // This CMS is self-hosted and runs `next dev` directly over plain HTTP on
+  // localhost (no TLS terminator in front of it) - forcing https there
+  // breaks the page outright (JS bundles fail to load, so React never
+  // hydrates). Production deployments normally sit behind a reverse proxy
+  // that already terminates TLS, so this only matters for `next start`
+  // without one; omit it entirely in dev.
+  ...(isDev ? [] : ["upgrade-insecure-requests"]),
 ].join("; ");
 
 const securityHeaders = [
@@ -37,10 +53,17 @@ const securityHeaders = [
     value:
       "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()",
   },
-  {
-    key: "Strict-Transport-Security",
-    value: "max-age=63072000; includeSubDomains; preload",
-  },
+  // Tells the BROWSER to remember, for up to 2 years, to force https for
+  // this exact host on every future visit - including plain "localhost".
+  // This CMS runs as a long-lived `next dev` process talked to directly
+  // over HTTP; sending this header even once poisons the browser into
+  // refusing http://localhost for the next two years (every asset request
+  // silently upgrades to https, which nothing here serves, so the page
+  // never loads again until the browser's HSTS cache for the host is
+  // manually cleared). Only ever send it in a real production deployment.
+  ...(isDev
+    ? []
+    : [{ key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" }]),
   { key: "Content-Security-Policy", value: csp },
   // Isolates the browsing context so other origins can't hold a reference
   // to this page's window (blocks some cross-origin timing/spectre-style

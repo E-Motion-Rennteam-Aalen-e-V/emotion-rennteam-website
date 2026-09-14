@@ -108,6 +108,22 @@ function asRecord(body: unknown): Record<string, unknown> {
   return typeof body === "object" && body !== null ? (body as Record<string, unknown>) : {};
 }
 
+export type NewsletterFormData = {
+  email: string;
+};
+
+export function validateNewsletterForm(body: unknown): ValidationResult<NewsletterFormData> {
+  const data = asRecord(body);
+  const errors: FieldErrors = {};
+
+  const email = readField(data, "email");
+  if (!email) errors.email = "Bitte gib deine E-Mail-Adresse an.";
+  else if (!isValidEmail(email)) errors.email = "Bitte gib eine gültige E-Mail-Adresse an.";
+
+  if (Object.keys(errors).length > 0) return { valid: false, errors };
+  return { valid: true, isBot: isBotSubmission(data), data: { email } };
+}
+
 export type ContactFormData = {
   name: string;
   email: string;

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { saveUploadedImage } from "@/lib/cms/content";
 import { getSessionUser } from "@/lib/cms/auth";
+import { matchesImageSignature } from "@/lib/imageSignature";
 
 const MAX_SIZE_BYTES = 8 * 1024 * 1024;
 // SVG is deliberately excluded. It's an XML document format that can carry
@@ -22,10 +23,21 @@ export async function POST(request: NextRequest) {
   const user = await getSessionUser(request);
   if (!user) return NextResponse.json({ error: "Nicht angemeldet." }, { status: 401 });
 
-  const formData = await request.formData();
+  let formData: FormData;
+  try {
+    formData = await request.formData();
+  } catch {
+    return NextResponse.json({ error: "Ungültige Anfrage (Formulardaten konnten nicht gelesen werden)." }, { status: 400 });
+  }
   const file = formData.get("file");
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "Keine Datei übermittelt." }, { status: 400 });
+  }
+  if (file.type === "image/svg+xml") {
+    return NextResponse.json(
+      { error: "SVG-Dateien werden aus Sicherheitsgründen nicht unterstützt. Bitte JPG, PNG, WebP oder GIF verwenden." },
+      { status: 400 }
+    );
   }
   if (!ALLOWED_TYPES.has(file.type)) {
     return NextResponse.json({ error: "Nur Bilddateien (JPG, PNG, WebP, GIF) sind erlaubt." }, { status: 400 });
@@ -35,6 +47,13 @@ export async function POST(request: NextRequest) {
   }
 
   const bytes = new Uint8Array(await file.arrayBuffer());
+  if (!matchesImageSignature(bytes, file.type)) {
+    return NextResponse.json(
+      { error: "Datei-Inhalt passt nicht zum angegebenen Dateityp." },
+      { status: 400 }
+    );
+  }
+
   try {
     const result = await saveUploadedImage(file.name, file.type, bytes, user.username);
     return NextResponse.json(result);

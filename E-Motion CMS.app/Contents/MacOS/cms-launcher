@@ -1,0 +1,146 @@
+#!/bin/bash
+# Der eigentliche Programm-Einstiegspunkt dieser .app (siehe
+# CFBundleExecutable in ../Info.plist) - macOS fuehrt diese Datei direkt aus,
+# wenn jemand im Finder auf "E-Motion CMS.app" doppelklickt. Kein Kompilat
+# noetig: ein ausfuehrbares Skript an dieser Stelle reicht als Bundle-
+# Executable voellig aus.
+#
+# Zweck dieses Launchers: das bereits vorhandene, gut getestete
+# CMS-Start.command (identische Logik wie CMS-Start.bat unter Windows)
+# aufrufen, aber wie eine echte, "fertig eingerichtete" App wirken lassen -
+# im Normalfall (Node.js vorhanden, node_modules installiert,
+# .env.local existiert) komplett ohne sichtbares Terminal-Fenster. Nur wenn
+# etwas Interaktion braucht (Ersteinrichtung, fehlende Abhaengigkeiten,
+# fehlendes Node.js) wird bewusst ein Terminal-Fenster geoeffnet, weil dort
+# echte Texteingabe und lesbare Fehlermeldungen noetig sind.
+set -u
+
+# Node.js via nvm oder Homebrew einbinden — Finder-gestartete Prozesse
+# erben nur den System-PATH, nicht ~/.zshrc oder ~/.bash_profile.
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh" --no-use
+[ -d "/opt/homebrew/bin" ] && export PATH="/opt/homebrew/bin:$PATH"
+[ -d "/usr/local/bin" ]    && export PATH="/usr/local/bin:$PATH"
+
+# Contents/MacOS/cms-launcher -> Contents -> <App>.app -> Projektordner
+# (die App liegt direkt im Repo-Root, wird zusammen mit dem Quellcode im
+# GitHub-ZIP ausgeliefert).
+DIR="$(cd "$(dirname "$0")/../../.." && pwd)"
+cd "$DIR" || exit 1
+
+# Gatekeeper "App Translocation": wird diese .app direkt aus dem Ordner
+# gestartet, in dem sie nach dem ZIP-Download/Entpacken landete, OHNE dass
+# sie vorher per Finder irgendwohin verschoben wurde, fuehrt macOS sie u.U.
+# aus einer zufaelligen, schreibgeschuetzten Kopie aus (Pfad enthaelt
+# "AppTranslocation"). Dort liegen dann NUR die App-Dateien selbst, nicht
+# die daneben liegenden CMS-Start.command/package.json/scripts/ - das oben
+# berechnete DIR zeigt also ins Leere. Ohne diese Pruefung wuerde das
+# entweder zu einem kryptischen "No such file or directory" im Terminal
+# fuehren oder (schlimmer) lautlos falsch weiterlaufen.
+if [[ "$DIR" == *AppTranslocation* ]] || [ ! -f "$DIR/CMS-Start.command" ] || [ ! -f "$DIR/package.json" ]; then
+    osascript -e 'display dialog "macOS hat \"E-Motion CMS.app\" aus einem isolierten, schreibgeschützten Ort gestartet (Gatekeeper-Schutz \"App Translocation\") - dadurch findet sie den restlichen Projektordner nicht.\n\nLösung: Diesen kompletten entpackten Ordner (nicht nur die App) im Finder z. B. auf den Schreibtisch ziehen und die App von dort aus erneut per Doppelklick starten." with title "E-Motion CMS" buttons {"OK"} with icon caution' >/dev/null 2>&1
+    exit 1
+fi
+
+needs_terminal=false
+command -v node >/dev/null 2>&1 || needs_terminal=true
+command -v npm >/dev/null 2>&1 || needs_terminal=true
+[ -f ".env.local" ] || needs_terminal=true
+[ -f "node_modules/.bin/next" ] || needs_terminal=true
+
+if [ "$needs_terminal" = false ]; then
+    # Laeuft schon eine Instanz (App versehentlich ein zweites Mal
+    # gestartet)? Dann NICHT versuchen, einen zweiten Server auf demselben
+    # Port zu starten - das wuerde nur mit einer kryptischen
+    # "EADDRINUSE"-Fehlermeldung im Absturz-Dialog enden. Stattdessen wie
+    # eine normale macOS-App beim zweiten Start einfach ein neues
+    # Fenster zur bereits laufenden Instanz oeffnen.
+    if (exec 3<>/dev/tcp/127.0.0.1/3000) 2>/dev/null; then
+        exec 3>&- 3<&-
+        bash "scripts/cms-open-app.sh" &
+        exit 0
+    fi
+fi
+
+if [ "$needs_terminal" = true ]; then
+    # Ersteinrichtung, Installation oder eine Fehlermeldung, die jemand
+    # tatsaechlich lesen koennen muss - dafuer ganz bewusst ein sichtbares
+    # Terminal-Fenster statt eines lautlosen Hintergrundprozesses.
+    #
+    # Sicherheits-Escaping: AppleScript-String in doppelten Anfuehrungs-
+    # zeichen — Backslashes verdoppeln, dann Anf.-Zeichen escapen,
+    # dann Zeilenumbrueche entfernen (koennen Pfade theoretisch enthalten
+    # und wuerden den do-script-String brechen).
+    escaped_dir="${DIR//$'\n'/}"   # Zeilenumbrueche entfernen
+    escaped_dir="${escaped_dir//$'\r'/}"
+    escaped_dir="${escaped_dir//\\/\\\\}"
+    escaped_dir="${escaped_dir//\"/\\\"}"
+    escaped_dir="${escaped_dir//\$/\\\$}"   # $ wuerde in nicht-quoted heredoc expandiert
+    escaped_dir="${escaped_dir//\`/\\\`}"   # Backtick = Command-Substitution
+    osascript <<OSA
+tell application "Terminal"
+    activate
+    do script "cd \"$escaped_dir\" && bash \"CMS-Start.command\""
+end tell
+OSA
+    exit 0
+fi
+
+# Normalfall: alles ist schon eingerichtet, laeuft komplett im Hintergrund -
+# fuehlt sich wie eine normal installierte App an, kein Terminal-Fenster.
+LOG="$DIR/.cms-launcher.log"
+{
+    echo "=== CMS-Start $(date) ==="
+} > "$LOG"
+
+bash "CMS-Start.command" >> "$LOG" 2>&1 &
+server_pid=$!
+
+# Wird DIESER Launcher beendet (Dock-Symbol -> "Beenden", Cmd+Q,
+# Aktivitaetsanzeige), soll nicht nur das Dock-Icon verschwinden, waehrend
+# CMS-Start.command/Supervisor/Next.js unsichtbar im Hintergrund weiterlaufen
+# (Port 3000 bliebe belegt, ohne dass irgendwo ein sichtbarer Prozess auf
+# eine Person hindeutet) - stattdessen den kompletten Prozessbaum mit
+# beenden. Regulaeres Beenden ueber den "Herunterfahren"-Button im CMS
+# raeumt den Baum schon selbst auf, dann findet dieser Trap nichts mehr vor.
+collect_descendants() {
+    local parent="$1" pid
+    for pid in $(pgrep -P "$parent" 2>/dev/null); do
+        collect_descendants "$pid"
+        printf '%s\n' "$pid"
+    done
+}
+cleanup() {
+    # $? an dieser Stelle ist der eigentliche Exit-Code des Skripts (0 nach
+    # sauberem Herunterfahren, 1 nach dem Absturz-Dialog-Pfad usw.) - ohne
+    # ihn explizit zu sichern und zurueckzugeben, wuerde der letzte Befehl
+    # in dieser Funktion (typischerweise ein "kill" auf einen bereits toten
+    # Prozess, Exit-Code 1) ihn faelschlich ueberschreiben.
+    local exit_code=$?
+    local pids
+    pids="$(collect_descendants "$server_pid")"
+    [ -n "$pids" ] && kill -TERM $pids 2>/dev/null
+    kill -TERM "$server_pid" 2>/dev/null
+    return "$exit_code"
+}
+trap cleanup EXIT TERM INT
+
+# Kurze Wartezeit: stuerzt der Start sofort ab (z.B. Port dauerhaft von
+# einem fremden Programm blockiert), lieber eine sichtbare Fehlermeldung
+# zeigen statt eine App, die scheinbar gar nichts tut.
+sleep 3
+if ! kill -0 "$server_pid" 2>/dev/null; then
+    tail_log="$(tail -n 8 "$LOG" 2>/dev/null)"
+    # AppleScript-String-Escaping: erst Backslashes verdoppeln, DANN
+    # Anführungszeichen escapen - sonst wuerden die gerade eingefuegten
+    # Escape-Backslashes selbst nochmal mit-escaped.
+    message=$(printf 'Das CMS konnte nicht gestartet werden.\n\n%s\n\nDetails in: %s' "$tail_log" "$LOG")
+    escaped_message=${message//\\/\\\\}
+    escaped_message=${escaped_message//\"/\\\"}
+    escaped_message=${escaped_message//\$/\\\$}
+    escaped_message=${escaped_message//\`/\\\`}
+    osascript -e "display dialog \"$escaped_message\" with title \"E-Motion CMS\" buttons {\"OK\"} with icon caution"
+    exit 1
+fi
+
+wait "$server_pid"

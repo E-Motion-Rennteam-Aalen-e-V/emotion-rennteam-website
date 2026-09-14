@@ -9,6 +9,7 @@ interface Item {
   slug: string;
   data: Record<string, unknown>;
   body: string;
+  mtime?: number;
 }
 
 interface WriteResult {
@@ -106,6 +107,14 @@ export default function CollectionExplorer({
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
   }, [panelDirty]);
 
+  // Expose dirty state so LogoutButton and other top-level controls can
+  // guard against navigating away with unsaved changes. Cleaned up when
+  // this component unmounts so stale flags never linger.
+  useEffect(() => {
+    (window as unknown as Record<string, unknown>).__cmsDirty = panelDirty;
+    return () => { (window as unknown as Record<string, unknown>).__cmsDirty = false; };
+  }, [panelDirty]);
+
   // Re-fetches the list after a save/create/delete inside the panel so it
   // reflects the change without a full page reload. Never called from an
   // effect (only from these user-triggered callbacks), so there's no
@@ -174,7 +183,9 @@ export default function CollectionExplorer({
   }
 
   function openDuplicate(item: Item) {
+    if (panelDirty && !window.confirm("Ungespeicherte Änderungen verwerfen?")) return;
     setNotice(null);
+    setPanelDirty(false);
     setPanel({ mode: "create-from", sourceSlug: item.slug });
   }
 
@@ -204,6 +215,13 @@ export default function CollectionExplorer({
           + Neuer Eintrag
         </button>
       </div>
+
+      {collectionName === "page" && (
+        <p className="mb-4 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3.5 py-2.5 text-sm text-amber-300">
+          ⚠️ Hier werden feste Seiteninhalte (Hero-Texte, Kennzahlen, Abteilungsbeschreibungen) direkt bearbeitet.
+          Unerfahrene Mitarbeiter bitte aufpassen: Änderungen wirken sich sofort auf die entsprechende Seite aus.
+        </p>
+      )}
 
       {notice && (
         <p
@@ -386,6 +404,7 @@ export default function CollectionExplorer({
                     initialSlug={item.slug}
                     initialData={item.data}
                     initialBody={item.body}
+                    initialMtime={item.mtime}
                     onDirtyChange={setPanelDirty}
                     onSaved={(result) => {
                       setNotice(noticeForWriteResult(result, "gespeichert"));

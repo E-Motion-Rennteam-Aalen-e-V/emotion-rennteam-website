@@ -7,8 +7,8 @@ gute Basis (Security-Header, CSP, A11y-Grundlagen, Tests, strukturierte Daten).
 
 - **Blog/News sehr dünn**: nur 2 Blog-Posts, 2 News-Einträge. Wirkt wie Platzhalter,
   nicht wie aktiv gepflegte Seite.
-- **Sitemap unvollständig**: `src/app/sitemap.ts` listet nur statische Routen –
-  `/blog/[slug]` und `/news/[slug]` fehlen komplett (SEO-Verlust für Content-Seiten).
+- ~~**Sitemap unvollständig**~~ – korrigiert: `src/app/sitemap.ts` listet `/blog/[slug]`
+  und `/news/[slug]` bereits über `getBlogPosts()`/`getNews()`.
 - **Keine Erfolge/Ergebnisse-Historie vor 2025**: `content/results/` hat nur 4 Einträge
   (Gründung, FSG 2025, FS Alpe Adria 2025, FS Czech 2025) – frühere Saisons fehlen.
 - **Keine englischsprachige Version**: internationale Sponsoren/Partner, Wettbewerbs-Jury

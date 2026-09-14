@@ -2,6 +2,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { _getTrackedBucketCountForTesting, checkRateLimit, getClientIp } from "@/lib/rateLimit";
 
+function requestWithHeaders(headers: Record<string, string>) {
+  return new NextRequest("http://localhost/api/contact", { headers });
+}
+
 describe("checkRateLimit", () => {
   beforeEach(() => {
     vi.useRealTimers();
@@ -88,25 +92,24 @@ describe("checkRateLimit", () => {
 });
 
 describe("getClientIp", () => {
+  it("uses the single x-forwarded-for value when there's only one", () => {
+    expect(getClientIp(requestWithHeaders({ "x-forwarded-for": "203.0.113.7" }))).toBe("203.0.113.7");
+  });
+
   it("uses the last x-forwarded-for entry, not the client-controlled first one", () => {
-    // The trusted proxy (e.g. Vercel's edge) appends its own value as the
-    // last entry; anything before that is attacker-supplied and must not
-    // be trusted, or rate limiting could be bypassed by spoofing it.
-    const request = new NextRequest("http://localhost/api/admin/login", {
-      headers: { "x-forwarded-for": "203.0.113.1, 198.51.100.7" },
-    });
-    expect(getClientIp(request)).toBe("198.51.100.7");
+    // A client can prepend anything before the request reaches the trusted
+    // proxy; only the last entry is the one the proxy itself appended.
+    // Trusting the first entry would let anyone dodge rate limiting by
+    // sending a different spoofed value on every request.
+    const header = "9.9.9.9, 198.51.100.20, 203.0.113.99";
+    expect(getClientIp(requestWithHeaders({ "x-forwarded-for": header }))).toBe("203.0.113.99");
   });
 
   it("falls back to x-real-ip when x-forwarded-for is absent", () => {
-    const request = new NextRequest("http://localhost/api/admin/login", {
-      headers: { "x-real-ip": "198.51.100.9" },
-    });
-    expect(getClientIp(request)).toBe("198.51.100.9");
+    expect(getClientIp(requestWithHeaders({ "x-real-ip": "203.0.113.55" }))).toBe("203.0.113.55");
   });
 
-  it("falls back to 'unknown' when neither header is present", () => {
-    const request = new NextRequest("http://localhost/api/admin/login");
-    expect(getClientIp(request)).toBe("unknown");
+  it("returns 'unknown' when neither header is present", () => {
+    expect(getClientIp(requestWithHeaders({}))).toBe("unknown");
   });
 });

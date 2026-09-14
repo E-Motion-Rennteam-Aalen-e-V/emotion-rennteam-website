@@ -68,6 +68,7 @@ function LoginFormInner() {
               type="text"
               autoComplete="username"
               required
+              autoFocus
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-accent"

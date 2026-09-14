@@ -8,11 +8,23 @@ import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import Counter from "@/components/motion/Counter";
 import ScrollScale from "@/components/motion/ScrollScale";
 
-const STATS = [
+const DEFAULT_STATS = [
   { value: 50, suffix: "+", label: "Studierende im Team" },
   { value: TEAM_DEPARTMENTS.length, suffix: "", label: "Fachbereiche" },
-  { value: 12, suffix: "+", label: "Jahre Erfahrung" },
+  { value: new Date().getFullYear() - 2009, suffix: "+", label: "Jahre Erfahrung" },
 ];
+
+function parseStats(page: ReturnType<typeof getPage>) {
+  if (!page?.stats?.length) return DEFAULT_STATS;
+  return page.stats.map((s) => {
+    const match = s.value.match(/^(\d+)(.*)$/);
+    return {
+      value: match ? Number(match[1]) : 0,
+      suffix: match ? match[2] : "",
+      label: s.label,
+    };
+  });
+}
 
 const DEPARTMENT_HIGHLIGHTS = [
   {
@@ -49,6 +61,7 @@ const DEPARTMENT_HIGHLIGHTS = [
 
 export default function Home() {
   const page = getPage("home");
+  const stats = parseStats(page);
   const vehicles = getVehicles();
   const vehicle = vehicles.find((v) => v.current) ?? vehicles[0];
   const bodyParagraphs = page?.body?.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean) ?? [];
@@ -83,7 +96,7 @@ export default function Home() {
 
         <div className="relative border-t border-border/60 bg-background/40 backdrop-blur-sm">
           <StaggerGroup className="container-page grid grid-cols-2 gap-8 py-10 sm:grid-cols-3">
-            {STATS.map((stat) => (
+            {stats.map((stat) => (
               <StaggerItem key={stat.label} className="text-center sm:text-left">
                 <div className="text-3xl font-extrabold text-foreground sm:text-4xl">
                   <Counter value={stat.value} suffix={stat.suffix} />

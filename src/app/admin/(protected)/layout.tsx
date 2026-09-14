@@ -1,22 +1,30 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/cms/auth";
 import Sidebar from "@/components/admin/Sidebar";
 import LogoutButton from "@/components/admin/LogoutButton";
+import ShutdownButton from "@/components/admin/ShutdownButton";
 import MobileNav from "@/components/admin/MobileNav";
+import UpdateBanner from "@/components/admin/UpdateBanner";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
   const session = await verifySessionToken(cookieStore.get(SESSION_COOKIE)?.value);
-  if (!session) redirect("/admin/login");
+  if (!session) {
+    const headerStore = await headers();
+    const pathname = headerStore.get("x-pathname") ?? "";
+    const next = pathname && pathname !== "/admin/login" ? `?next=${encodeURIComponent(pathname)}` : "";
+    redirect(`/admin/login${next}`);
+  }
   if (session.mustChangePassword) redirect("/admin/passwort-aendern");
 
   const isAdmin = session.username === process.env.CMS_ADMIN_USER;
 
   return (
     <div className="min-h-screen bg-background">
+      <UpdateBanner />
       <header className="sticky top-0 z-20 border-b border-border bg-surface/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
           <div className="flex items-center gap-2">
@@ -30,6 +38,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </div>
           <div className="flex items-center gap-3">
             <span className="hidden text-xs text-muted sm:inline">Angemeldet als {session.username}</span>
+            {isAdmin && <ShutdownButton />}
             <LogoutButton />
           </div>
         </div>

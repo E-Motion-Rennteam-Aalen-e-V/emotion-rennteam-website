@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 interface MediaFile {
@@ -43,13 +42,28 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
     return () => clearTimeout(id);
   }, [copiedPath]);
 
+  const ALLOWED_UPLOAD_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+
   async function uploadFile(file: File) {
+    if (file.type === "image/svg+xml" || file.name.toLowerCase().endsWith(".svg")) {
+      setNotice({ kind: "error", message: "SVG-Dateien werden aus Sicherheitsgründen nicht unterstützt. Bitte JPG, PNG, WebP oder GIF verwenden." });
+      return;
+    }
+    if (!ALLOWED_UPLOAD_TYPES.has(file.type)) {
+      setNotice({ kind: "error", message: "Nur Bilddateien (JPG, PNG, WebP, GIF) sind erlaubt." });
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      setNotice({ kind: "error", message: "Datei zu groß – maximal 8 MB erlaubt." });
+      return;
+    }
     setUploading(true);
     setNotice(null);
+    let res: Response | undefined;
     try {
       const form = new FormData();
       form.append("file", file);
-      const res = await fetch("/api/admin/upload", { method: "POST", body: form });
+      res = await fetch("/api/admin/upload", { method: "POST", body: form });
       const data = await res.json();
       if (!res.ok) {
         setNotice({ kind: "error", message: data.error || "Upload fehlgeschlagen." });
@@ -63,7 +77,17 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
       });
       await refresh();
     } catch {
-      setNotice({ kind: "error", message: "Verbindung fehlgeschlagen." });
+      // `res` having a value here means the server answered but with a body
+      // that wasn't valid JSON (e.g. a crashed/HTML error page) - worth
+      // surfacing the status code instead of implying the network itself
+      // is down, which is what actually happens when `res` is still
+      // undefined (fetch() itself threw).
+      setNotice({
+        kind: "error",
+        message: res
+          ? `Server-Antwort ungültig (Status ${res.status}). Bitte Server-Konsole prüfen.`
+          : "Verbindung fehlgeschlagen. Bitte Internetverbindung und Server-Status prüfen.",
+      });
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -99,8 +123,9 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
     if (!confirm(`Datei "${filename}" wirklich löschen? Das kann nicht rückgängig gemacht werden.`)) return;
     setDeleting(filename);
     setNotice(null);
+    let res: Response | undefined;
     try {
-      const res = await fetch("/api/admin/media", {
+      res = await fetch("/api/admin/media", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ filename }),
@@ -118,7 +143,12 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
       });
       setFiles((prev) => prev.filter((f) => f.name !== filename));
     } catch {
-      setNotice({ kind: "error", message: "Verbindung fehlgeschlagen." });
+      setNotice({
+        kind: "error",
+        message: res
+          ? `Server-Antwort ungültig (Status ${res.status}). Bitte Server-Konsole prüfen.`
+          : "Verbindung fehlgeschlagen. Bitte Internetverbindung und Server-Status prüfen.",
+      });
     } finally {
       setDeleting(null);
     }
@@ -149,7 +179,7 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
         <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
           <div className="rounded-2xl border-2 border-dashed border-accent px-16 py-12 text-center">
             <p className="text-2xl font-bold text-accent-text">Bild hier ablegen</p>
-            <p className="mt-1 text-sm text-muted">JPG, PNG, WebP oder GIF</p>
+            <p className="mt-1 text-sm text-muted">JPG, PNG, WebP oder GIF · max. 8 MB</p>
           </div>
         </div>
       )}
@@ -178,16 +208,24 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
         </div>
       </div>
 
+      {/* Direkter Upload läuft über den Server und wird per GitHub-Commit ins
+          Repo geschrieben (siehe saveUploadedImage) — dabei kommt es bei
+          manchen Dateien öfter zu Konvertierungs-/Commit-Fehlern. */}
+      <p className="mb-4 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3.5 py-2.5 text-sm text-amber-300">
+        Bei Upload-Fehlern hier: Bild lieber direkt im GitHub-Repo unter{" "}
+        <code className="font-mono">public/uploads/</code> hochladen.
+      </p>
+
       {/* Drop zone hint when library is empty */}
       {files.length === 0 && !dragOver && (
         <div className="mb-4 rounded-xl border-2 border-dashed border-border p-8 text-center text-sm text-muted transition-colors hover:border-accent">
           <p className="font-medium text-foreground">Bilder hier ablegen oder oben hochladen</p>
-          <p className="mt-1">JPG, PNG, WebP und GIF werden unterstützt</p>
+          <p className="mt-1">JPG, PNG, WebP und GIF (max. 8 MB) werden unterstützt</p>
         </div>
       )}
 
       {notice && (
-        <div
+        <p
           role="status"
           className={`mb-4 rounded-lg border px-3.5 py-2.5 text-sm ${
             notice.kind === "ok"
@@ -197,14 +235,8 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
                 : "border-red-500/30 bg-red-500/10 text-red-400"
           }`}
         >
-          <p>{notice.message}</p>
-          {notice.kind === "error" && (
-            <p className="mt-1 opacity-80">
-              Workaround: Bild direkt im GitHub-Repo unter <code>public/uploads/</code> hochladen –
-              es taucht danach automatisch hier in der Mediathek auf.
-            </p>
-          )}
-        </div>
+          {notice.message}
+        </p>
       )}
 
       {files.length >= 6 && (
@@ -231,21 +263,18 @@ export default function MediaLibrary({ initialFiles }: { initialFiles: MediaFile
             className="group relative overflow-hidden rounded-xl border border-border bg-surface transition-colors hover:border-accent"
           >
             {/* Thumbnail */}
-            <div className="relative aspect-square w-full">
-              <Image
-                src={file.path}
-                alt={file.name}
-                fill
-                sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
-                className="object-cover"
-                unoptimized
-              />
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={file.path}
+              alt={file.name}
+              className="aspect-square w-full object-cover"
+              loading="lazy"
+            />
 
             {/* Overlay with actions */}
             <div className="flex flex-col gap-1 p-2">
               <p className="truncate text-xs font-medium text-foreground" title={file.name}>
-                {file.name}
+                {file.name.split("/").pop()}
               </p>
               <p className="text-[10px] text-muted">{formatBytes(file.size)}</p>
               <div className="mt-1 flex gap-1.5">

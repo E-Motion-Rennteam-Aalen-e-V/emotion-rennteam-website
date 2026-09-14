@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import NotFoundContent from "@/components/NotFoundContent";
+import { getHiddenNavIds } from "@/lib/nav-settings.server";
 
 export const metadata: Metadata = {
   title: "Seite nicht gefunden",
@@ -11,14 +12,15 @@ export const metadata: Metadata = {
 // (which has its own not-found.tsx rendered inside its Header/Footer
 // layout) — this one renders outside any nested layout, so it brings its
 // own chrome to stay visually consistent with the rest of the site.
-export default function RootNotFound() {
+export default async function RootNotFound() {
+  const hiddenIds = await getHiddenNavIds();
   return (
     <>
-      <Header />
+      <Header hiddenIds={hiddenIds} />
       <main id="main-content" className="flex-1">
         <NotFoundContent />
       </main>
-      <Footer />
+      <Footer hiddenIds={hiddenIds} />
     </>
   );
 }

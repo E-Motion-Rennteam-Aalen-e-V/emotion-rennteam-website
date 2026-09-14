@@ -1,19 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSessionToken, SESSION_COOKIE, SESSION_MAX_AGE } from "@/lib/cms/auth";
-import { hashPassword, verifyPassword } from "@/lib/cms/password";
+import { burnPasswordVerificationTime, verifyPassword } from "@/lib/cms/password";
 import { findUser } from "@/lib/cms/users";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
-
-// A fixed, precomputed hash with no matching password. Verifying against it
-// when the username doesn't exist keeps the scrypt cost identical to the
-// "user found, wrong password" path, so response timing can't be used to
-// enumerate which usernames are valid. Computed lazily on first use so the
-// blocking scryptSync call does not run at module-load time.
-let _dummyHash: string | null = null;
-function getDummyPasswordHash(): string {
-  if (_dummyHash === null) _dummyHash = hashPassword("dummy-password-for-constant-time-login");
-  return _dummyHash;
-}
 
 export async function POST(request: NextRequest) {
   const ip = getClientIp(request);
@@ -38,7 +27,15 @@ export async function POST(request: NextRequest) {
   if ((!adminUser || !adminHash) && typeof username === "string" && !findUser(username)) {
     return NextResponse.json(
       { error: "CMS-Login ist serverseitig nicht konfiguriert (CMS_ADMIN_USER/CMS_ADMIN_PASSWORD_HASH fehlen)." },
-      { status: 500 }
+      { status: 503 }
+    );
+  }
+
+  const sessionSecret = process.env.CMS_SESSION_SECRET;
+  if (!sessionSecret || sessionSecret.length < 16) {
+    return NextResponse.json(
+      { error: "CMS-Login ist serverseitig nicht konfiguriert (CMS_SESSION_SECRET fehlt oder ist zu kurz)." },
+      { status: 503 }
     );
   }
 
@@ -46,19 +43,19 @@ export async function POST(request: NextRequest) {
   let authenticated = false;
 
   if (typeof username === "string" && typeof password === "string") {
-    if (adminUser && adminHash && username === adminUser) {
-      if (verifyPassword(password, adminHash)) authenticated = true;
+    if (adminUser && adminHash && username === adminUser && verifyPassword(password, adminHash)) {
+      authenticated = true;
     } else {
       const user = findUser(username);
-      if (user) {
-        if (verifyPassword(password, user.passwordHash)) {
-          authenticated = true;
-          mustChangePassword = user.mustChangePassword;
-        }
-      } else {
-        // Unknown username: still pay the scrypt cost so this branch takes
-        // the same time as a real "wrong password" check above.
-        verifyPassword(password, getDummyPasswordHash());
+      if (user && verifyPassword(password, user.passwordHash)) {
+        authenticated = true;
+        mustChangePassword = user.mustChangePassword;
+      } else if (!user) {
+        // No such user: still do scrypt-equivalent work so this branch
+        // takes about as long as a wrong-password attempt for a real user,
+        // closing the timing side channel that would otherwise let an
+        // attacker enumerate valid usernames (see password.ts).
+        burnPasswordVerificationTime(password);
       }
     }
   }

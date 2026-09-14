@@ -1,15 +1,62 @@
 import { promises as fs } from "node:fs";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import path from "node:path";
 import matter from "gray-matter";
-import { getCollection } from "./collections";
+import { getCollection, type CollectionDef } from "./collections";
 import { commitFile, commitBinaryFile, deleteFile as githubDeleteFile, getGithubConfig } from "./github";
 
 const ROOT = process.cwd();
+const execFileAsync = promisify(execFile);
+
+// Must match the marker cms-update.sh/.ps1 look for to peel off this commit
+// again before their own fast-forward-only merge (see the comment there).
+const CONTENT_SYNC_MARKER = "[cms-content-sync]";
+
+/**
+ * A CMS save writes straight to disk (see below) and commits via the GitHub
+ * API - it never touches the local git index. Left alone, that permanently
+ * dirties the local working tree relative to local HEAD, and cms-update.sh/
+ * .ps1's "are there local changes?" guard then refuses to fast-forward ever
+ * again, even though the exact same change already exists as a real commit
+ * on GitHub. Fold the just-written path into a local, never-pushed marker
+ * commit (reusing the existing "[cms-content-sync]" convention, which
+ * cms-update.sh/.ps1 already knows to strip off before its own update
+ * check) so `git status` goes clean again right away. Best-effort and
+ * silent: if git isn't installed/available here, the GitHub commit above is
+ * already the source of truth, so this is a nicety, not a requirement.
+ */
+export async function syncLocalGitAfterCommit(relPath: string): Promise<void> {
+  try {
+    const git = (args: string[]) => execFileAsync("git", args, { cwd: ROOT, timeout: 5000 });
+
+    await git(["rev-parse", "--is-inside-work-tree"]);
+    await git(["add", "--", relPath]);
+
+    const { stdout: staged } = await git(["diff", "--cached", "--name-only"]);
+    if (!staged.trim()) return; // Nothing actually changed (e.g. re-saving identical content).
+
+    await git([
+      "-c",
+      "user.name=CMS Auto-Sync",
+      "-c",
+      "user.email=cms-sync@localhost",
+      "commit",
+      "--quiet",
+      "-m",
+      CONTENT_SYNC_MARKER,
+    ]);
+  } catch {
+    // Best effort only - see comment above.
+  }
+}
 
 export interface ContentItem {
   slug: string;
   data: Record<string, unknown>;
   body: string;
+  /** File mtime in ms (for ETag-based optimistic concurrency). */
+  mtime?: number;
 }
 
 export interface SaveResult {
@@ -54,13 +101,23 @@ export async function listItems(collectionName: string): Promise<ContentItem[]> 
   if (!collection) throw new Error(`Unbekannte Collection: ${collectionName}`);
   const dir = path.join(/* turbopackIgnore: true */ ROOT, collection.path);
   const files = (await readDirSafe(dir)).filter((f) => f.endsWith(".md"));
-  const items = await Promise.all(
+  // Eine einzelne defekte Datei darf die Redaktion nicht aussperren - sonst
+  // laesst sich die Liste, mit der man genau diese Datei reparieren wuerde,
+  // gar nicht mehr oeffnen. Kaputte Eintraege werden uebersprungen und geloggt.
+  const results = await Promise.all(
     files.map(async (file) => {
-      const raw = await fs.readFile(path.join(dir, file), "utf-8");
-      const parsed = matter(raw);
-      return { slug: file.replace(/\.md$/, ""), data: parsed.data, body: parsed.content.trim() };
+      try {
+        const filePath = path.join(dir, file);
+        const [raw, stat] = await Promise.all([fs.readFile(filePath, "utf-8"), fs.stat(filePath)]);
+        const parsed = matter(raw);
+        return { slug: file.replace(/\.md$/, ""), data: parsed.data, body: parsed.content.trim(), mtime: stat.mtimeMs };
+      } catch (error) {
+        console.error(`[cms] Ueberspringe defekte Datei ${collectionName}/${file}:`, error);
+        return null;
+      }
     })
   );
+  const items = results.filter((item) => item !== null) as ContentItem[];
   return items.sort((a, b) => a.slug.localeCompare(b.slug));
 }
 
@@ -70,16 +127,85 @@ export async function getItem(collectionName: string, slug: string): Promise<Con
   if (!isValidSlug(slug)) return null;
   const filePath = path.join(/* turbopackIgnore: true */ ROOT, collection.path, `${slug}.md`);
   try {
-    const raw = await fs.readFile(filePath, "utf-8");
+    const [raw, stat] = await Promise.all([fs.readFile(filePath, "utf-8"), fs.stat(filePath)]);
     const parsed = matter(raw);
-    return { slug, data: parsed.data, body: parsed.content.trim() };
+    return { slug, data: parsed.data, body: parsed.content.trim(), mtime: stat.mtimeMs };
+  } catch {
+    return null;
+  }
+}
+
+/** Returns the file mtime (ms since epoch) for ETag generation, or null if not found. */
+export async function getItemMtime(collectionName: string, slug: string): Promise<number | null> {
+  const collection = getCollection(collectionName);
+  if (!collection || !isValidSlug(slug)) return null;
+  const filePath = path.join(/* turbopackIgnore: true */ ROOT, collection.path, `${slug}.md`);
+  try {
+    const stat = await fs.stat(filePath);
+    return stat.mtimeMs;
   } catch {
     return null;
   }
 }
 
 function serialize(data: Record<string, unknown>, body: string): string {
-  return matter.stringify(body ? `\n${body}\n` : "\n", data);
+  const cleaned = Object.fromEntries(
+    Object.entries(data).filter(([, v]) => v !== "" && v !== undefined && v !== null)
+  );
+  return matter.stringify(body ? `\n${body}\n` : "\n", cleaned);
+}
+
+/** Thrown for invalid/incomplete input, as opposed to storage/network failures. */
+export class ValidationError extends Error {}
+
+function isEmptyValue(value: unknown): boolean {
+  if (value === undefined || value === null) return true;
+  if (typeof value === "string") return value.trim().length === 0;
+  if (typeof value === "number") return Number.isNaN(value);
+  return false;
+}
+
+/**
+ * The admin UI already enforces `required` client-side, but that alone
+ * leaves the server accepting incomplete data straight from the API - e.g.
+ * a vehicle without `year` or a news post without `date` silently breaks
+ * the `b.year - a.year` / `new Date(b.date)` sort used on the live site
+ * (NaN, not a crash, just a wrong/undeterministic order). Enforce the same
+ * `required` fields server-side so that can't happen.
+ */
+function validateRequiredFields(
+  collection: CollectionDef,
+  data: Record<string, unknown>,
+  body: string
+): void {
+  for (const field of collection.fields) {
+    if (!field.required) continue;
+    const value = field.isBody ? body : data[field.name];
+    if (isEmptyValue(value)) {
+      throw new ValidationError(`Pflichtfeld "${field.label}" fehlt oder ist leer.`);
+    }
+  }
+}
+
+// URL fields (linkedin, website) must not contain javascript:/data:/vbscript:
+// URIs — if ever rendered as <a href> they'd execute arbitrary code.
+const UNSAFE_URL_PREFIX = /^\s*(?:javascript|data|vbscript)\s*:/i;
+const URL_FIELD_NAMES = new Set(["linkedin", "website", "href", "url"]);
+
+function validateUrlFields(
+  collection: CollectionDef,
+  data: Record<string, unknown>
+): void {
+  for (const field of collection.fields) {
+    if (!URL_FIELD_NAMES.has(field.name)) continue;
+    const value = data[field.name];
+    if (typeof value !== "string" || !value.trim()) continue;
+    if (UNSAFE_URL_PREFIX.test(value)) {
+      throw new ValidationError(
+        `Ungültige URL im Feld "${field.label}": javascript:, data: und vbscript: sind nicht erlaubt.`
+      );
+    }
+  }
 }
 
 export async function saveItem(
@@ -92,6 +218,8 @@ export async function saveItem(
   const collection = getCollection(collectionName);
   if (!collection) throw new Error(`Unbekannte Collection: ${collectionName}`);
   if (!isValidSlug(slug)) throw new Error(`Ungültiger Slug: "${slug}"`);
+  validateRequiredFields(collection, data, body);
+  validateUrlFields(collection, data);
   const relPath = path.join(collection.path, `${slug}.md`).split(path.sep).join("/");
   const content = serialize(data, body);
 
@@ -121,6 +249,7 @@ export async function saveItem(
     `cms: ${collection.label} "${slug}" aktualisieren`,
     authorName
   );
+  await syncLocalGitAfterCommit(relPath);
   return { committedToGithub: true, commitUrl };
 }
 
@@ -145,6 +274,7 @@ export async function deleteItem(collectionName: string, slug: string, authorNam
   }
 
   await githubDeleteFile(relPath, `cms: ${collection.label} "${slug}" löschen`, authorName);
+  await syncLocalGitAfterCommit(relPath);
   return { committedToGithub: true, commitUrl: null };
 }
 
@@ -200,5 +330,6 @@ export async function saveUploadedImage(
   }
 
   const { commitUrl } = await commitBinaryFile(relPath, bytes, `cms: Bild "${safeName}" hochladen`, authorName);
+  await syncLocalGitAfterCommit(relPath);
   return { publicPath, committedToGithub: true, commitUrl };
 }

@@ -2,8 +2,25 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSessionToken, SESSION_COOKIE, SESSION_MAX_AGE, getSessionUser } from "@/lib/cms/auth";
 import { hashPassword } from "@/lib/cms/password";
 import { setUserPassword } from "@/lib/cms/users";
+import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 
 export async function POST(request: NextRequest) {
+  const ip = getClientIp(request);
+  if (!checkRateLimit(`cms-change-password:${ip}`, 10, 5 * 60 * 1000)) {
+    return NextResponse.json(
+      { error: "Zu viele Anfragen. Bitte in ein paar Minuten erneut versuchen." },
+      { status: 429 }
+    );
+  }
+
+  const sessionSecret = process.env.CMS_SESSION_SECRET;
+  if (!sessionSecret || sessionSecret.length < 16) {
+    return NextResponse.json(
+      { error: "CMS-Login ist serverseitig nicht konfiguriert (CMS_SESSION_SECRET fehlt oder ist zu kurz)." },
+      { status: 500 }
+    );
+  }
+
   const session = await getSessionUser(request);
   if (!session) {
     return NextResponse.json({ error: "Nicht angemeldet." }, { status: 401 });
