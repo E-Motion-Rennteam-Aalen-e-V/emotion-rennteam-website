@@ -84,24 +84,13 @@ export default function GalleryGrid({ images, onImageError }: { images: GalleryI
   useEffect(() => {
     if (activeIndex === null) return;
 
-    const focusableElements = [closeButtonRef.current];
-    if (images.length > 1) {
-      const buttons = document.querySelectorAll(
-        'button[aria-label*="Bild"], button[aria-label="Schließen"]'
-      );
-      focusableElements.length = 0;
-      buttons.forEach((btn) => focusableElements.push(btn as HTMLButtonElement));
-    }
-
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") close();
       else if (e.key === "ArrowRight") next();
       else if (e.key === "ArrowLeft") prev();
       else if (e.key === "Tab") {
         const focusable = Array.from(
-          document.querySelectorAll(
-            'button[aria-label*="Bild"], button[aria-label="Schließen"]'
-          )
+          document.querySelectorAll("[data-focus-trap]")
         ) as HTMLButtonElement[];
         if (focusable.length === 0) return;
         const currentIndex = focusable.indexOf(document.activeElement as HTMLButtonElement);
@@ -192,6 +181,7 @@ export default function GalleryGrid({ images, onImageError }: { images: GalleryI
                 type="button"
                 onClick={close}
                 aria-label="Schließen"
+                data-focus-trap
                 className="absolute -top-4 -right-4 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface text-foreground hover:border-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
               >
                 ✕
@@ -202,6 +192,7 @@ export default function GalleryGrid({ images, onImageError }: { images: GalleryI
                     type="button"
                     onClick={prev}
                     aria-label="Vorheriges Bild"
+                    data-focus-trap
                     className="absolute left-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-surface/80 text-foreground hover:border-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                   >
                     ←
@@ -210,6 +201,7 @@ export default function GalleryGrid({ images, onImageError }: { images: GalleryI
                     type="button"
                     onClick={next}
                     aria-label="Nächstes Bild"
+                    data-focus-trap
                     className="absolute right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-surface/80 text-foreground hover:border-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                   >
                     →

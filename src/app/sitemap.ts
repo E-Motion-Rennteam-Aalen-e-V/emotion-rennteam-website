@@ -1,6 +1,18 @@
 import type { MetadataRoute } from "next";
+import fs from "fs";
+import path from "path";
 import { SITE_URL } from "@/lib/site";
 import { getBlogPosts, getNews } from "@/lib/content";
+
+function getPageMtime(routePath: string): Date {
+  const segments = routePath.replace(/^\//, "").split("/");
+  const filePath = path.join(process.cwd(), "src", "app", "(site)", ...segments, "page.tsx");
+  try {
+    return fs.statSync(filePath).mtime;
+  } catch {
+    return new Date();
+  }
+}
 
 const STATIC_ROUTES: {
   path: string;
@@ -26,7 +38,7 @@ const STATIC_ROUTES: {
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticEntries = STATIC_ROUTES.map((route) => ({
     url: `${SITE_URL}${route.path}`,
-    lastModified: new Date(),
+    lastModified: getPageMtime(route.path || "/"),
     changeFrequency: route.changeFrequency,
     priority: route.priority,
   }));

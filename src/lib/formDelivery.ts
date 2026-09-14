@@ -27,11 +27,8 @@ export async function deliverFormSubmission(
 
   const webhookUrl = process.env.FORM_WEBHOOK_URL;
   if (!webhookUrl) {
-    console.log(`[form:${form}] submission received (no FORM_WEBHOOK_URL configured):`, {
-      ...data,
-      message: undefined, // avoid dumping full free-text into logs by default
-    });
-    return;
+    console.error(`[form:${form}] FORM_WEBHOOK_URL is not configured — form submission cannot be delivered`);
+    throw new Error("Formularversand ist momentan nicht verfügbar. Bitte versuche es später erneut.");
   }
 
   try {

@@ -182,7 +182,7 @@ function getAutoGalleryImages(): GalleryImage[] {
           .replace(/^./, (c) => c.toUpperCase());
         images.push({
           title: title || "Foto",
-          image: `/uploads/${dir.path}/${file}`,
+          image: `/uploads/${encodeURIComponent(dir.path)}/${encodeURIComponent(file)}`,
           album: dir.album,
           slug: `auto-${dir.path}-${file}`,
         });
