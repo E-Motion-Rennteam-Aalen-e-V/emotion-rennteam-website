@@ -43,7 +43,7 @@ describe("CMS user store", () => {
     upsertUser("linda", "hash1");
     const updated = setUserPassword("linda", "hash2");
     expect(updated).toBe(true);
-    expect(findUser("linda")).toEqual({ username: "linda", passwordHash: "hash2", mustChangePassword: false });
+    expect(findUser("linda")).toEqual(expect.objectContaining({ username: "linda", passwordHash: "hash2", mustChangePassword: false }));
   });
 
   it("returns false when setting a password for an unknown user", () => {

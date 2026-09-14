@@ -129,6 +129,8 @@ describe("commitFile / commitBinaryFile / deleteFile", () => {
   it("throws with response status and body when the PUT commit fails", async () => {
     fetchMock
       .mockResolvedValueOnce(new Response("not found", { status: 404 }))
+      .mockResolvedValueOnce(new Response("stale sha", { status: 422 }))
+      .mockResolvedValueOnce(new Response("not found", { status: 404 }))
       .mockResolvedValueOnce(new Response("bad request details", { status: 422 }));
 
     await expect(commitFile("content/team/foo.md", "hello", "msg", "Editor")).rejects.toThrow(/422/);
