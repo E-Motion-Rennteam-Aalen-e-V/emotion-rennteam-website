@@ -24,7 +24,13 @@ export async function generateMetadata({
     title: post.title,
     description: post.excerpt ?? post.title,
     alternates: { canonical: `/news/${slug}` },
-    openGraph: post.coverImage ? { images: [{ url: post.coverImage }] } : undefined,
+    openGraph: {
+      images: [{ url: post.coverImage ?? "/uploads/ert-14-26-studio.jpg" }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      images: [post.coverImage ?? "/uploads/ert-14-26-studio.jpg"],
+    },
   };
 }
 
