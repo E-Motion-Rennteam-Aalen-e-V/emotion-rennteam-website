@@ -117,7 +117,7 @@ export async function listItems(collectionName: string): Promise<ContentItem[]> 
       }
     })
   );
-  const items = results.filter((item): item is ContentItem => item !== null);
+  const items = results.filter((item) => item !== null) as ContentItem[];
   return items.sort((a, b) => a.slug.localeCompare(b.slug));
 }
 

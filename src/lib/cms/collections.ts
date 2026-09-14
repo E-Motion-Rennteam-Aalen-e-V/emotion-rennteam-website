@@ -2,6 +2,7 @@
 // admin UI (list/edit forms) and the content-loading helpers key off this.
 
 import { TEAM_DEPARTMENTS, TEAM_SEASONS } from "@/lib/team-departments";
+import { SPONSOR_CONTENT_TIERS } from "@/lib/validation";
 
 export type FieldType =
   | "string"
@@ -98,7 +99,7 @@ export const collections: CollectionDef[] = [
         name: "tier",
         label: "Sponsoring-Stufe",
         type: "select",
-        options: ["Platin", "Gold", "Silber", "Partner"],
+        options: [...SPONSOR_CONTENT_TIERS],
         required: true,
       },
       { name: "logo", label: "Logo", type: "image" },

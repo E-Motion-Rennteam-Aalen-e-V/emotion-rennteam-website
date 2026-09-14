@@ -5,6 +5,8 @@
  * API route handler under `src/app/api`.
  */
 
+import { TEAM_DEPARTMENTS } from "@/lib/team-departments";
+
 export type FieldErrors = Record<string, string>;
 
 export type ValidationResult<T> =
@@ -183,24 +185,7 @@ export const MEMBER_SKILLS = [
   { id: "video_photo", label: "Video & Foto Editing" },
 ] as const;
 
-export const MEMBER_DEPARTMENTS = [
-  "Project Management",
-  "Workshop",
-  "Chassis and Ergonomics",
-  "Electrics",
-  "Powertrain",
-  "Aerodynamics",
-  "Suspension and Steering Systems",
-  "Driverless",
-  "Vehicle Dynamics",
-  "Testing and Data Acquisition",
-  "Media and Marketing",
-  "Business Plan",
-  "Sponsoring",
-  "Eventmanagement",
-  "Finance",
-  "Noch unentschlossen",
-] as const;
+export const MEMBER_DEPARTMENTS = [...TEAM_DEPARTMENTS, "Noch unentschlossen"] as const;
 
 export function validateMemberApplicationForm(
   body: unknown
@@ -251,13 +236,11 @@ export type SponsorFormData = {
   message: string;
 };
 
-export const SPONSOR_TIERS = [
-  "Platin",
-  "Gold",
-  "Silber",
-  "Partner",
-  "Noch unentschlossen",
-] as const;
+/** Tiers accepted as field values in sponsor content files. */
+export const SPONSOR_CONTENT_TIERS = ["Platin", "Gold", "Silber", "Partner"] as const;
+
+/** Tiers shown in the sponsor inquiry form; includes the undecided option. */
+export const SPONSOR_TIERS = [...SPONSOR_CONTENT_TIERS, "Noch unentschlossen"] as const;
 
 export function validateSponsorForm(body: unknown): ValidationResult<SponsorFormData> {
   const data = asRecord(body);

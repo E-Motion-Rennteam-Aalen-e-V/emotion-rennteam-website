@@ -76,6 +76,7 @@ export type NewsPost = {
   coverImage?: string;
   body: string;
   slug: string;
+  fileMtime?: Date;
 };
 
 export type Page = {
@@ -100,6 +101,7 @@ export type BlogPost = {
   coverImage?: string;
   body: string;
   slug: string;
+  fileMtime?: Date;
 };
 
 export type GalleryImage = {
