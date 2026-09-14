@@ -5,12 +5,18 @@ export const config = {
   matcher: ["/admin/:path*", "/api/admin/:path*"],
 };
 
+function nextWithPathname(pathname: string): NextResponse {
+  const res = NextResponse.next();
+  res.headers.set("x-pathname", pathname);
+  return res;
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const isPublic =
     pathname === "/admin/login" || pathname === "/api/admin/login";
-  if (isPublic) return NextResponse.next();
+  if (isPublic) return nextWithPathname(pathname);
 
   const token = request.cookies.get(SESSION_COOKIE)?.value;
   const session = await verifySessionToken(token);
@@ -24,31 +30,43 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Ein neu angelegter Benutzer muss zuerst ein eigenes Passwort vergeben,
-  // bevor er irgendetwas anderes im CMS tun kann.
   const isPasswordChangeRoute =
-    pathname === "/admin/passwort-aendern" || pathname === "/api/admin/change-password";
+    pathname === "/admin/passwort-aendern" ||
+    pathname === "/api/admin/change-password";
   if (session.mustChangePassword && !isPasswordChangeRoute) {
     if (pathname.startsWith("/api/admin")) {
-      return NextResponse.json({ error: "Bitte zuerst ein eigenes Passwort vergeben." }, { status: 403 });
+      return NextResponse.json(
+        { error: "Bitte zuerst ein eigenes Passwort vergeben." },
+        { status: 403 }
+      );
     }
-    return NextResponse.redirect(new URL("/admin/passwort-aendern", request.url));
+    return NextResponse.redirect(
+      new URL("/admin/passwort-aendern", request.url)
+    );
   }
 
-  // Die Benutzerverwaltung ist dem Hauptadministrator (CMS_ADMIN_USER) vorbehalten.
-  const isUserManagement = pathname.startsWith("/admin/benutzer") || pathname.startsWith("/api/admin/users");
+  const isUserManagement =
+    pathname.startsWith("/admin/benutzer") ||
+    pathname.startsWith("/api/admin/users");
   if (isUserManagement && session.username !== process.env.CMS_ADMIN_USER) {
     if (pathname.startsWith("/api/admin")) {
-      return NextResponse.json({ error: "Nur der Hauptadministrator kann Benutzer verwalten." }, { status: 403 });
+      return NextResponse.json(
+        { error: "Nur der Hauptadministrator kann Benutzer verwalten." },
+        { status: 403 }
+      );
     }
     return NextResponse.redirect(new URL("/admin", request.url));
   }
 
-  // Das Beenden des CMS-Servers betrifft alle Redakteure gleichzeitig -
-  // ebenfalls dem Hauptadministrator vorbehalten.
-  if (pathname === "/api/admin/shutdown" && session.username !== process.env.CMS_ADMIN_USER) {
-    return NextResponse.json({ error: "Nur der Hauptadministrator kann das CMS beenden." }, { status: 403 });
+  if (
+    pathname === "/api/admin/shutdown" &&
+    session.username !== process.env.CMS_ADMIN_USER
+  ) {
+    return NextResponse.json(
+      { error: "Nur der Hauptadministrator kann das CMS beenden." },
+      { status: 403 }
+    );
   }
 
-  return NextResponse.next();
+  return nextWithPathname(pathname);
 }
