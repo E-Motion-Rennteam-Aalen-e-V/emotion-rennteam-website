@@ -109,6 +109,39 @@ Ein separates Redaktionssystem (Login, Editor, GitHub-Commits) existiert
 unabhängig davon im `cms-app`-Branch als eigenes Deployment. Dadurch enthält
 die öffentliche Website selbst keinen Admin-/Login-Code.
 
+## 🍎 macOS-Installation (CMS-App)
+
+> Dieser Abschnitt gilt für den `CMS-App-MacOs`-Branch (das macOS-App-Bundle).
+
+### Schritt-für-Schritt-Anleitung
+
+1. **Ordner aus Downloads verschieben** — Vor dem ersten Start den
+   entpackten Ordner aus `~/Downloads` heraus bewegen, z. B. auf den
+   Schreibtisch oder nach `~/Programme`. macOS sperrt Apps, die direkt
+   aus dem Download-Ordner gestartet werden (Gatekeeper „App Translocation").
+
+2. **App starten** — Doppelklick auf `E-Motion CMS.app` oder auf
+   `CMS-Start_macos.command`.
+
+3. **„App ist beschädigt"-Fehler (Apple Silicon)** — Einmalig im Terminal:
+   ```bash
+   xattr -cr "E-Motion CMS.app"
+   ```
+   Danach die App erneut starten.
+
+4. **Skripte nicht ausführbar** — Falls `.command`-Dateien beim Doppelklick
+   nicht starten:
+   ```bash
+   chmod +x CMS-Start_macos.command CMS-Start.command
+   ```
+
+5. **Node.js nicht gefunden** — Das Startskript sucht automatisch nach nvm
+   (`~/.nvm`) und Homebrew (`/opt/homebrew/bin`). Falls Node.js trotzdem
+   nicht erkannt wird: im Terminal `node --version` prüfen, dann ggf.
+   Node.js von https://nodejs.org neu installieren (LTS-Version).
+
+---
+
 ## 🔐 Betrieb & Sicherheitshinweise (Produktion)
 
 Checkliste vor dem Go-Live des `cms-app`-Deployments:

@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -12,7 +12,12 @@ import UpdateBanner from "@/components/admin/UpdateBanner";
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
   const session = await verifySessionToken(cookieStore.get(SESSION_COOKIE)?.value);
-  if (!session) redirect("/admin/login");
+  if (!session) {
+    const headerStore = await headers();
+    const pathname = headerStore.get("x-pathname") ?? "";
+    const next = pathname && pathname !== "/admin/login" ? `?next=${encodeURIComponent(pathname)}` : "";
+    redirect(`/admin/login${next}`);
+  }
   if (session.mustChangePassword) redirect("/admin/passwort-aendern");
 
   const isAdmin = session.username === process.env.CMS_ADMIN_USER;

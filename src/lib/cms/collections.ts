@@ -45,6 +45,7 @@ export const collections: CollectionDef[] = [
         name: "department",
         label: "Abteilung",
         type: "select",
+        required: true,
         // Muss exakt den Werten aus TEAM_DEPARTMENTS entsprechen - die
         // Team-Seite filtert Mitglieder strikt nach diesen Strings
         // (team.filter(member => member.department === department)). Ein

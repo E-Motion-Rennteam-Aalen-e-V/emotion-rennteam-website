@@ -1,29 +1,18 @@
 #!/bin/bash
-# ===========================================================================
-# HINWEIS FUER macOS-NUTZER / NOTE FOR macOS USERS
-# ===========================================================================
-#
-# Diese Datei oeffnet sich auf macOS im Texteditor - das ist normal.
-# Bitte verwende stattdessen:
-#
-#   -> CMS-Start.command  (Doppelklick im Finder genuegt)
-#
-# This file opens in a text editor on macOS. Use CMS-Start.command instead
-# (just double-click it in Finder).
-#
-# ===========================================================================
 # Doppelklick-Start des Redaktions-CMS fuer macOS.
-# Inhaltlich identisch mit CMS-Start.command (Gegenstueck zu CMS-Start.bat
-# unter Windows) - diese Datei traegt bewusst den Dateinamen
-# CMS-Start_macos.bat.
-#
-# Hinweis: macOS fuehrt Dateien per Doppelklick anhand ihres Typs aus, nicht
-# anhand der Endung. Bei .bat oeffnet der Finder stattdessen meist einen
-# Texteditor. Zum Starten daher entweder CMS-Start.command per Doppelklick
-# verwenden, oder diese Datei im Terminal ausfuehren:
-#   bash CMS-Start_macos.bat
+# Gegenstueck zu CMS-Start.bat (Windows). Diese Datei traegt die Endung
+# .command, damit macOS sie per Doppelklick im Finder direkt ausfuehrt.
 
 cd "$(dirname "$0")"
+
+# Node.js via nvm oder Homebrew einbinden, bevor wir nach "node" suchen.
+# Finder-gestartete Prozesse erben nur den System-PATH, nicht die Shell-
+# Konfiguration aus ~/.zshrc oder ~/.bash_profile.
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh" --no-use
+# Homebrew Apple Silicon (/opt/homebrew) und Intel (/usr/local)
+[ -d "/opt/homebrew/bin" ] && export PATH="/opt/homebrew/bin:$PATH"
+[ -d "/usr/local/bin" ]    && export PATH="/usr/local/bin:$PATH"
 
 echo "============================================"
 echo "  E-Motion Rennteam Aalen - Redaktions-CMS"
@@ -34,6 +23,20 @@ if ! command -v node >/dev/null 2>&1; then
     echo "[FEHLER] Node.js wurde nicht gefunden."
     echo "Bitte installiere Node.js von https://nodejs.org/ (LTS-Version)"
     echo "und starte dieses Fenster danach neu."
+    echo ""
+    echo "Tipp: Falls Node.js ueber nvm oder Homebrew installiert ist,"
+    echo "bitte einmalig das Terminal oeffnen und 'node --version' pruefen."
+    echo ""
+    read -r -p "Zum Beenden Enter druecken..." _
+    exit 1
+fi
+
+# Next.js 15 benoetigt Node.js >= 18.17
+NODE_MAJOR=$(node -e "process.stdout.write(process.versions.node.split('.')[0])" 2>/dev/null)
+if [ -z "$NODE_MAJOR" ] || [ "$NODE_MAJOR" -lt 18 ]; then
+    echo "[FEHLER] Node.js 18 oder neuer wird benoetigt."
+    echo "Aktuell installiert: $(node -v 2>/dev/null || echo 'unbekannt')"
+    echo "Bitte Node.js aktualisieren: https://nodejs.org"
     echo ""
     read -r -p "Zum Beenden Enter druecken..." _
     exit 1
@@ -50,7 +53,7 @@ fi
 
 if [ ! -f "package.json" ]; then
     echo "[FEHLER] Diese Datei liegt nicht im Projektordner."
-    echo "CMS-Start_macos.bat muss im selben Ordner liegen wie \"package.json\"."
+    echo "CMS-Start_macos.command muss im selben Ordner liegen wie \"package.json\"."
     echo ""
     read -r -p "Zum Beenden Enter druecken..." _
     exit 1
@@ -63,12 +66,6 @@ if ! command -v git >/dev/null 2>&1; then
     echo "Zum Aktivieren: Git installieren von https://git-scm.com/"
     echo ""
 fi
-
-# Der Update-Check laeuft NICHT mehr hier im Vordergrund - das wuerde den
-# Start unnoetig verzoegern, bevor ueberhaupt etwas zu sehen ist. Stattdessen
-# prueft scripts/cms-supervisor.mjs direkt beim Start (und danach alle paar
-# Minuten) im Hintergrund auf Updates, waehrend der Server bereits laeuft -
-# man landet dadurch sofort auf der Login-Seite.
 
 # Nur die tatsaechlich vorhandene next-Startdatei zaehlt. Ein blosser
 # node_modules-Ordner kann von einem abgebrochenen Lauf uebrig sein.
@@ -104,10 +101,24 @@ if [ ! -f "node_modules/.bin/next" ]; then
             echo ""
             echo "Hinweis: \"npm ci\" war nicht moeglich, versuche \"npm install\"..."
             echo ""
-            npm install --no-audit --no-fund
+            if ! npm install --no-audit --no-fund; then
+                echo ""
+                echo "[FEHLER] npm install fehlgeschlagen."
+                echo "Bitte Netzwerkverbindung und verfuegbaren Speicherplatz pruefen."
+                echo ""
+                read -r -p "Zum Beenden Enter druecken..." _
+                exit 1
+            fi
         fi
     else
-        npm install --no-audit --no-fund
+        if ! npm install --no-audit --no-fund; then
+            echo ""
+            echo "[FEHLER] npm install fehlgeschlagen."
+            echo "Bitte Netzwerkverbindung und verfuegbaren Speicherplatz pruefen."
+            echo ""
+            read -r -p "Zum Beenden Enter druecken..." _
+            exit 1
+        fi
     fi
 
     if [ ! -f "node_modules/.bin/next" ]; then
@@ -140,16 +151,6 @@ if [ ! -f ".env.local" ]; then
     echo ""
 fi
 
-# Laeuft schon ein CMS auf Port 3000? Dann wuerde Next.js auf einen anderen
-# Port ausweichen und das App-Fenster ins Leere zeigen.
-#
-# Das kann auch ein VERWAISTER Server aus einem vorherigen Lauf sein: wird
-# das Terminalfenster geschlossen, sendet macOS SIGHUP, und ein Next.js-
-# Server, der aus irgendeinem Grund nicht sauber mit heruntergefahren wurde,
-# blockiert den Port dann dauerhaft. Handelt es sich erkennbar um genau
-# diesen Projektordner (gleiches Arbeitsverzeichnis), wird er automatisch
-# aufgeraeumt statt den Start zu blockieren. Ein fremdes Programm auf Port
-# 3000 wird dagegen nicht angetastet.
 repo_root="$(pwd)"
 if lsof -iTCP:3000 -sTCP:LISTEN -Pn >/dev/null 2>&1; then
     stale_pid="$(lsof -tiTCP:3000 -sTCP:LISTEN -Pn 2>/dev/null | head -1)"
@@ -192,9 +193,6 @@ echo ""
 
 bash "scripts/cms-open-app.sh" &
 
-# Der Supervisor startet den eigentlichen Server und prueft waehrend des
-# Betriebs alle paar Minuten selbststaendig auf Updates - wird eines
-# gefunden, wendet er es an und startet den Server automatisch neu.
 node "scripts/cms-supervisor.mjs" -p 3000
 
 echo ""

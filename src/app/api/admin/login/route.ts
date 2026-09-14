@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
   if ((!adminUser || !adminHash) && typeof username === "string" && !findUser(username)) {
     return NextResponse.json(
       { error: "CMS-Login ist serverseitig nicht konfiguriert (CMS_ADMIN_USER/CMS_ADMIN_PASSWORD_HASH fehlen)." },
-      { status: 500 }
+      { status: 503 }
     );
   }
 
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
   if (!sessionSecret || sessionSecret.length < 16) {
     return NextResponse.json(
       { error: "CMS-Login ist serverseitig nicht konfiguriert (CMS_SESSION_SECRET fehlt oder ist zu kurz)." },
-      { status: 500 }
+      { status: 503 }
     );
   }
 

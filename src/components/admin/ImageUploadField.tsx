@@ -128,6 +128,7 @@ export default function ImageUploadField({
   // GitHub", amber) — they used to share one field and one color.
   const [error, setError] = useState("");
   const [warning, setWarning] = useState("");
+  const [showUploadHint, setShowUploadHint] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
 
   async function handleFile(file: File) {
@@ -141,12 +142,14 @@ export default function ImageUploadField({
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || "Upload fehlgeschlagen.");
+        setShowUploadHint(true);
         return;
       }
       onChange(data.publicPath);
-      if (data.warning) setWarning(data.warning);
+      if (data.warning) { setWarning(data.warning); setShowUploadHint(true); }
     } catch {
       setError("Verbindung zum Server fehlgeschlagen.");
+      setShowUploadHint(true);
     } finally {
       setUploading(false);
     }
@@ -154,17 +157,13 @@ export default function ImageUploadField({
 
   return (
     <div>
-      {/* Direkter Upload läuft über den Server und landet erst per GitHub-Commit
-          im Repo (siehe saveUploadedImage) — dabei kommt es bei manchen
-          Dateien (z. B. iPhone-HEIC, sehr große Originale) öfter zu
-          Konvertierungs-/Commit-Fehlern. Bei Problemen: Bild direkt im
-          GitHub-Repo unter public/uploads/ hochladen und hier nur den
-          Pfad eintragen bzw. aus der Mediathek auswählen. */}
-      <p className="mb-2 rounded-md border border-amber-500/30 bg-amber-500/10 px-2.5 py-1.5 text-[11px] text-amber-300">
-        Bei Upload-Fehlern: Bild lieber direkt im GitHub-Repo unter{" "}
-        <code className="font-mono">public/uploads/</code> hochladen und danach hier aus der
-        Mediathek wählen.
-      </p>
+      {showUploadHint && (
+        <p className="mb-2 rounded-md border border-amber-500/30 bg-amber-500/10 px-2.5 py-1.5 text-[11px] text-amber-300">
+          Bei Upload-Fehlern: Bild lieber direkt im GitHub-Repo unter{" "}
+          <code className="font-mono">public/uploads/</code> hochladen und danach hier aus der
+          Mediathek wählen.
+        </p>
+      )}
       <div className="flex items-center gap-4">
         <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-surface-2">
           {value ? (

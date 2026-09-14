@@ -24,6 +24,7 @@ export async function generateMetadata({
     title: post.title,
     description: post.excerpt ?? post.title,
     alternates: { canonical: `/blog/${slug}` },
+    openGraph: post.coverImage ? { images: [{ url: post.coverImage }] } : undefined,
   };
 }
 

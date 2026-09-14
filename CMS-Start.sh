@@ -27,6 +27,17 @@ if ! command -v node >/dev/null 2>&1; then
     exit 1
 fi
 
+# Next.js 15 benoetigt Node.js >= 18.17
+NODE_MAJOR=$(node -e "process.stdout.write(process.versions.node.split('.')[0])" 2>/dev/null)
+if [ -z "$NODE_MAJOR" ] || [ "$NODE_MAJOR" -lt 18 ]; then
+    echo "[FEHLER] Node.js 18 oder neuer wird benoetigt."
+    echo "Aktuell installiert: $(node -v 2>/dev/null || echo 'unbekannt')"
+    echo "Bitte Node.js aktualisieren: https://nodejs.org"
+    echo ""
+    read -r -p "Zum Beenden Enter druecken..." _
+    exit 1
+fi
+
 if ! command -v npm >/dev/null 2>&1; then
     echo "[FEHLER] npm wurde nicht gefunden, obwohl Node.js vorhanden ist."
     echo "Bitte installiere Node.js von https://nodejs.org/ neu (LTS-Version)"

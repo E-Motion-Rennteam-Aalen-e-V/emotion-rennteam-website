@@ -15,6 +15,13 @@
 # echte Texteingabe und lesbare Fehlermeldungen noetig sind.
 set -u
 
+# Node.js via nvm oder Homebrew einbinden — Finder-gestartete Prozesse
+# erben nur den System-PATH, nicht ~/.zshrc oder ~/.bash_profile.
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh" --no-use
+[ -d "/opt/homebrew/bin" ] && export PATH="/opt/homebrew/bin:$PATH"
+[ -d "/usr/local/bin" ]    && export PATH="/usr/local/bin:$PATH"
+
 # Contents/MacOS/cms-launcher -> Contents -> <App>.app -> Projektordner
 # (die App liegt direkt im Repo-Root, wird zusammen mit dem Quellcode im
 # GitHub-ZIP ausgeliefert).
@@ -59,8 +66,15 @@ if [ "$needs_terminal" = true ]; then
     # Ersteinrichtung, Installation oder eine Fehlermeldung, die jemand
     # tatsaechlich lesen koennen muss - dafuer ganz bewusst ein sichtbares
     # Terminal-Fenster statt eines lautlosen Hintergrundprozesses.
-    escaped_dir=${DIR//\\/\\\\}
-    escaped_dir=${escaped_dir//\"/\\\"}
+    #
+    # Sicherheits-Escaping: AppleScript-String in doppelten Anfuehrungs-
+    # zeichen — Backslashes verdoppeln, dann Anf.-Zeichen escapen,
+    # dann Zeilenumbrueche entfernen (koennen Pfade theoretisch enthalten
+    # und wuerden den do-script-String brechen).
+    escaped_dir="${DIR//$'\n'/}"   # Zeilenumbrueche entfernen
+    escaped_dir="${escaped_dir//$'\r'/}"
+    escaped_dir="${escaped_dir//\\/\\\\}"
+    escaped_dir="${escaped_dir//\"/\\\"}"
     osascript <<OSA
 tell application "Terminal"
     activate

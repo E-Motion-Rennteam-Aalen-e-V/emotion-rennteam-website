@@ -66,7 +66,14 @@ export default function SponsorCard({ sponsor, index }: { sponsor: Sponsor; inde
     const Wrapper = sponsor.website ? "a" : "div";
     return (
       <Wrapper
-        {...(sponsor.website ? { href: sponsor.website, target: "_blank", rel: "noopener noreferrer" } : {})}
+        {...(sponsor.website
+          ? {
+              href: sponsor.website,
+              target: "_blank",
+              rel: "noopener noreferrer",
+              "aria-label": `${sponsor.name} (öffnet in neuem Tab)`,
+            }
+          : {})}
         className="flex h-full flex-col items-center justify-center rounded-xl border border-border bg-surface p-8 text-center transition-all duration-300 hover:-translate-y-1 hover:border-accent hover:shadow-[0_0_30px_-10px_rgba(0,113,181,0.35)]"
       >
         <SponsorMark sponsor={sponsor} />
@@ -78,7 +85,13 @@ export default function SponsorCard({ sponsor, index }: { sponsor: Sponsor; inde
     <motion.a
       ref={ref}
       href={sponsor.website || undefined}
-      {...(sponsor.website ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      {...(sponsor.website
+        ? {
+            target: "_blank",
+            rel: "noopener noreferrer",
+            "aria-label": `${sponsor.name} (öffnet in neuem Tab)`,
+          }
+        : {})}
 
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}

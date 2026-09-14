@@ -4,6 +4,15 @@
 
 cd "$(dirname "$0")"
 
+# Node.js via nvm oder Homebrew einbinden, bevor wir nach "node" suchen.
+# Finder-gestartete Prozesse erben nur den System-PATH, nicht die Shell-
+# Konfiguration aus ~/.zshrc oder ~/.bash_profile.
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh" --no-use
+# Homebrew Apple Silicon (/opt/homebrew) und Intel (/usr/local)
+[ -d "/opt/homebrew/bin" ] && export PATH="/opt/homebrew/bin:$PATH"
+[ -d "/usr/local/bin" ]    && export PATH="/usr/local/bin:$PATH"
+
 echo "============================================"
 echo "  E-Motion Rennteam Aalen - Redaktions-CMS"
 echo "============================================"
@@ -13,6 +22,20 @@ if ! command -v node >/dev/null 2>&1; then
     echo "[FEHLER] Node.js wurde nicht gefunden."
     echo "Bitte installiere Node.js von https://nodejs.org/ (LTS-Version)"
     echo "und starte dieses Fenster danach neu."
+    echo ""
+    echo "Tipp: Falls Node.js ueber nvm oder Homebrew installiert ist,"
+    echo "bitte einmalig das Terminal oeffnen und 'node --version' pruefen."
+    echo ""
+    read -r -p "Zum Beenden Enter druecken..." _
+    exit 1
+fi
+
+# Next.js 15 benoetigt Node.js >= 18.17
+NODE_MAJOR=$(node -e "process.stdout.write(process.versions.node.split('.')[0])" 2>/dev/null)
+if [ -z "$NODE_MAJOR" ] || [ "$NODE_MAJOR" -lt 18 ]; then
+    echo "[FEHLER] Node.js 18 oder neuer wird benoetigt."
+    echo "Aktuell installiert: $(node -v 2>/dev/null || echo 'unbekannt')"
+    echo "Bitte Node.js aktualisieren: https://nodejs.org"
     echo ""
     read -r -p "Zum Beenden Enter druecken..." _
     exit 1

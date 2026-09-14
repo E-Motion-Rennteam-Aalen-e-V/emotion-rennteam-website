@@ -24,12 +24,17 @@ fi
 open_macos() {
     local chrome_app="/Applications/Google Chrome.app"
     local edge_app="/Applications/Microsoft Edge.app"
+    local safari_app="/Applications/Safari.app"
     if [ -d "$chrome_app" ]; then
         open -na "Google Chrome" --args "--app=$loading_url" "--window-size=1360,900"
     elif [ -d "$edge_app" ]; then
         open -na "Microsoft Edge" --args "--app=$loading_url" "--window-size=1360,900"
+    elif [ -d "$safari_app" ]; then
+        # Safari unterstuetzt kein App-Modus-Fenster — normaler Tab als Fallback.
+        echo "Tipp: Chrome oder Edge installieren fuer ein App-Fenster ohne Browser-Leisten."
+        open -a Safari "$loading_url"
     else
-        # Weder Chrome noch Edge gefunden: normaler Standardbrowser als Rueckfall.
+        # Unbekannter Standardbrowser.
         open "$loading_url"
     fi
 }
