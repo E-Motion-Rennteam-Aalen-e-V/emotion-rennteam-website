@@ -167,7 +167,7 @@
       var messages = [
         [0, "Verbinde mit Server…"],
         [16000, "Fast fertig – die erste Seite wird vorbereitet…"],
-        [35000, "Das dauert gerade ungewöhnlich lange…"],
+        [35000, "Noch kein Server – bitte Terminal auf Fehler prüfen…"],
       ];
       var currentMessage = -1;
 
@@ -189,10 +189,10 @@
           }
         }
         if (elapsed >= 35000) {
-          hintEl.textContent = "Beim allerersten Start kann die Installation ein paar Minuten dauern.";
+          hintEl.textContent = "Beim ersten Start nach npm-Installation kann es länger dauern.";
           retryEl.classList.add("visible");
         }
-        if (elapsed >= 90000 && !handedOff) {
+        if (elapsed >= 60000 && !handedOff) {
           cardEl.classList.add("error");
           spinnerEl.classList.add("hidden");
           statusEl.textContent = "Der Server antwortet nicht.";
