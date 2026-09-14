@@ -1,6 +1,6 @@
 ---
 name: AMK motion
-tier: Partner
+tier: Silber
 website: ''
 logo: /uploads/1789065183285-amk.webp
 ---

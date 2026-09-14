@@ -1,6 +1,6 @@
 ---
 name: Zeiss
-tier: Partner
+tier: Silber
 logo: /uploads/1789067739256-zeiss.webp
 ---
 
