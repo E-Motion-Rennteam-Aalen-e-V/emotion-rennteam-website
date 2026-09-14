@@ -1,6 +1,6 @@
 ---
 name: EDAG
-tier: Silber
+tier: Bronze
 website: ''
 logo: /uploads/1789065328041-edag.webp
 ---

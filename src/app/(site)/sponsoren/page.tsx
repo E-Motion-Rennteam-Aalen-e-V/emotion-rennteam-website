@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/sponsoren" },
 };
 
-const TIERS: Sponsor["tier"][] = ["Platin", "Gold", "Silber", "Partner"];
+const TIERS: Sponsor["tier"][] = ["Platin", "Gold", "Silber", "Bronze", "Partner"];
 
 export default function SponsorsPage() {
   const sponsors = getSponsors();

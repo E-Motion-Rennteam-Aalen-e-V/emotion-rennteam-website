@@ -63,7 +63,7 @@ export type Vehicle = {
 
 export type Sponsor = {
   name: string;
-  tier: "Platin" | "Gold" | "Silber" | "Partner";
+  tier: "Platin" | "Gold" | "Silber" | "Bronze" | "Partner";
   logo?: string;
   website?: string;
   body: string;
@@ -141,7 +141,7 @@ export function getVehicles(): Vehicle[] {
 }
 
 export function getSponsors(): Sponsor[] {
-  const tierOrder = ["Platin", "Gold", "Silber", "Partner"];
+  const tierOrder = ["Platin", "Gold", "Silber", "Bronze", "Partner"];
   return readCollection<Sponsor>("sponsors").sort(
     (a, b) => tierOrder.indexOf(a.tier) - tierOrder.indexOf(b.tier)
   );

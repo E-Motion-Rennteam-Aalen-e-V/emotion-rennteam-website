@@ -34,6 +34,12 @@ const TIER_STYLES: Partial<Record<Sponsor["tier"], TierStyle>> = {
     borderGlow: "rgba(203,213,225,0.65)",
     tilt: false,
   },
+  Bronze: {
+    shimmer: "rgba(205,127,50,0.4)",
+    glow: "rgba(205,127,50,0.25)",
+    borderGlow: "rgba(205,127,50,0.55)",
+    tilt: false,
+  },
 };
 
 const TILT_RANGE_DEG = 12;
