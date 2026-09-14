@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { createWriteStream } from "node:fs";
+import { writeFileSync } from "node:fs";
 import path from "node:path";
 import os from "node:os";
 
@@ -23,7 +23,7 @@ function makeTempPng(): string {
     "hex"
   );
   const file = path.join(os.tmpdir(), "e2e-test.png");
-  require("node:fs").writeFileSync(file, bytes);
+  writeFileSync(file, bytes);
   return file;
 }
 
@@ -56,7 +56,7 @@ test.describe("Media Upload", () => {
     await page.goto("/admin/media");
     const svgContent = '<svg xmlns="http://www.w3.org/2000/svg"><circle r="5"/></svg>';
     const tmpFile = path.join(os.tmpdir(), "e2e-test.svg");
-    require("node:fs").writeFileSync(tmpFile, svgContent);
+    writeFileSync(tmpFile, svgContent);
 
     const uploadInput = page.locator('input[type="file"]');
     await uploadInput.setInputFiles(tmpFile);
