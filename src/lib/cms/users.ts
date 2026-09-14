@@ -15,6 +15,8 @@ export interface CmsUser {
   passwordHash: string;
   /** Muss beim naechsten Login ein eigenes Passwort vergeben. */
   mustChangePassword: boolean;
+  /** Unix timestamp — sessions with iat < revokedBefore are invalidated. */
+  revokedBefore?: number;
 }
 
 const USERS_FILE = path.join(process.cwd(), ".cms-users.json");
@@ -71,8 +73,32 @@ export function setUserPassword(username: string, passwordHash: string): boolean
   const users = readStore();
   const idx = users.findIndex((u) => u.username === username);
   if (idx === -1) return false;
-  users[idx] = { ...users[idx], passwordHash, mustChangePassword: false };
+  users[idx] = {
+    ...users[idx],
+    passwordHash,
+    mustChangePassword: false,
+    revokedBefore: Math.floor(Date.now() / 1000),
+  };
   writeStore(users);
+  return true;
+}
+
+/**
+ * Returns true if the session with the given iat (issued-at) is still valid
+ * for this user — i.e., the password hasn't been changed (or the user deleted)
+ * since the token was issued.
+ *
+ * Called from Node.js API routes only (not edge middleware — those only check
+ * signature + expiry via verifySessionToken).
+ */
+export function isSessionValid(username: string, iat: number): boolean {
+  // Check secondary users store first.
+  const users = readStore();
+  const user = users.find((u) => u.username === username);
+  if (user) {
+    return !user.revokedBefore || iat >= user.revokedBefore;
+  }
+  // Main admin user is not in .cms-users.json — no revocation tracking for them yet.
   return true;
 }
 

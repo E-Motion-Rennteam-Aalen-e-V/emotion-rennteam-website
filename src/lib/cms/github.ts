@@ -70,6 +70,28 @@ async function getFileSha(config: GithubConfig, path: string): Promise<string | 
   return data.sha as string;
 }
 
+async function putFile(
+  config: GithubConfig,
+  filePath: string,
+  bodyContent: string,
+  message: string,
+  authorName: string,
+  sha: string | undefined
+): Promise<Response> {
+  const url = `https://api.github.com/repos/${config.owner}/${config.repo}/contents/${encodeURI(filePath)}`;
+  return fetch(url, {
+    method: "PUT",
+    headers: { ...authHeaders(config.token), "Content-Type": "application/json" },
+    body: JSON.stringify({
+      message,
+      content: bodyContent,
+      branch: config.branch,
+      sha,
+      committer: { name: authorName, email: `${authorName.toLowerCase().replace(/\s+/g, "-")}@cms.local` },
+    }),
+  });
+}
+
 /** Creates or updates a file at `path` with UTF-8 `content`, returns the commit URL. */
 export async function commitFile(
   path: string,
@@ -80,19 +102,14 @@ export async function commitFile(
   const config = getGithubConfig();
   if (!config) throw new Error("GitHub-Anbindung ist nicht konfiguriert (GITHUB_TOKEN/GITHUB_OWNER/GITHUB_REPO fehlen).");
 
-  const sha = await getFileSha(config, path);
-  const url = `https://api.github.com/repos/${config.owner}/${config.repo}/contents/${encodeURI(path)}`;
-  const res = await fetch(url, {
-    method: "PUT",
-    headers: { ...authHeaders(config.token), "Content-Type": "application/json" },
-    body: JSON.stringify({
-      message,
-      content: Buffer.from(content, "utf-8").toString("base64"),
-      branch: config.branch,
-      sha,
-      committer: { name: authorName, email: `${authorName.toLowerCase().replace(/\s+/g, "-")}@cms.local` },
-    }),
-  });
+  const b64 = Buffer.from(content, "utf-8").toString("base64");
+  let sha = await getFileSha(config, path);
+  let res = await putFile(config, path, b64, message, authorName, sha);
+  // 422 means our SHA is stale (another write raced us); re-fetch and retry once.
+  if (res.status === 422) {
+    sha = await getFileSha(config, path);
+    res = await putFile(config, path, b64, message, authorName, sha);
+  }
   if (!res.ok) {
     if (res.status === 401 || res.status === 403 || res.status === 404) {
       throw new Error(describeGithubError(res.status, config.owner, config.repo, config.branch));
@@ -114,19 +131,13 @@ export async function commitBinaryFile(
   const config = getGithubConfig();
   if (!config) throw new Error("GitHub-Anbindung ist nicht konfiguriert (GITHUB_TOKEN/GITHUB_OWNER/GITHUB_REPO fehlen).");
 
-  const sha = await getFileSha(config, path);
-  const url = `https://api.github.com/repos/${config.owner}/${config.repo}/contents/${encodeURI(path)}`;
-  const res = await fetch(url, {
-    method: "PUT",
-    headers: { ...authHeaders(config.token), "Content-Type": "application/json" },
-    body: JSON.stringify({
-      message,
-      content: Buffer.from(bytes).toString("base64"),
-      branch: config.branch,
-      sha,
-      committer: { name: authorName, email: `${authorName.toLowerCase().replace(/\s+/g, "-")}@cms.local` },
-    }),
-  });
+  const b64 = Buffer.from(bytes).toString("base64");
+  let sha = await getFileSha(config, path);
+  let res = await putFile(config, path, b64, message, authorName, sha);
+  if (res.status === 422) {
+    sha = await getFileSha(config, path);
+    res = await putFile(config, path, b64, message, authorName, sha);
+  }
   if (!res.ok) {
     if (res.status === 401 || res.status === 403 || res.status === 404) {
       throw new Error(describeGithubError(res.status, config.owner, config.repo, config.branch));

@@ -8,6 +8,7 @@ const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7; // 7 days
 interface SessionPayload {
   u: string;
   exp: number;
+  iat: number;
   /** Muss vor weiterer Nutzung erst ein eigenes Passwort vergeben. */
   p?: boolean;
 }
@@ -47,9 +48,11 @@ function getSecret(): string {
 }
 
 export async function createSessionToken(username: string, mustChangePassword = false): Promise<string> {
+  const now = Math.floor(Date.now() / 1000);
   const payload: SessionPayload = {
     u: username,
-    exp: Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS,
+    iat: now,
+    exp: now + SESSION_TTL_SECONDS,
     ...(mustChangePassword ? { p: true } : {}),
   };
   const payloadBytes = new TextEncoder().encode(JSON.stringify(payload));
@@ -62,7 +65,7 @@ export async function createSessionToken(username: string, mustChangePassword = 
 
 export async function verifySessionToken(
   token: string | undefined | null
-): Promise<{ username: string; mustChangePassword: boolean } | null> {
+): Promise<{ username: string; mustChangePassword: boolean; iat: number } | null> {
   if (!token) return null;
   const parts = token.split(".");
   if (parts.length !== 2) return null;
@@ -93,7 +96,8 @@ export async function verifySessionToken(
     const payload: SessionPayload = JSON.parse(new TextDecoder().decode(base64UrlDecode(payloadB64)));
     if (typeof payload.exp !== "number" || payload.exp < Math.floor(Date.now() / 1000)) return null;
     if (typeof payload.u !== "string" || !payload.u) return null;
-    return { username: payload.u, mustChangePassword: payload.p === true };
+    const iat = typeof payload.iat === "number" ? payload.iat : 0;
+    return { username: payload.u, mustChangePassword: payload.p === true, iat };
   } catch {
     return null;
   }
@@ -112,5 +116,18 @@ export async function getSessionUser(
     .find((c) => c.startsWith(`${SESSION_COOKIE}=`));
   if (!match) return null;
   const token = decodeURIComponent(match.slice(SESSION_COOKIE.length + 1));
-  return verifySessionToken(token);
+  const session = await verifySessionToken(token);
+  if (!session) return null;
+  // In Node.js runtime (API routes), also check against the file-based
+  // revocation store. Sessions issued before a password change are rejected.
+  // This import is intentionally dynamic so this file remains importable from
+  // the edge runtime (middleware), where `users.ts` (which uses `fs`) cannot
+  // be imported synchronously.
+  try {
+    const { isSessionValid } = await import("./users");
+    if (!isSessionValid(session.username, session.iat)) return null;
+  } catch {
+    // Edge runtime or unavailable — skip revocation check.
+  }
+  return session;
 }
