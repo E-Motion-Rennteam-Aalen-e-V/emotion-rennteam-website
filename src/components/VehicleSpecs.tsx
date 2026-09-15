@@ -41,7 +41,7 @@ function StatCard({
   return (
     <CardShell>
       <CardLabel>{label}</CardLabel>
-      <p className="mt-1.5 text-2xl font-extrabold sm:text-3xl" style={{ color: `var(--${tone})` }}>
+      <p className="mt-1.5 text-xl font-extrabold sm:text-2xl lg:text-3xl" style={{ color: `var(--${tone})` }}>
         {value}
         {unit && <span className="ml-1 text-sm font-semibold text-muted sm:text-base">{unit}</span>}
       </p>
