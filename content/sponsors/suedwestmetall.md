@@ -1,6 +1,6 @@
 ---
 name: Südwestmetall
-tier: Partner
+tier: Bronze
 logo: /uploads/1789066434469-swm.webp
 ---
 

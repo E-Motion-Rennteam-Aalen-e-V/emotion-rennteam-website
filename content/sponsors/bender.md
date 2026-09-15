@@ -1,6 +1,6 @@
 ---
 name: Bender
-tier: Partner
+tier: Bronze
 website: ''
 logo: /uploads/1789065099666-bender.webp
 ---

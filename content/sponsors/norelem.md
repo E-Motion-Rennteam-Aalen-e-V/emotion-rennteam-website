@@ -1,6 +1,6 @@
 ---
 name: norelem
-tier: Partner
+tier: Bronze
 website: ''
 logo: /uploads/1789066366439-norelem.webp
 ---
