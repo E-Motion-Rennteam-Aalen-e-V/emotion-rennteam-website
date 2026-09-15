@@ -17,7 +17,7 @@ export default function JoinPage() {
   const positions = getPositions();
   const memberCount = getTeam().length;
   const stats = [
-    { value: "Seit 2009", label: "Am Start" },
+    { value: "2009", label: "Dabei seit" },
     { value: String(memberCount), label: "Aktive Mitglieder" },
     { value: String(TEAM_DEPARTMENTS.length), label: "Fachbereiche" },
   ];
@@ -26,7 +26,7 @@ export default function JoinPage() {
     <div className="container-page py-20">
       <Reveal>
         <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Mitmachen</p>
-        <h1 className="mt-2 text-5xl font-extrabold leading-tight tracking-tight sm:text-6xl">Werde Teil des Teams</h1>
+        <h1 className="mt-2 text-5xl font-extrabold leading-tight tracking-tight sm:text-6xl xl:text-7xl">Werde Teil des Teams</h1>
         <p className="mt-4 max-w-2xl text-muted">
           Egal ob Chassis, Electrics, Driverless oder Sponsoring – bei uns lernst du,
           Theorie in ein reales Projekt zu übersetzen. Keine Vorerfahrung nötig, nur Motivation.

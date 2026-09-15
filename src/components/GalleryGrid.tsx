@@ -43,7 +43,7 @@ function GalleryThumbnail({
         src={src}
         alt=""
         fill
-        sizes="(max-width: 768px) 100vw, 33vw"
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         className={`object-cover transition-all duration-500 group-hover:scale-110 ${
           loaded ? "opacity-100" : "opacity-0"
         }`}
