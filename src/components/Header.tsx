@@ -179,7 +179,7 @@ export default function Header({ hiddenIds = [] }: HeaderProps) {
         </nav>
 
         <button
-          className="relative flex h-9 w-9 items-center justify-center rounded-md border border-border md:hidden"
+          className="relative flex h-11 w-11 items-center justify-center rounded-md border border-border md:hidden"
           onClick={() => setOpen((v) => !v)}
           aria-label={open ? "Menü schließen" : "Menü öffnen"}
           aria-expanded={open}
@@ -225,7 +225,7 @@ export default function Header({ hiddenIds = [] }: HeaderProps) {
                   >
                     <Link
                       href={link.href}
-                      className="block rounded-md px-2 py-2 text-sm font-medium text-muted hover:bg-surface hover:text-foreground"
+                      className="block rounded-md px-2 py-3 text-sm font-medium text-muted hover:bg-surface hover:text-foreground"
                     >
                       {link.label}
                     </Link>
