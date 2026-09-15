@@ -1,6 +1,6 @@
 ---
 name: Klausmann 77 Suspension
-tier: Partner
+tier: Bronze
 logo: /uploads/1789068213837-klausmann.webp
 ---
 

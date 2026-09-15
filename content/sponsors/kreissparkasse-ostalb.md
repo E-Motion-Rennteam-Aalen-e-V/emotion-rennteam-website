@@ -1,6 +1,6 @@
 ---
 name: Kreissparkasse Ostalb
-tier: Partner
+tier: Bronze
 logo: /uploads/1789067826655-ksk.webp
 ---
 

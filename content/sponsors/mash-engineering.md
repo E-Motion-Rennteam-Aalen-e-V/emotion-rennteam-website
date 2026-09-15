@@ -1,6 +1,6 @@
 ---
 name: MesH Engineering Team
-tier: Partner
+tier: Bronze
 logo: /uploads/1789065805114-mesh.webp
 ---
 

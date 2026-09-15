@@ -1,6 +1,6 @@
 ---
 name: FEIN
-tier: Partner
+tier: Bronze
 logo: /Sponsoren-Logo/Fein-Logo.png
 website: ''
 ---

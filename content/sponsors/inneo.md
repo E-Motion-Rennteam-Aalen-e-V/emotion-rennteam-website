@@ -1,6 +1,6 @@
 ---
 name: INNEO
-tier: Partner
+tier: Bronze
 logo: /uploads/1789065617621-inneo.webp
 ---
 

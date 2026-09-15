@@ -1,6 +1,6 @@
 ---
 name: Altium
-tier: Partner
+tier: Bronze
 website: ''
 logo: /uploads/1789064436855-altium.webp
 ---

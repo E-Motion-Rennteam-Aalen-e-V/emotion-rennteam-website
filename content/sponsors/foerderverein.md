@@ -1,6 +1,6 @@
 ---
 name: Förderverein Hochschule Aalen
-tier: Partner
+tier: Bronze
 logo: /uploads/1789065493142-forderverein.webp
 ---
 
