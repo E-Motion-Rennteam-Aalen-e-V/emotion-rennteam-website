@@ -95,10 +95,10 @@ export default function Home() {
         )}
 
         <div className="relative border-t border-border/60 bg-background/40 backdrop-blur-sm">
-          <StaggerGroup className="container-page grid grid-cols-2 gap-8 py-10 sm:grid-cols-3">
+          <StaggerGroup className="container-page grid grid-cols-3 gap-4 py-10 sm:gap-8">
             {stats.map((stat) => (
               <StaggerItem key={stat.label} className="text-center sm:text-left">
-                <div className="text-3xl font-extrabold text-foreground sm:text-4xl">
+                <div className="text-2xl font-extrabold text-foreground sm:text-3xl lg:text-4xl">
                   <Counter value={stat.value} suffix={stat.suffix} />
                 </div>
                 <div className="mt-1 text-xs uppercase tracking-wide text-muted">
