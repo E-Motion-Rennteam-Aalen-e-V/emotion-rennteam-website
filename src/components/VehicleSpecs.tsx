@@ -122,7 +122,7 @@ function NicknameCard({ spec }: { spec: Spec }) {
     <CardShell className="col-span-2 border-accent/30 bg-gradient-to-br from-accent/5 to-transparent">
       <CardLabel>{spec.label}</CardLabel>
       <p className="mt-1.5 text-2xl font-extrabold tracking-tight text-accent-text sm:text-3xl">
-        „{name}"
+        &bdquo;{name}&ldquo;
       </p>
       {explanation && (
         <p className="mt-1.5 text-sm text-muted">{explanation}</p>
