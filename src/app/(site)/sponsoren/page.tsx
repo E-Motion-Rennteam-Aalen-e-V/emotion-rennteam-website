@@ -24,7 +24,7 @@ export default function SponsorsPage() {
         <div className="flex flex-col gap-8 sm:flex-row sm:items-center sm:gap-12">
           <div className="flex-1">
             <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Sponsoren</p>
-            <h1 className="mt-2 text-5xl font-extrabold leading-tight tracking-tight sm:text-6xl xl:text-7xl">Unsere Partner</h1>
+            <h1 className="mt-2 text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl md:text-6xl xl:text-7xl">Unsere Partner</h1>
             <p className="mt-4 max-w-2xl text-muted">
               Ohne die Unterstützung unserer Sponsoren wäre die Entwicklung unseres Fahrzeugs nicht
               möglich. Vielen Dank an alle Partner!

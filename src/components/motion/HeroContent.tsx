@@ -45,7 +45,7 @@ export default function HeroContent({
       </motion.p>
       <motion.h1
         variants={item}
-        className="mx-auto text-6xl font-extrabold leading-[1.2] tracking-tight sm:text-7xl lg:text-8xl"
+        className="mx-auto text-4xl font-extrabold leading-[1.2] tracking-tight sm:text-6xl md:text-7xl lg:text-8xl"
       >
         <span className="text-gradient-accent">
           {titleFirstLine}

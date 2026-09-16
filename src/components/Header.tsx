@@ -86,7 +86,7 @@ export default function Header({ hiddenIds = [] }: HeaderProps) {
           <span className="absolute -inset-x-4 -inset-y-2 -z-10 rounded-full bg-accent/0 blur-lg transition-colors duration-300 group-hover:bg-accent/20" />
         </Link>
 
-        <nav aria-label="Hauptnavigation" className="hidden items-center gap-8 md:flex">
+        <nav aria-label="Hauptnavigation" className="hidden items-center gap-4 md:flex lg:gap-8">
           {NAV_LINKS.map((link) => {
             const active = pathname === link.href || pathname?.startsWith(`${link.href}/`);
             return (
