@@ -70,7 +70,7 @@ export default async function TeamPage({
     <div className="container-page py-20">
       <Reveal>
         <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Team</p>
-        <h1 className="mt-2 text-5xl font-extrabold leading-tight tracking-tight sm:text-6xl xl:text-7xl">{heading}</h1>
+        <h1 className="mt-2 text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl md:text-6xl xl:text-7xl">{heading}</h1>
         <p className="mt-4 max-w-2xl text-muted">
           Über 50 Studierende verschiedenster Fachrichtungen entwickeln, fertigen und testen
           gemeinsam unseren elektrischen Rennwagen – organisiert in {TEAM_DEPARTMENTS.length} Fachteams.
