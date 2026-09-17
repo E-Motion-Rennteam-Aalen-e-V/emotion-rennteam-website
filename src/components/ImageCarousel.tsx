@@ -19,6 +19,7 @@ const CAROUSEL_IMAGES = [
 export default function ImageCarousel() {
   const [current, setCurrent] = useState(0);
   const [autoPlay, setAutoPlay] = useState(true);
+  const [userNavigated, setUserNavigated] = useState(false);
 
   useEffect(() => {
     if (!autoPlay) return;
@@ -34,18 +35,20 @@ export default function ImageCarousel() {
   const next = () => {
     setCurrent((prev) => (prev + 1) % CAROUSEL_IMAGES.length);
     setAutoPlay(false);
+    setUserNavigated(true);
   };
 
   const prev = () => {
     setCurrent((prev) => (prev - 1 + CAROUSEL_IMAGES.length) % CAROUSEL_IMAGES.length);
     setAutoPlay(false);
+    setUserNavigated(true);
   };
 
   return (
     <div
       className="relative w-full h-full bg-gradient-to-br from-surface to-surface/50"
       onMouseEnter={() => setAutoPlay(false)}
-      onMouseLeave={() => setAutoPlay(true)}
+      onMouseLeave={() => { if (!userNavigated) setAutoPlay(true); }}
     >
       {/* Images Container */}
       <AnimatePresence mode="wait">
@@ -62,7 +65,7 @@ export default function ImageCarousel() {
             alt={CAROUSEL_IMAGES[current].alt}
             fill
             className="object-cover"
-            priority
+            priority={current === 0}
           />
         </motion.div>
       </AnimatePresence>
@@ -98,6 +101,7 @@ export default function ImageCarousel() {
             onClick={() => {
               setCurrent(i);
               setAutoPlay(false);
+              setUserNavigated(true);
             }}
             className={`h-2 rounded-full transition-all ${
               i === current

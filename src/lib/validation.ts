@@ -328,6 +328,8 @@ export function validateMediaKitForm(body: unknown): ValidationResult<MediaKitFo
 
   if (details.length > LIMITS.message) errors.details = "Text ist zu lang.";
 
+  if (categories.length === 0) errors.categories = "Bitte wähle mindestens eine Kategorie aus.";
+
   if (!data.consent) errors.consent = "Bitte stimme der Datenverarbeitung zu.";
 
   if (Object.keys(errors).length > 0) return { valid: false, errors };

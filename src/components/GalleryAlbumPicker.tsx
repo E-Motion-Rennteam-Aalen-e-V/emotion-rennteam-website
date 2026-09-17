@@ -84,7 +84,7 @@ export default function GalleryAlbumPicker({
         ))}
       </select>
 
-      {active && <GalleryGrid images={active.images} onImageError={handleImageError} />}
+      {active && <GalleryGrid key={selected} images={active.images} onImageError={handleImageError} />}
     </div>
   );
 }

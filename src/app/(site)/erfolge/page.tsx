@@ -22,7 +22,7 @@ export default function ResultsPage() {
             <h1 className="mt-2 text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl md:text-6xl xl:text-7xl">Unsere Historie</h1>
             <p className="mt-4 max-w-2xl text-muted">
               Von der Teamgründung bis zu unseren besten Wettbewerbsergebnissen – eine Zeitreise
-              durch die Geschichte des E-Motion Rennteams. Seit 2012 sind wir bei internationalen
+              durch die Geschichte des E-Motion Rennteams. Seit 2009 sind wir bei internationalen
               Formula-Student-Events angetreten und landeten dabei immer wieder in den Top 5
               einzelner Disziplinen und in der Gesamtwertung unter den besten 10 Teams.
             </p>

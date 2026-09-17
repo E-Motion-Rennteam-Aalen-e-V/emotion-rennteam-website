@@ -51,7 +51,7 @@ export default function SponsorForm() {
           )}
           <HoneypotField />
           <div>
-            <label htmlFor="company" className="text-sm font-medium">Firmenname</label>
+            <label htmlFor="company" className="text-sm font-medium">Firmenname <span className="text-accent-text">*</span></label>
             <input
               id="company"
               name="company"
@@ -68,7 +68,7 @@ export default function SponsorForm() {
             )}
           </div>
           <div>
-            <label htmlFor="contact" className="text-sm font-medium">Ansprechpartner:in</label>
+            <label htmlFor="contact" className="text-sm font-medium">Ansprechpartner:in <span className="text-accent-text">*</span></label>
             <input
               id="contact"
               name="contact"
@@ -85,7 +85,7 @@ export default function SponsorForm() {
             )}
           </div>
           <div>
-            <label htmlFor="sponsor-email" className="text-sm font-medium">E-Mail</label>
+            <label htmlFor="sponsor-email" className="text-sm font-medium">E-Mail <span className="text-accent-text">*</span></label>
             <input
               id="sponsor-email"
               name="email"

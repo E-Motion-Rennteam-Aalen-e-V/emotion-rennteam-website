@@ -119,7 +119,9 @@ export default function MediaKitRequestForm() {
           </div>
 
           <div className="sm:col-span-2 space-y-3 rounded-lg border border-border/50 bg-accent/5 p-4">
-            <label className="text-sm font-medium">Welches Material interessiert dich?</label>
+            <label className="text-sm font-medium">
+              Welches Material interessiert dich? <span className="text-accent-text">*</span>
+            </label>
             <div className="grid gap-2.5 sm:grid-cols-2">
               {MEDIAKIT_CATEGORIES.map(({ id, label }) => (
                 <label key={id} className="flex items-center gap-2.5 cursor-pointer group">
@@ -132,6 +134,9 @@ export default function MediaKitRequestForm() {
                 </label>
               ))}
             </div>
+            {errors.categories && (
+              <p className="mt-1 text-xs text-red-500">{errors.categories}</p>
+            )}
           </div>
 
           <div className="sm:col-span-2">
