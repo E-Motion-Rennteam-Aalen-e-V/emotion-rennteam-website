@@ -33,6 +33,7 @@ export default function TeamYearTabs({ allMembers, departments, descriptions, de
             <button
               key={season}
               onClick={() => setActiveSeason(season)}
+              aria-pressed={activeSeason === season}
               className={`rounded-full border px-5 py-1.5 text-sm font-semibold transition-colors duration-200 ${
                 activeSeason === season
                   ? "border-accent bg-accent text-white"

@@ -14,7 +14,6 @@ export const metadata: Metadata = {
 function groupByAlbum(images: ReturnType<typeof getGallery>) {
   const albums = new Map<string, typeof images>();
   for (const image of images) {
-    if (image.album === "Einzelbilder") continue;
     albums.set(image.album, [...(albums.get(image.album) ?? []), image]);
   }
   return Array.from(albums.entries()).map(([name, images]) => ({ name, images }));

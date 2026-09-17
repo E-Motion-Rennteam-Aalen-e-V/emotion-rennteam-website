@@ -2,10 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { validateNewsletterForm } from "@/lib/validation";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { deliverFormSubmission } from "@/lib/formDelivery";
+import { isTrustedOrigin, hasJsonContentType } from "@/lib/apiSecurity";
 
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
+  if (!isTrustedOrigin(request)) {
+    return NextResponse.json({ ok: false, error: "Ungültige Anfrage." }, { status: 403 });
+  }
+  if (!hasJsonContentType(request)) {
+    return NextResponse.json({ ok: false, error: "Ungültige Anfrage." }, { status: 415 });
+  }
+
   const ip = getClientIp(request);
   if (!checkRateLimit(`newsletter:${ip}`, 5, 10 * 60 * 1000)) {
     return NextResponse.json(
