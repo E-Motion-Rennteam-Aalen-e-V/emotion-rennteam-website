@@ -114,8 +114,29 @@ function BatteryCard({ label, num, unit, subtext }: { label: string; num: string
   );
 }
 
+function NicknameCard({ spec }: { spec: Spec }) {
+  const dashIdx = spec.value.indexOf("–");
+  const name = dashIdx > -1 ? spec.value.slice(0, dashIdx).trim() : spec.value;
+  const explanation = dashIdx > -1 ? spec.value.slice(dashIdx + 1).trim() : undefined;
+  return (
+    <CardShell className="col-span-2 border-accent/30 bg-gradient-to-br from-accent/5 to-transparent">
+      <CardLabel>{spec.label}</CardLabel>
+      <p className="mt-1.5 text-2xl font-extrabold tracking-tight text-accent-text sm:text-3xl">
+        &bdquo;{name}&ldquo;
+      </p>
+      {explanation && (
+        <p className="mt-1.5 text-sm text-muted">{explanation}</p>
+      )}
+    </CardShell>
+  );
+}
+
 function renderSpec(spec: Spec, i: number) {
   const label = spec.label.toLowerCase();
+
+  if (label === "spitzname") {
+    return <NicknameCard key={i} spec={spec} />;
+  }
 
   if (label === "leistung") {
     const parsed = parseNumericSpec(spec.value);
@@ -180,11 +201,12 @@ export default function VehicleSpecs({
       <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2">{specs.map(renderSpec)}</div>
 
       {achievements && achievements.length > 0 && (
-        <CardShell className="mt-3">
-          <ul className="space-y-2">
+        <CardShell className="mt-3 border-accent-2-text/20 bg-gradient-to-br from-accent-2-text/5 to-transparent">
+          <CardLabel>🏆 Erfolge &amp; Highlights</CardLabel>
+          <ul className="mt-2 space-y-2">
             {achievements.map((achievement) => (
               <li key={achievement} className="flex gap-2 text-sm text-foreground">
-                <span className="mt-0.5 flex h-4 w-4 flex-none items-center justify-center rounded-full bg-accent-text/15 text-[10px] font-bold text-accent-text">
+                <span className="mt-0.5 flex h-4 w-4 flex-none items-center justify-center rounded-full bg-accent-2-text/20 text-[10px] font-bold text-accent-2-text">
                   ✓
                 </span>
                 {achievement}
