@@ -119,7 +119,7 @@ function NicknameCard({ spec }: { spec: Spec }) {
   const name = dashIdx > -1 ? spec.value.slice(0, dashIdx).trim() : spec.value;
   const explanation = dashIdx > -1 ? spec.value.slice(dashIdx + 1).trim() : undefined;
   return (
-    <CardShell className="col-span-2 border-accent/30 bg-gradient-to-br from-accent/5 to-transparent">
+    <CardShell className="@min-[420px]:col-span-2 border-accent/30 bg-gradient-to-br from-accent/5 to-transparent">
       <CardLabel>{spec.label}</CardLabel>
       <p className="mt-1.5 text-2xl font-extrabold tracking-tight text-accent-text sm:text-3xl">
         &bdquo;{name}&ldquo;
