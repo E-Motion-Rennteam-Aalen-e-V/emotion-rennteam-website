@@ -41,7 +41,7 @@
   --font-heading: var(--font-heading);
 }
 
-html {
+html[data-scroll-behavior="smooth"] {
   scroll-behavior: smooth;
 }
 
@@ -79,7 +79,7 @@ select:focus-visible,
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html {
+  html[data-scroll-behavior="smooth"] {
     scroll-behavior: auto;
   }
 }
