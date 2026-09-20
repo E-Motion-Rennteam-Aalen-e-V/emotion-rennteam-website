@@ -14,8 +14,8 @@ export default function MediaKitPage() {
     <div className="container-page py-20">
       <Reveal>
         <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Mediakit</p>
-        <h1 className="mt-2 text-5xl font-extrabold leading-tight tracking-tight sm:text-6xl">
-          Bild- und Video&shy;material anfragen
+        <h1 className="mt-2 text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl md:text-6xl">
+          Bild- und Videomaterial anfragen
         </h1>
         <p className="mt-4 max-w-2xl text-muted">
           Für Präsentationen, Pressemitteilungen oder eure eigene Website: Sagt uns, welches

@@ -26,11 +26,10 @@ const csp = [
   "connect-src 'self'",
   // ContactMap creates a blob: iframe to render the Leaflet map locally
   // without loading external scripts into the main document.
-  "frame-src blob:",
+  // The ContactMap embeds an OpenStreetMap iframe via blob: URL. frame-ancestors
+  // stays 'none' (nobody may embed us), but frame-src must allow both.
+  "frame-src blob: https://www.openstreetmap.org",
   "object-src 'none'",
-  // The ContactMap embeds an OpenStreetMap iframe. frame-ancestors stays
-  // 'none' (nobody may embed us), but frame-src must allow OSM.
-  "frame-src https://www.openstreetmap.org",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",
