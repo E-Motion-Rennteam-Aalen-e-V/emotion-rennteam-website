@@ -83,7 +83,7 @@ export default function VehiclesPage() {
                         </span>
                       )}
                     </div>
-                    <h2 className="mt-2 text-2xl font-extrabold tracking-tight sm:text-3xl">
+                    <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-balance sm:text-3xl">
                       {vehicle.name}
                     </h2>
                     {vehicle.tagline && <p className="mt-2 text-muted">{vehicle.tagline}</p>}
