@@ -17,7 +17,9 @@ function parseNumericSpec(value: string) {
 
 function CardShell({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`rounded-xl border border-border bg-surface-2 p-4 ${className}`}>{children}</div>
+    <div className={`relative isolate rounded-xl border border-border bg-surface-2 p-4 ${className}`}>
+      {children}
+    </div>
   );
 }
 
@@ -66,9 +68,23 @@ function PowerGauge({ label, num, unit, subtext, max = 200 }: { label: string; n
   const c = 2 * Math.PI * r;
 
   return (
-    <CardShell>
+    <CardShell className="overflow-hidden">
       <CardLabel>{label}</CardLabel>
-      <div className="relative mx-auto mt-3 h-28 w-28 sm:h-32 sm:w-32">
+
+      {/* Mobile: compact bar, no ring (avoids cramped circle on narrow screens) */}
+      <div className="mt-2 flex items-baseline gap-2 sm:hidden">
+        <span className="text-2xl font-extrabold text-accent-text">
+          {num}
+          <span className="ml-0.5 text-xs font-semibold text-muted">{unit}</span>
+        </span>
+      </div>
+      <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-border sm:hidden" aria-hidden="true">
+        <div className="h-full rounded-full bg-accent-text" style={{ width: `${pct * 100}%` }} />
+      </div>
+      {subtext && <p className="mt-1.5 text-xs text-muted sm:hidden">{subtext}</p>}
+
+      {/* Desktop/tablet: circular gauge */}
+      <div className="relative mx-auto mt-3 hidden h-28 w-28 sm:flex sm:h-32 sm:w-32">
         <svg viewBox="0 0 128 128" className="h-full w-full -rotate-90">
           <circle cx="64" cy="64" r={r} fill="none" stroke="var(--border)" strokeWidth="10" />
           <circle
@@ -105,7 +121,7 @@ function BatteryCard({ label, num, unit, subtext }: { label: string; num: string
         {num}
         <span className="ml-1 text-sm font-semibold text-muted sm:text-base">{unit}</span>
       </p>
-      <div className="mt-3 grid grid-cols-10 gap-1" aria-hidden="true">
+      <div className="mt-3 grid grid-cols-5 gap-1 sm:grid-cols-10" aria-hidden="true">
         {Array.from({ length: 10 }).map((_, i) => (
           <span key={i} className="h-5 rounded-sm bg-accent-2-text/70" />
         ))}
