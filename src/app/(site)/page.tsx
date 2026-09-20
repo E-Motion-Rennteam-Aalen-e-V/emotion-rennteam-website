@@ -95,7 +95,7 @@ export default function Home() {
         )}
 
         <div className="relative border-t border-border/60 bg-background/40 backdrop-blur-sm">
-          <StaggerGroup className="container-page grid grid-cols-3 gap-4 py-10 sm:gap-8">
+          <StaggerGroup className="container-page grid grid-cols-2 gap-4 py-10 sm:grid-cols-4 sm:gap-8">
             {stats.map((stat) => (
               <StaggerItem key={stat.label} className="text-center sm:text-left">
                 <div className="text-2xl font-extrabold text-foreground sm:text-3xl lg:text-4xl">
