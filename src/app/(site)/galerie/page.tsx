@@ -35,9 +35,21 @@ export default function GalleryPage() {
       </Reveal>
 
       {hasImages ? (
-        <Reveal delay={0.05} className="mt-14">
-          <GalleryAlbumPicker albums={albums} />
-        </Reveal>
+        <>
+          <Reveal delay={0.05} className="mt-10 flex items-start gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-sm text-muted">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="mt-0.5 h-5 w-5 shrink-0 text-accent-text">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 8v5" strokeLinecap="round" />
+              <path d="M12 16h.01" strokeLinecap="round" />
+            </svg>
+            <span>
+              Werden die Bilder nicht angezeigt? Lade die Seite bitte einmal neu (F5 bzw. Strg/Cmd + R).
+            </span>
+          </Reveal>
+          <Reveal delay={0.1} className="mt-6">
+            <GalleryAlbumPicker albums={albums} />
+          </Reveal>
+        </>
       ) : (
         <p className="mt-14 text-muted">Es sind noch keine Bilder hinterlegt.</p>
       )}
