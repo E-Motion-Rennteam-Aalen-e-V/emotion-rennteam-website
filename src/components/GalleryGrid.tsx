@@ -71,7 +71,7 @@ export default function GalleryGrid({ images, onImageError }: { images: GalleryI
     setActiveIndex(null);
     if (idx !== null) {
       const btn = document.querySelector<HTMLButtonElement>(`[data-gallery-index="${idx}"]`);
-      btn ? btn.focus() : lastTriggerRef.current?.focus();
+      if (btn) { btn.focus(); } else { lastTriggerRef.current?.focus(); }
     }
   }
 

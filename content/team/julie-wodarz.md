@@ -1,5 +1,5 @@
 ---
-name: Julied Wodarz
+name: Julie Wodarz
 role: Mitglied
 department: Vehicle Performance
 season: "ERT-15/27"
