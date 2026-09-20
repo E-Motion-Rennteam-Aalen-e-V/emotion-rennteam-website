@@ -71,7 +71,7 @@ export default function HeroContent({
           href="/fahrzeuge"
           className="rounded-full border border-border px-7 py-3.5 text-sm font-semibold text-foreground transition-colors hover:border-accent hover:bg-surface"
         >
-          Unser Fahrzeug entdecken
+          Unsere Fahrzeuge entdecken
         </Link>
         <Link
           href="/sponsoren#werden"

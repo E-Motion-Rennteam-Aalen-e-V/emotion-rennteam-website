@@ -136,7 +136,7 @@ export default function Home() {
             <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">
               {vehicle.year} · Aktuelles Fahrzeug
             </p>
-            <h2 className="mx-auto mt-3 max-w-2xl text-4xl font-extrabold tracking-tight sm:text-5xl">
+            <h2 className="mx-auto mt-3 max-w-2xl text-4xl font-extrabold tracking-tight text-balance sm:text-5xl">
               {vehicle.name}
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-lg text-muted">{vehicle.tagline}</p>
@@ -169,7 +169,7 @@ export default function Home() {
               <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">
                 Fachbereiche
               </p>
-              <h2 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
+              <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-balance sm:text-4xl">
                 Ein Fahrzeug, {TEAM_DEPARTMENTS.length} Fachteams
               </h2>
               <p className="mt-4 text-lg text-muted">
@@ -206,7 +206,7 @@ export default function Home() {
             <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">
               Wettbewerbe & Momente
             </p>
-            <h2 className="mt-1 text-2xl font-extrabold tracking-tight sm:text-3xl">
+            <h2 className="mt-1 text-2xl font-extrabold tracking-tight text-balance sm:text-3xl">
               Auf der Strecke zuhause
             </h2>
           </div>
@@ -244,7 +244,7 @@ export default function Home() {
 
       <section className="container-page py-24 text-center">
         <Reveal>
-          <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Unsere Sponsoren</h2>
+          <h2 className="text-3xl font-extrabold tracking-tight text-balance sm:text-4xl">Unsere Sponsoren</h2>
           <p className="mx-auto mt-4 max-w-xl text-lg text-muted">
             Ohne unsere Partner wäre unser Projekt nicht möglich. Lernen Sie die Unternehmen
             kennen, die uns unterstützen.
@@ -261,7 +261,7 @@ export default function Home() {
       <section className="border-t border-border/60 bg-surface/40 py-24 text-center">
         <div className="container-page">
           <Reveal>
-            <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
+            <h2 className="text-3xl font-extrabold tracking-tight text-balance sm:text-4xl">
               Werde Teil des Teams
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-lg text-muted">
