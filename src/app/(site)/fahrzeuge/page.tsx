@@ -53,10 +53,10 @@ export default function VehiclesPage() {
                   />
                 </span>
 
-                <div className="grid gap-6 pl-10 lg:grid-cols-2 lg:items-center lg:gap-16 lg:pl-0">
+                <div className="grid gap-6 pl-10 lg:grid-cols-2 lg:items-stretch lg:gap-16 lg:pl-0">
                   <div className={reversed ? "lg:order-2" : undefined}>
                     {vehicle.coverImage && (
-                      <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl border border-border">
+                      <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl border border-border lg:aspect-auto lg:h-full lg:min-h-[320px]">
                         <Image
                           src={vehicle.coverImage}
                           alt={vehicle.name}
