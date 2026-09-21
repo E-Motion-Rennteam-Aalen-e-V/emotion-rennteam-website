@@ -51,9 +51,6 @@ next-env.d.ts
 /.cms-update-status.json
 /.cms-update-trigger
 
-# CMS: Log der macOS-App (E-Motion CMS.app/Contents/MacOS/cms-launcher)
-/.cms-launcher.log
-
 # Formulare: lokaler Fallback, falls FORM_WEBHOOK_URL fehlt oder unerreichbar ist
 /.pending-form-submissions.jsonl
 
