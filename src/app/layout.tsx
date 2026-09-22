@@ -7,6 +7,7 @@ import MotionProvider from "@/components/MotionProvider";
 import CookieConsent from "@/components/CookieConsent";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import { getOrganizationJsonLdScript } from "@/lib/structuredData";
+import { DEVICE_BOOTSTRAP_SCRIPT } from "@/lib/device";
 
 const airstrike = localFont({
   src: "../fonts/airstrike.ttf",
@@ -57,8 +58,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="de"
       className={`${airstrike.variable} ${lato.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
+        <script dangerouslySetInnerHTML={{ __html: DEVICE_BOOTSTRAP_SCRIPT }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: getOrganizationJsonLdScript() }}

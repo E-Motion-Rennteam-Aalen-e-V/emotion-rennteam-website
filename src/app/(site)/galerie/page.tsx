@@ -27,7 +27,7 @@ export default function GalleryPage() {
     <div className="container-page py-20">
       <Reveal>
         <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Galerie</p>
-        <h1 className="mt-2 text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl md:text-6xl xl:text-7xl">Impressionen</h1>
+        <h1 className="mt-2 text-4xl font-extrabold leading-tight tracking-normal sm:text-5xl md:text-6xl xl:text-7xl">Impressionen</h1>
         <p className="mt-4 max-w-2xl text-muted">
           Eindrücke von Wettbewerben, aus der Werkstatt und von Events – das E-Motion
           Rennteam Aalen in Bildern, nach Album sortiert.

@@ -46,7 +46,7 @@ export default function HeroContent({
       </motion.p>
       <motion.h1
         variants={item}
-        className="text-5xl font-black uppercase leading-[0.95] tracking-tight text-foreground sm:text-7xl md:text-8xl"
+        className="text-5xl font-black uppercase leading-[0.95] tracking-normal text-foreground sm:text-7xl md:text-8xl"
       >
         {titleFirstLine}
         {titleLastLine && (

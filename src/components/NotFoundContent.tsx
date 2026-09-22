@@ -18,7 +18,7 @@ export default function NotFoundContent() {
       <p className="relative bg-gradient-to-r from-accent to-accent-2 bg-clip-text text-7xl font-black tracking-tight text-transparent sm:text-8xl">
         404
       </p>
-      <h1 className="relative mt-4 text-xl font-bold tracking-tight text-foreground sm:text-2xl">
+      <h1 className="relative mt-4 text-xl font-bold tracking-normal text-foreground sm:text-2xl">
         Diese Seite gibt es nicht (mehr)
       </h1>
       <p className="relative mt-2 max-w-md text-sm text-muted">
