@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import fs from "fs";
 import path from "path";
 import { SITE_URL } from "@/lib/site";
-import { getBlogPosts, getNews } from "@/lib/content";
+import { getBlogPosts, getGalleryAlbums, getNews } from "@/lib/content";
 
 function getPageMtime(routePath: string): Date {
   const segments = routePath.replace(/^\//, "").split("/");
@@ -57,5 +57,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.4,
   }));
 
-  return [...staticEntries, ...newsEntries, ...blogEntries];
+  const galleryEntries = getGalleryAlbums().map((album) => ({
+    url: `${SITE_URL}/galerie/${encodeURIComponent(album.name)}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.3,
+  }));
+
+  return [...staticEntries, ...newsEntries, ...blogEntries, ...galleryEntries];
 }
