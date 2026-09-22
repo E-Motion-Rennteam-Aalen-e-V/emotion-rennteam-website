@@ -3,24 +3,32 @@ import Image from "next/image";
 import { getResults } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 
-function parsePlacements(desc: string): { intro: string; placements: { rank: number; discipline: string }[] } | null {
+type ParsedChip =
+  | { kind: "placement"; rank: number; discipline: string }
+  | { kind: "points"; points: number; discipline: string };
+
+function parseDescChips(desc: string): { intro: string; chips: ParsedChip[] } | null {
   const colonIdx = desc.indexOf(":");
   if (colonIdx === -1) return null;
   const rest = desc.slice(colonIdx + 1).trim();
-  const parts = rest.split(",").map((s) => s.trim());
-  const placements = parts.map((p) => {
-    const m = p.match(/^Platz\s+(\d+)\s+(.+)$/);
-    return m ? { rank: parseInt(m[1]), discipline: m[2].trim() } : null;
-  }).filter(Boolean) as { rank: number; discipline: string }[];
-  if (placements.length < 2) return null;
-  return { intro: desc.slice(0, colonIdx + 1).trim(), placements };
+  const chips: ParsedChip[] = [];
+  for (const p of rest.split(",").map((s) => s.trim())) {
+    const pm = p.match(/^Platz\s+(\d+)\s+(.+)$/);
+    if (pm) { chips.push({ kind: "placement", rank: parseInt(pm[1]), discipline: pm[2].trim() }); continue; }
+    const qm = p.match(/^(\d+)\s+Pkt\.\s+(.+)$/);
+    if (qm) chips.push({ kind: "points", points: parseInt(qm[1]), discipline: qm[2].trim() });
+  }
+  if (chips.length < 2) return null;
+  return { intro: desc.slice(0, colonIdx + 1).trim(), chips };
 }
 
-function rankColor(rank: number): string {
-  if (rank === 1) return "border-yellow-400/60 text-yellow-300";
-  if (rank <= 3) return "border-yellow-600/50 text-yellow-400/80";
-  if (rank <= 5) return "border-accent/60 text-accent-text";
-  if (rank <= 10) return "border-accent/30 text-accent-text/70";
+function chipClass(chip: ParsedChip): string {
+  if (chip.kind === "points") return "border-border/50 text-muted";
+  const r = chip.rank;
+  if (r === 1) return "border-yellow-400/60 text-yellow-300";
+  if (r <= 3) return "border-yellow-600/50 text-yellow-400/80";
+  if (r <= 5) return "border-accent/60 text-accent-text";
+  if (r <= 10) return "border-accent/30 text-accent-text/70";
   return "border-border text-muted";
 }
 
@@ -91,19 +99,21 @@ export default function ResultsPage() {
                     </span>
                   )}
                   {result.description && (() => {
-                    const parsed = parsePlacements(result.description);
+                    const parsed = parseDescChips(result.description);
                     if (!parsed) return <p className="mt-3 text-sm text-muted">{result.description}</p>;
                     return (
                       <div className="mt-3">
                         <p className="text-sm text-muted">{parsed.intro}</p>
                         <div className="mt-2 flex flex-wrap gap-1.5">
-                          {parsed.placements.map((p) => (
+                          {parsed.chips.map((chip) => (
                             <span
-                              key={p.discipline}
-                              className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium ${rankColor(p.rank)}`}
+                              key={chip.discipline}
+                              className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium ${chipClass(chip)}`}
                             >
-                              <span className="font-bold tabular-nums">#{p.rank}</span>
-                              <span>{p.discipline}</span>
+                              {chip.kind === "placement"
+                                ? <><span className="font-bold tabular-nums">#{chip.rank}</span><span>{chip.discipline}</span></>
+                                : <><span className="font-bold tabular-nums">{chip.points}</span><span className="text-muted/70">Pkt.</span><span>{chip.discipline}</span></>
+                              }
                             </span>
                           ))}
                         </div>
