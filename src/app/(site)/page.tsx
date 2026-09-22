@@ -151,7 +151,7 @@ export default function Home() {
           <Reveal delay={0.1} className="mt-10">
             <Link
               href="/fahrzeuge"
-              className="inline-flex items-center gap-1 text-sm font-semibold text-accent-text transition-all hover:gap-2 hover:underline"
+              className="inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition-all hover:gap-3"
             >
               Alle technischen Daten ansehen <span aria-hidden>&rarr;</span>
             </Link>

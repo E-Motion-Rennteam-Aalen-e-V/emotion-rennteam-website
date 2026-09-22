@@ -100,7 +100,7 @@ export default function JoinPage() {
               <p className="mt-2 flex-1 text-sm text-muted">{position.body}</p>
               <a
                 href="#bewerbung"
-                className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-accent-text transition-all hover:gap-2 hover:underline"
+                className="mt-4 inline-flex w-fit items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground transition-all hover:gap-3"
               >
                 Jetzt bewerben <span aria-hidden>&rarr;</span>
               </a>

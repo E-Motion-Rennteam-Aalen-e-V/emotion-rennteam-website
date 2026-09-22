@@ -134,7 +134,7 @@ export default function FormulaStudentPage() {
             </Link>
             <Link
               href="/team"
-              className="inline-flex items-center gap-1 text-sm font-semibold text-accent-text transition-all hover:gap-2 hover:underline"
+              className="inline-flex items-center gap-2 rounded-full border border-accent px-6 py-3 text-sm font-semibold text-accent-text transition-all hover:gap-3 hover:bg-accent/10"
             >
               Unser Team kennenlernen <span aria-hidden>&rarr;</span>
             </Link>
