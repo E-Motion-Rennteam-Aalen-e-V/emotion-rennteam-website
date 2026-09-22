@@ -69,6 +69,20 @@ body {
   html[data-device="desktop"] h3 {
     letter-spacing: 0.01em;
   }
+
+  /* Desktop: slightly larger body text baseline for comfortable reading
+     at typical 1080p+ viewing distances. */
+  html[data-device="desktop"] body {
+    font-size: 1.0625rem;
+  }
+
+  /* Desktop: tighten hyphenation — wide columns rarely need it. */
+  html[data-device="desktop"] h1,
+  html[data-device="desktop"] h2,
+  html[data-device="desktop"] h3,
+  html[data-device="desktop"] h4 {
+    hyphens: manual;
+  }
 }
 
 ::selection {

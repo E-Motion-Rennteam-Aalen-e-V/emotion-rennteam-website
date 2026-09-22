@@ -8,6 +8,10 @@ const TABLET_UA = /iPad|Android(?!.*Mobile)|Tablet/i;
  * rather than relying on any single signal alone: width alone mismatches a
  * narrowed desktop window, UA alone mismatches new/unlisted devices, and
  * pointer alone mismatches touch-screen laptops.
+ *
+ * Touch-device tablet range capped at 1024 px (was 1280) so that
+ * touch-screen laptops (Surface Book, iPad Pro in landscape) get the
+ * desktop layout at full width.
  */
 export function detectDevice(win: Window): DeviceType {
   const ua = win.navigator.userAgent;
@@ -16,7 +20,7 @@ export function detectDevice(win: Window): DeviceType {
   const noHover = win.matchMedia?.("(hover: none)").matches ?? false;
   const touchLike = coarsePointer || noHover;
 
-  if (TABLET_UA.test(ua) || (touchLike && width >= 768 && width < 1280)) {
+  if (TABLET_UA.test(ua) || (touchLike && width >= 768 && width < 1024)) {
     return "tablet";
   }
   if (MOBILE_UA.test(ua) || (touchLike && width < 768)) {
@@ -38,7 +42,7 @@ export const DEVICE_BOOTSTRAP_SCRIPT = `
     var coarse = (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) || false;
     var noHover = (window.matchMedia && window.matchMedia("(hover: none)").matches) || false;
     var touchLike = coarse || noHover;
-    if (TABLET_UA.test(ua) || (touchLike && w >= 768 && w < 1280)) return "tablet";
+    if (TABLET_UA.test(ua) || (touchLike && w >= 768 && w < 1024)) return "tablet";
     if (MOBILE_UA.test(ua) || (touchLike && w < 768)) return "mobile";
     if (w < 768) return "mobile";
     if (w < 1024) return "tablet";
