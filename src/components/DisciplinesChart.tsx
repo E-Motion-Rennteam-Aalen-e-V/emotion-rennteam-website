@@ -223,8 +223,8 @@ export default function DisciplinesChart() {
                   <div className="flex items-baseline gap-2">
                     <span className="font-semibold text-foreground">{d.name}</span>
                     <span
-                      className="rounded-full px-2 py-0.5 text-xs font-bold text-white"
-                      style={{ backgroundColor: STATIC_COLOR }}
+                      className="rounded-full border px-2 py-0.5 text-xs font-bold"
+                      style={{ color: STATIC_COLOR, borderColor: STATIC_COLOR }}
                     >
                       {d.points} Pkt.
                     </span>
@@ -258,8 +258,8 @@ export default function DisciplinesChart() {
                   <div className="flex items-baseline gap-2">
                     <span className="font-semibold text-foreground">{d.name}</span>
                     <span
-                      className="rounded-full px-2 py-0.5 text-xs font-bold text-white"
-                      style={{ backgroundColor: DYNAMIC_COLOR }}
+                      className="rounded-full border px-2 py-0.5 text-xs font-bold"
+                      style={{ color: DYNAMIC_COLOR, borderColor: DYNAMIC_COLOR }}
                     >
                       {d.points} Pkt.
                     </span>
@@ -305,10 +305,7 @@ export default function DisciplinesChart() {
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-2xl">{c.icon}</span>
                 <div>
-                  <div
-                    className="text-xs font-bold uppercase tracking-widest"
-                    style={{ color: c.color }}
-                  >
+                  <div className="text-xs font-bold uppercase tracking-widest text-foreground">
                     {c.id}
                   </div>
                   <div className="font-semibold text-foreground text-sm">{c.label}</div>
