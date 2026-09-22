@@ -1,12 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { getPage, getVehicles, TEAM_DEPARTMENTS } from "@/lib/content";
-import HeroBackground from "@/components/motion/HeroBackground";
+import HeroMedia from "@/components/motion/HeroMedia";
 import HeroContent from "@/components/motion/HeroContent";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import Counter from "@/components/motion/Counter";
-import ScrollScale from "@/components/motion/ScrollScale";
 
 const DEFAULT_STATS = [
   { value: 50, suffix: "+", label: "Studierende im Team" },
@@ -68,34 +67,30 @@ export default function Home() {
 
   return (
     <>
-      <section className="relative overflow-hidden border-b border-border">
-        <HeroBackground />
-        <div className="container-page relative pb-20 pt-28 sm:pb-28 sm:pt-36">
+      <section className="relative flex min-h-[92svh] flex-col justify-end overflow-hidden">
+        <HeroMedia
+          videoSrc={page?.heroVideo}
+          posterSrc={vehicle?.coverImage}
+          alt={vehicle?.name ?? "E-Motion Rennteam Aalen"}
+        />
+
+        <div className="container-page relative pb-24 pt-32 sm:pb-28">
           <HeroContent
-            eyebrow="Formula Student"
+            eyebrow="Formula Student Electric"
             title={page?.heroTitle ?? "E-Motion Rennteam Aalen"}
             subtitle={page?.heroSubtitle ?? "Elektrisch. Ambitioniert. Aalen."}
           />
         </div>
 
-        {vehicle?.coverImage && (
-          <div className="container-page relative pb-20 sm:pb-28">
-            <ScrollScale className="mx-auto aspect-[16/9] w-full max-w-5xl overflow-hidden rounded-[2rem] border border-border/60 bg-surface shadow-[0_40px_120px_-40px_rgba(0,113,181,0.35)] sm:aspect-[21/9]">
-              <Image
-                src={vehicle.coverImage}
-                alt={vehicle.name}
-                width={1600}
-                height={900}
-                priority
-                sizes="(min-width: 1024px) 1024px, 100vw"
-                className="h-full w-full object-cover"
-              />
-            </ScrollScale>
-          </div>
-        )}
+        <div className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 animate-bounce flex-col items-center gap-2 text-foreground/50 sm:flex">
+          <span className="text-[0.65rem] font-semibold uppercase tracking-[0.3em]">Scrollen</span>
+          <span aria-hidden className="text-lg leading-none">&darr;</span>
+        </div>
+      </section>
 
-        <div className="relative border-t border-border/60 bg-background/40 backdrop-blur-sm">
-          <StaggerGroup className="container-page grid grid-cols-2 gap-4 py-10 sm:grid-cols-4 sm:gap-8">
+      <div className="relative z-10 -mt-12 sm:-mt-16">
+        <div className="container-page">
+          <StaggerGroup className="grid grid-cols-2 gap-3 rounded-2xl border border-border bg-surface/95 p-5 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)] backdrop-blur-md sm:grid-cols-4 sm:gap-8 sm:rounded-[1.75rem] sm:p-8">
             {stats.map((stat) => (
               <StaggerItem key={stat.label} className="text-center sm:text-left">
                 <div className="text-2xl font-extrabold text-foreground sm:text-3xl lg:text-4xl">
@@ -108,7 +103,7 @@ export default function Home() {
             ))}
           </StaggerGroup>
         </div>
-      </section>
+      </div>
 
       {bodyParagraphs.length > 0 && (
         <section className="container-page py-24">
@@ -251,7 +246,7 @@ export default function Home() {
           </p>
           <Link
             href="/sponsoren"
-            className="mt-8 inline-flex items-center gap-1.5 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition-all hover:gap-2.5"
+            className="mt-8 inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3.5 text-sm font-bold uppercase tracking-wide text-accent-foreground shadow-[0_8px_30px_-8px_rgba(0,113,181,0.6)] transition-all hover:scale-[1.04] hover:gap-3"
           >
             Zu unseren Sponsoren <span aria-hidden>&rarr;</span>
           </Link>
@@ -270,7 +265,7 @@ export default function Home() {
             </p>
             <Link
               href="/mitmachen"
-              className="mt-8 inline-flex items-center gap-1.5 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition-all hover:gap-2.5"
+              className="mt-8 inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3.5 text-sm font-bold uppercase tracking-wide text-accent-foreground shadow-[0_8px_30px_-8px_rgba(0,113,181,0.6)] transition-all hover:scale-[1.04] hover:gap-3"
             >
               Offene Positionen ansehen <span aria-hidden>&rarr;</span>
             </Link>
