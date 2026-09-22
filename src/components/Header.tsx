@@ -73,7 +73,7 @@ export default function Header({ hiddenIds = [] }: HeaderProps) {
       }`}
     >
       <div className="relative">
-      <div className="container-page flex h-20 items-center justify-between">
+      <div className="container-page flex h-20 items-center justify-between lg:h-24">
         <Link href="/" className="group relative -ml-3 flex items-center">
           <Image
             src="/uploads/logo.png"
@@ -81,19 +81,19 @@ export default function Header({ hiddenIds = [] }: HeaderProps) {
             width={1000}
             height={563}
             priority
-            className="h-14 w-auto"
+            className="h-14 w-auto lg:h-16"
           />
           <span className="absolute -inset-x-4 -inset-y-2 -z-10 rounded-full bg-accent/0 blur-lg transition-colors duration-300 group-hover:bg-accent/20" />
         </Link>
 
-        <nav aria-label="Hauptnavigation" className="hidden items-center gap-4 md:flex lg:gap-8">
+        <nav aria-label="Hauptnavigation" className="hidden items-center gap-6 md:flex lg:gap-10">
           {NAV_LINKS.map((link) => {
             const active = pathname === link.href || pathname?.startsWith(`${link.href}/`);
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`relative py-1 text-sm font-medium transition-colors ${
+                className={`relative py-1 text-sm font-semibold tracking-wide transition-colors lg:text-[0.9375rem] ${
                   active ? "text-foreground" : "text-muted hover:text-foreground"
                 }`}
               >
@@ -116,7 +116,7 @@ export default function Header({ hiddenIds = [] }: HeaderProps) {
               onClick={() => setMoreOpen((v) => !v)}
               aria-expanded={moreOpen}
               aria-haspopup="menu"
-              className={`relative flex items-center gap-1 py-1 text-sm font-medium transition-colors ${
+              className={`relative flex items-center gap-1.5 py-1 text-sm font-semibold tracking-wide transition-colors lg:text-[0.9375rem] ${
                 moreActive ? "text-foreground" : "text-muted hover:text-foreground"
               }`}
             >
@@ -171,7 +171,7 @@ export default function Header({ hiddenIds = [] }: HeaderProps) {
           {showCta && (
             <Link
               href="/kontakt"
-              className="rounded-md bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground transition-transform hover:scale-105"
+              className="rounded-full bg-accent px-5 py-2.5 text-sm font-bold tracking-wide text-accent-foreground shadow-[0_4px_20px_-4px_rgba(0,113,181,0.6)] transition-all hover:scale-[1.04] hover:shadow-[0_6px_28px_-4px_rgba(0,113,181,0.8)] lg:px-6 lg:py-3 lg:text-[0.9375rem]"
             >
               Kontakt
             </Link>
