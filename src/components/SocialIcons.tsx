@@ -26,7 +26,7 @@ export default function SocialIcons({ className }: { className?: string }) {
           target="_blank"
           rel="noopener noreferrer"
           aria-label={social.label}
-          className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-accent transition-colors hover:border-accent hover:text-accent-text"
+          className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-accent transition-all duration-300 hover:-translate-y-0.5 hover:border-accent hover:text-accent-text"
         >
           <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
             <path d={social.path} />

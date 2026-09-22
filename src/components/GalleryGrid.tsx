@@ -181,36 +181,42 @@ export default function GalleryGrid({ images, onImageError }: { images: GalleryI
               </div>
               <p className="mt-4 text-center text-sm text-muted">{active.title}</p>
 
-              <button
+              <motion.button
                 ref={closeButtonRef}
                 type="button"
                 onClick={close}
                 aria-label="Schließen"
                 data-focus-trap
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.95 }}
                 className="absolute -top-4 -right-4 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface text-foreground hover:border-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
               >
                 ✕
-              </button>
+              </motion.button>
               {images.length > 1 && (
                 <>
-                  <button
+                  <motion.button
                     type="button"
                     onClick={prev}
                     aria-label="Vorheriges Bild"
                     data-focus-trap
+                    whileHover={{ scale: 1.08 }}
+                    whileTap={{ scale: 0.95 }}
                     className="absolute left-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-surface/80 text-foreground hover:border-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                   >
                     ←
-                  </button>
-                  <button
+                  </motion.button>
+                  <motion.button
                     type="button"
                     onClick={next}
                     aria-label="Nächstes Bild"
                     data-focus-trap
+                    whileHover={{ scale: 1.08 }}
+                    whileTap={{ scale: 0.95 }}
                     className="absolute right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-surface/80 text-foreground hover:border-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                   >
                     →
-                  </button>
+                  </motion.button>
                 </>
               )}
             </motion.div>
