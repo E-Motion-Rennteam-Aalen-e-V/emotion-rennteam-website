@@ -165,6 +165,22 @@ export default function ImpressumPage() {
           </p>
         </section>
 
+        <section>
+          <h2 className="text-base font-semibold text-foreground">Technische Umsetzung</h2>
+          <p className="mt-2">
+            Diese Website wird mit Next.js erstellt und über Vercel ausgeliefert. Zur optimalen
+            Darstellung auf allen Endgeräten erkennt ein clientseitiges Skript beim Seitenaufruf
+            den Gerätetyp (Mobilgerät, Tablet, Desktop) anhand von Viewport-Breite,
+            Zeigereigenschaften und User-Agent. Das Ergebnis wird ausschließlich als HTML-Attribut
+            im Browser verarbeitet; es werden keine Daten gespeichert oder übertragen. Nähere
+            Informationen zur Datenverarbeitung auf dieser Website findest du in unserer{" "}
+            <a href="/datenschutz" className="text-accent-text underline">
+              Datenschutzerklärung
+            </a>
+            .
+          </p>
+        </section>
+
         <section className="flex flex-col items-center pt-4 text-center">
           <HumanCreatedBadge className="h-24 w-24 text-muted" />
           <p className="mt-3 max-w-xs text-xs text-muted">
