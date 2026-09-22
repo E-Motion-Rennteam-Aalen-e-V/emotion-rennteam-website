@@ -62,27 +62,15 @@ export default function HeroContent({
       >
         {subtitle}
       </motion.p>
-      <motion.div variants={item} className="mt-9 flex flex-wrap gap-3 sm:gap-4">
+      <motion.div variants={item} className="mt-9">
         <Link
           href="/mitmachen"
-          className="group inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-bold uppercase tracking-wide text-accent-foreground shadow-[0_8px_30px_-8px_rgba(0,113,181,0.6)] transition-all hover:scale-[1.04] hover:shadow-[0_12px_40px_-8px_rgba(0,113,181,0.75)] sm:px-7"
+          className="group inline-flex items-center gap-2 rounded-full bg-accent px-7 py-4 text-sm font-bold uppercase tracking-wide text-accent-foreground shadow-[0_8px_30px_-8px_rgba(0,113,181,0.6)] transition-all hover:scale-[1.04] hover:shadow-[0_12px_40px_-8px_rgba(0,113,181,0.75)] sm:px-8"
         >
           Jetzt mitmachen
           <span aria-hidden className="transition-transform group-hover:translate-x-1">
             &rarr;
           </span>
-        </Link>
-        <Link
-          href="/fahrzeuge"
-          className="inline-flex items-center gap-2 rounded-full border-2 border-foreground/25 bg-background/30 px-6 py-3.5 text-sm font-bold uppercase tracking-wide text-foreground backdrop-blur-sm transition-all hover:scale-[1.04] hover:border-foreground/60 sm:px-7"
-        >
-          Fahrzeuge
-        </Link>
-        <Link
-          href="/sponsoren#werden"
-          className="inline-flex items-center gap-2 rounded-full border-2 border-foreground/25 bg-background/30 px-6 py-3.5 text-sm font-bold uppercase tracking-wide text-foreground backdrop-blur-sm transition-all hover:scale-[1.04] hover:border-foreground/60 sm:px-7"
-        >
-          Sponsor werden
         </Link>
       </motion.div>
     </motion.div>
