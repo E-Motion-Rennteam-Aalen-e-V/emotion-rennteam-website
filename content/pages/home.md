@@ -9,8 +9,6 @@ stats:
     value: "8"
   - label: "Jahre Erfahrung"
     value: "12+"
-  - label: "Wettbewerbe pro Saison"
-    value: "2"
 ---
 
 Wir sind das Formula-Student-Team der Hochschule Aalen und entwickeln jedes Jahr einen vollelektrischen Rennwagen, mit dem wir international gegen andere Hochschulteams antreten. Seit der Vereinsgründung 2009 sind mittlerweile rund 60 Studierende verschiedenster Fachrichtungen interdisziplinär im Team aktiv.
