@@ -111,7 +111,7 @@ export default function Home() {
           <StaggerItem>
             <div className="flex h-full flex-col justify-between gap-6 rounded-2xl border border-border bg-surface p-7 transition-colors hover:border-accent/60 sm:p-8">
               <div>
-                <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
+                <h2 className="text-2xl font-extrabold tracking-normal sm:text-3xl">
                   Unsere Sponsoren
                 </h2>
                 <p className="mt-3 text-muted">
@@ -129,7 +129,7 @@ export default function Home() {
           <StaggerItem>
             <div className="flex h-full flex-col justify-between gap-6 rounded-2xl border border-border bg-surface p-7 transition-colors hover:border-accent/60 sm:p-8">
               <div>
-                <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
+                <h2 className="text-2xl font-extrabold tracking-normal sm:text-3xl">
                   Werde Teil des Teams
                 </h2>
                 <p className="mt-3 text-muted">
@@ -166,7 +166,7 @@ export default function Home() {
             <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">
               {vehicle.year} · Aktuelles Fahrzeug
             </p>
-            <h2 className="mx-auto mt-3 max-w-2xl text-4xl font-extrabold tracking-tight text-balance sm:text-5xl">
+            <h2 className="mx-auto mt-3 max-w-2xl text-4xl font-extrabold tracking-normal text-balance sm:text-5xl">
               {vehicle.name}
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-lg text-muted">{vehicle.tagline}</p>
@@ -233,7 +233,7 @@ export default function Home() {
             <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">
               Wettbewerbe & Momente
             </p>
-            <h2 className="mt-1 text-2xl font-extrabold tracking-tight text-balance sm:text-3xl">
+            <h2 className="mt-1 text-2xl font-extrabold tracking-normal text-balance sm:text-3xl">
               Auf der Strecke zuhause
             </h2>
           </div>

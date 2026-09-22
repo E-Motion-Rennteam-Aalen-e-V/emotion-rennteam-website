@@ -40,7 +40,7 @@ export default function AlumniShowcase() {
         <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">
           Dein Sprungbrett
         </p>
-        <h2 className="mx-auto mt-2 max-w-xl text-3xl font-extrabold tracking-tight sm:text-4xl">
+        <h2 className="mx-auto mt-2 max-w-xl text-3xl font-extrabold tracking-normal sm:text-4xl">
           Formula Student ist der direkte Weg in die Industrie
         </h2>
         <p className="mx-auto mt-3 max-w-2xl text-muted">

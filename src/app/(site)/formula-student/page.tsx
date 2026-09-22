@@ -25,7 +25,7 @@ export default function FormulaStudentPage() {
             <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">
               Formula Student
             </p>
-            <h1 className="mt-2 text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl md:text-6xl xl:text-7xl">
+            <h1 className="mt-2 text-4xl font-extrabold leading-tight tracking-normal sm:text-5xl md:text-6xl xl:text-7xl">
               Studierenden&shy;teams bauen Rennwagen
             </h1>
           </div>

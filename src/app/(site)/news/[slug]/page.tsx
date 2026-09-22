@@ -58,7 +58,7 @@ export default async function NewsDetailPage({
             year: "numeric",
           })}
         </time>
-        <h1 className="mt-2 text-4xl font-extrabold tracking-tight text-balance sm:text-5xl">{post.title}</h1>
+        <h1 className="mt-2 text-4xl font-extrabold tracking-normal text-balance sm:text-5xl">{post.title}</h1>
 
         {post.coverImage && (
           <div className="relative mt-8 aspect-[16/9] w-full overflow-hidden rounded-2xl border border-border">

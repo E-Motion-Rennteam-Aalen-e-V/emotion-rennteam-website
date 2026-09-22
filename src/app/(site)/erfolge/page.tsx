@@ -19,7 +19,7 @@ export default function ResultsPage() {
         <div className="flex flex-col gap-8 sm:flex-row sm:items-center sm:gap-12">
           <div className="flex-1">
             <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Timeline</p>
-            <h1 className="mt-2 text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl md:text-6xl xl:text-7xl">Unsere Historie</h1>
+            <h1 className="mt-2 text-4xl font-extrabold leading-tight tracking-normal sm:text-5xl md:text-6xl xl:text-7xl">Unsere Historie</h1>
             <p className="mt-4 max-w-2xl text-muted">
               Von der Teamgründung bis zu unseren besten Wettbewerbsergebnissen – eine Zeitreise
               durch die Geschichte des E-Motion Rennteams. Seit 2009 sind wir bei internationalen
