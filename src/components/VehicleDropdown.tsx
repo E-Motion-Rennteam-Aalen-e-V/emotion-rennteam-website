@@ -15,7 +15,6 @@ export default function VehicleDropdown({ vehicles }: VehicleDropdownProps) {
   const [selected, setSelected] = useState<Vehicle | null>(vehicles[0] || null);
   const ref = useRef<HTMLDivElement>(null);
 
-  // Close on click outside
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) {
@@ -56,82 +55,80 @@ export default function VehicleDropdown({ vehicles }: VehicleDropdownProps) {
             exit={{ opacity: 0, y: -8, scale: 0.97 }}
             transition={{ duration: 0.15 }}
             onMouseLeave={() => setOpen(false)}
-            className="absolute left-1/2 top-full -translate-x-1/2 mt-3 w-[480px] origin-top rounded-2xl border border-border bg-surface shadow-2xl overflow-hidden"
+            className="absolute left-1/2 top-full -translate-x-1/2 mt-3 w-[520px] origin-top rounded-2xl border border-border bg-surface shadow-2xl overflow-hidden"
           >
-            <div className="grid grid-cols-2 gap-0">
-              {/* Vehicle Image Section */}
-              <div className="relative aspect-[4/3] bg-background border-r border-border">
-                {selected.coverImage && (
-                  <Image
-                    src={selected.coverImage}
-                    alt={selected.name}
-                    fill
-                    className="object-cover"
-                  />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+            <div className="grid grid-cols-2 gap-6 p-6">
+              {/* Left: Vehicle List */}
+              <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
+                {vehicles.map((vehicle) => (
+                  <button
+                    key={vehicle.slug}
+                    onClick={() => {
+                      setSelected(vehicle);
+                    }}
+                    className={`w-full text-left px-4 py-3 rounded-xl border transition-all ${
+                      selected.slug === vehicle.slug
+                        ? "bg-accent/10 border-accent/50 text-foreground"
+                        : "border-border hover:border-accent/30 text-muted hover:text-foreground"
+                    }`}
+                  >
+                    <span className="font-bold text-sm">{vehicle.name}</span>
+                    <p className="text-xs text-muted mt-0.5">{vehicle.year}</p>
+                  </button>
+                ))}
               </div>
 
-              {/* Vehicle Info Section */}
-              <div className="p-4 flex flex-col">
-                {/* Vehicle List */}
-                <div className="space-y-1 mb-4 max-h-[200px] overflow-y-auto">
-                  {vehicles.map((vehicle) => (
-                    <button
-                      key={vehicle.slug}
-                      onClick={() => {
-                        setSelected(vehicle);
-                        setOpen(false);
-                      }}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        selected.slug === vehicle.slug
-                          ? "bg-accent/10 text-accent font-semibold"
-                          : "text-muted hover:bg-surface-2 hover:text-foreground"
-                      }`}
-                    >
-                      <span className="font-mono text-xs text-muted mr-2">
-                        {vehicle.year}
-                      </span>
-                      {vehicle.name}
-                    </button>
-                  ))}
-                </div>
+              {/* Right: Vehicle Details Card */}
+              <div className="rounded-2xl border border-border bg-surface-2 p-6 h-fit">
+                {/* Cover Image */}
+                {selected.coverImage && (
+                  <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl mb-4 border border-border">
+                    <Image
+                      src={selected.coverImage}
+                      alt={selected.name}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                )}
 
-                {/* Selected Vehicle Details */}
-                <div className="border-t border-border pt-3 flex-1 flex flex-col">
-                  <div className="flex items-start justify-between mb-2">
+                {/* Details */}
+                <div className="space-y-3">
+                  <div className="flex items-start justify-between gap-2">
                     <div>
-                      <h3 className="font-bold text-sm text-foreground">{selected.name}</h3>
+                      <h3 className="font-bold text-lg text-foreground">{selected.name}</h3>
                       {selected.tagline && (
-                        <p className="text-xs text-muted mt-1 line-clamp-2">{selected.tagline}</p>
+                        <p className="text-xs text-muted mt-1">{selected.tagline}</p>
                       )}
                     </div>
                     {selected.current && (
-                      <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-semibold text-accent-foreground whitespace-nowrap ml-2">
+                      <span className="shrink-0 rounded-full bg-gradient-to-r from-yellow-500/20 to-accent/20 px-2.5 py-0.5 text-xs font-bold text-yellow-300 border border-yellow-400/30">
                         Aktuell
                       </span>
                     )}
                   </div>
 
-                  {/* Quick Specs */}
+                  {/* Quick Specs Grid */}
                   {selected.specs && selected.specs.length > 0 && (
-                    <div className="grid grid-cols-2 gap-2 text-xs mt-2">
+                    <div className="grid grid-cols-2 gap-2 pt-2 border-t border-border">
                       {selected.specs.slice(0, 4).map((spec, idx) => (
-                        <div key={idx} className="border-t border-border pt-1">
-                          <p className="text-muted font-mono">{spec.label}</p>
-                          <p className="font-semibold text-foreground text-[11px]">{spec.value}</p>
+                        <div key={idx} className="pt-2">
+                          <p className="text-xs font-semibold uppercase tracking-widest text-accent-text">
+                            {spec.label}
+                          </p>
+                          <p className="text-sm font-bold text-foreground mt-0.5">{spec.value}</p>
                         </div>
                       ))}
                     </div>
                   )}
 
-                  {/* View Details Link */}
+                  {/* View Details */}
                   <Link
                     href="/fahrzeuge"
                     onClick={() => setOpen(false)}
-                    className="mt-3 inline-block text-xs font-semibold text-accent hover:text-accent/80 transition-colors"
+                    className="mt-4 block text-center rounded-lg bg-accent px-3 py-2 text-xs font-semibold text-accent-foreground hover:shadow-lg transition-all"
                   >
-                    Alle Details →
+                    Alle Details ansehen
                   </Link>
                 </div>
               </div>
