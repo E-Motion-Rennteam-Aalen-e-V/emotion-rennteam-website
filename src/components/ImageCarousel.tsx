@@ -5,10 +5,10 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 
 const CAROUSEL_IMAGES = [
-  { src: "/uploads/em-fahrzeug-detail.jpg", alt: "Detailansicht des E-Motion-Fahrzeugs" },
+  { src: "/uploads/ert-14-26-detail.jpg", alt: "Detailansicht des ERT 14-26" },
   { src: "/uploads/ert-14-26-nightrun-rear.jpg", alt: "ERT 14-26 beim Nachtlauf — Heckansicht" },
   { src: "/uploads/em-fahrzeug-buehne.jpg", alt: "E-Motion-Fahrzeug auf der Präsentationsbühne" },
-  { src: "/uploads/ert-12-24-track.jpg", alt: "ERT 12-24 auf der Rennstrecke" },
+  { src: "/uploads/rollout-2026/rollout-2026-fahrzeug-seitenansicht.webp", alt: "E-Motion-Fahrzeug Seitenansicht" },
   { src: "/uploads/em-fahrzeug-heckfluegel.jpg", alt: "Heckflügel-Detail des E-Motion-Fahrzeugs" },
   { src: "/uploads/ert-14-26-frontwing-detail.jpg", alt: "Frontflügel-Detail des ERT 14-26" },
   { src: "/uploads/ert-14-26-nightrun-cone.jpg", alt: "ERT 14-26 beim Nachtlauf — Slalomkegel" },

@@ -39,8 +39,8 @@ export default function FormulaStudentPage() {
       <Reveal delay={0.03}>
         <div className="relative aspect-[21/9] w-full overflow-hidden rounded-2xl border border-border/60">
           <Image
-            src="/uploads/ert-14-26-rollout-2026.jpg"
-            alt="E-Motion Rennteam ERT 14-26 auf der Strecke"
+            src="/uploads/rollout-2026/rollout-2026-impression.webp"
+            alt="Impression vom Rollout 2026"
             fill
             priority
             sizes="(min-width: 1280px) 1280px, 100vw"
