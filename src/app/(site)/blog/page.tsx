@@ -4,6 +4,7 @@ import Image from "next/image";
 import { getBlogPosts } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
+import NewsletterForm from "@/components/NewsletterForm";
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -70,6 +71,21 @@ export default function BlogPage() {
           ))}
         </StaggerGroup>
       )}
+
+      <Reveal className="mt-20">
+        <div className="rounded-2xl border border-border bg-surface p-8 sm:p-10">
+          <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">
+            Newsletter
+          </p>
+          <h2 className="mt-2 text-2xl font-bold sm:text-3xl">Nichts verpassen</h2>
+          <p className="mt-2 max-w-lg text-sm text-muted">
+            Wettbewerbsergebnisse, neue Blogbeiträge und Behind-the-Scenes – direkt in dein Postfach.
+          </p>
+          <div className="mt-6 max-w-md">
+            <NewsletterForm />
+          </div>
+        </div>
+      </Reveal>
     </div>
   );
 }

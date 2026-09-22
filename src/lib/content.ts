@@ -131,6 +131,17 @@ export type Position = {
   slug: string;
 };
 
+export type Competition = {
+  name: string;
+  location: string;
+  region: string;
+  teams?: string;
+  prestige?: number;
+  order?: number;
+  body: string;
+  slug: string;
+};
+
 export function getTeam(): TeamMember[] {
   return readCollection<TeamMember>("team").sort(
     (a, b) => (a.order ?? 99) - (b.order ?? 99)
@@ -160,6 +171,12 @@ export function getNewsBySlug(slug: string): NewsPost | undefined {
 
 export function getPage(slug: string): Page | undefined {
   return readCollection<Page>("pages").find((page) => page.slug === slug);
+}
+
+export function getCompetitions(): Competition[] {
+  return readCollection<Competition>("competitions").sort(
+    (a, b) => (a.order ?? 99) - (b.order ?? 99)
+  );
 }
 
 export function getBlogPosts(): BlogPost[] {
