@@ -16,7 +16,7 @@ export const NAV_ITEMS: NavItemDef[] = [
   { id: "team", href: "/team", label: "Team", group: "main" },
   { id: "fahrzeuge", href: "/fahrzeuge", label: "Fahrzeuge", group: "main" },
   { id: "sponsoren", href: "/sponsoren", label: "Sponsoren", group: "main" },
-  { id: "formula-student", href: "/formula-student", label: "FS", group: "more" },
+  { id: "formula-student", href: "/formula-student", label: "Formular Student", group: "more" },
   { id: "galerie", href: "/galerie", label: "Galerie", group: "more" },
   { id: "erfolge", href: "/erfolge", label: "Timeline", group: "more" },
   { id: "blog", href: "/blog", label: "Blog", group: "more" },
