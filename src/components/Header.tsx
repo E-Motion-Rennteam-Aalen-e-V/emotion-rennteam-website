@@ -86,7 +86,7 @@ export default function Header({ hiddenIds = [] }: HeaderProps) {
           <span className="absolute -inset-x-4 -inset-y-2 -z-10 rounded-full bg-accent/0 blur-lg transition-colors duration-300 group-hover:bg-accent/20" />
         </Link>
 
-        <nav aria-label="Hauptnavigation" className="hidden items-center gap-6 md:flex lg:gap-10">
+        <nav aria-label="Hauptnavigation" className="hidden items-center gap-5 md:flex lg:gap-8">
           {NAV_LINKS.map((link) => {
             const active = pathname === link.href || pathname?.startsWith(`${link.href}/`);
             return (
@@ -109,8 +109,31 @@ export default function Header({ hiddenIds = [] }: HeaderProps) {
             );
           })}
 
+          {/* Flat links on xl+ (enough space); dropdown on md–xl */}
+          {MORE_LINKS.filter((l) => l.id !== "kontakt").map((link) => {
+            const active = pathname === link.href || pathname?.startsWith(`${link.href}/`);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`relative hidden py-1 text-sm font-semibold tracking-wide transition-colors xl:block xl:text-[0.9375rem] ${
+                  active ? "text-foreground" : "text-muted hover:text-foreground"
+                }`}
+              >
+                {link.label}
+                {active && (
+                  <motion.span
+                    layoutId="nav-underline"
+                    className="absolute inset-x-0 -bottom-1 h-0.5 rounded-full bg-accent"
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
+                )}
+              </Link>
+            );
+          })}
+
           {MORE_LINKS.length > 0 && (
-          <div className="relative" ref={moreRef}>
+          <div className="relative xl:hidden" ref={moreRef}>
             <button
               type="button"
               onClick={() => setMoreOpen((v) => !v)}
