@@ -223,8 +223,8 @@ export default function DisciplinesChart() {
                   <div className="flex items-baseline gap-2">
                     <span className="font-semibold text-foreground">{d.name}</span>
                     <span
-                      className="rounded-full border px-2 py-0.5 text-xs font-bold"
-                      style={{ color: STATIC_COLOR, borderColor: STATIC_COLOR }}
+                      className="rounded-full border px-2 py-0.5 text-xs font-bold text-foreground"
+                      style={{ borderColor: STATIC_COLOR }}
                     >
                       {d.points} Pkt.
                     </span>
@@ -258,8 +258,8 @@ export default function DisciplinesChart() {
                   <div className="flex items-baseline gap-2">
                     <span className="font-semibold text-foreground">{d.name}</span>
                     <span
-                      className="rounded-full border px-2 py-0.5 text-xs font-bold"
-                      style={{ color: DYNAMIC_COLOR, borderColor: DYNAMIC_COLOR }}
+                      className="rounded-full border px-2 py-0.5 text-xs font-bold text-foreground"
+                      style={{ borderColor: DYNAMIC_COLOR }}
                     >
                       {d.points} Pkt.
                     </span>
