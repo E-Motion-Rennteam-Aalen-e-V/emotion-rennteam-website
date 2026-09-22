@@ -50,23 +50,21 @@ export default function Home() {
           />
         </div>
 
-        <div className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 animate-bounce flex-col items-center gap-2 sm:flex">
-          <span className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-white/80 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">Scrollen</span>
-          <span aria-hidden className="text-lg leading-none text-white/80 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">&darr;</span>
+        <div className="absolute bottom-8 left-1/2 hidden -translate-x-1/2 animate-bounce flex-col items-center gap-1.5 sm:flex">
+          <span className="text-[0.6rem] font-semibold uppercase tracking-[0.35em] text-white/60 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">Scrollen</span>
+          <span aria-hidden className="text-base leading-none text-white/60 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">&darr;</span>
         </div>
       </section>
 
-      <div className="relative z-10 -mt-12 sm:-mt-16">
+      <div className="border-b border-t border-border/50 bg-surface/80 backdrop-blur-sm">
         <div className="container-page">
-          <StaggerGroup className="grid grid-cols-2 overflow-hidden rounded-2xl border border-border bg-surface/95 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)] backdrop-blur-md sm:grid-cols-4 sm:rounded-[1.75rem]">
+          <StaggerGroup className="grid grid-cols-2 sm:grid-cols-4">
             {stats.map((stat, i) => (
               <StaggerItem
                 key={stat.label}
-                className={`flex flex-col items-center justify-center px-5 py-7 text-center sm:px-8 sm:py-10 ${
-                  i < stats.length - 1
-                    ? "border-r border-border [&:nth-child(2)]:border-r-0 sm:[&:nth-child(2)]:border-r"
-                    : ""
-                } [&:nth-child(1)]:border-b [&:nth-child(2)]:border-b sm:[&:nth-child(1)]:border-b-0 sm:[&:nth-child(2)]:border-b-0`}
+                className={`flex flex-col items-center justify-center px-6 py-9 text-center sm:px-10 sm:py-11 ${
+                  i < stats.length - 1 ? "border-r border-border" : ""
+                } [&:nth-child(2)]:border-r-0 sm:[&:nth-child(2)]:border-r [&:nth-child(1)]:border-b [&:nth-child(2)]:border-b sm:[&:nth-child(1)]:border-b-0 sm:[&:nth-child(2)]:border-b-0`}
               >
                 <div className="text-3xl font-extrabold tabular-nums text-foreground lg:text-4xl">
                   <Counter value={stat.value} suffix={stat.suffix} />
@@ -80,7 +78,7 @@ export default function Home() {
         </div>
       </div>
 
-      <section className="container-page py-20">
+      <section className="container-page py-16 sm:py-20">
         <StaggerGroup className="grid gap-5 sm:grid-cols-2">
           <StaggerItem className="h-full">
             <div className="flex h-full flex-col gap-6 rounded-2xl border border-border bg-surface p-8 transition-colors hover:border-accent/50 sm:p-10">
