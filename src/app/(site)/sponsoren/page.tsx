@@ -32,8 +32,8 @@ export default function SponsorsPage() {
           </div>
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl sm:w-80 lg:w-96">
             <Image
-              src="/uploads/ert-14-26-sponsor-detail.jpg"
-              alt="ERT 14-26 Sponsorenlogos am Fahrzeug"
+              src="/uploads/fsb-2025-track-action.webp"
+              alt="ERT 13-25 auf der Strecke bei der FS Bopfingen 2025"
               fill
               sizes="(min-width: 1024px) 384px, (min-width: 640px) 320px, 100vw"
               className="object-cover"
