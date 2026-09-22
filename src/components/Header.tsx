@@ -17,7 +17,7 @@ export default function Header({ hiddenIds = [] }: HeaderProps) {
   const hidden = new Set(hiddenIds);
   const NAV_LINKS = NAV_ITEMS.filter((item) => item.group === "main" && !hidden.has(item.id));
   const MORE_LINKS = NAV_ITEMS.filter((item) => item.group === "more" && !hidden.has(item.id));
-  const showCta = !hidden.has("mitmachen");
+  const showCta = !hidden.has("kontakt");
 
   const [open, setOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
@@ -170,10 +170,10 @@ export default function Header({ hiddenIds = [] }: HeaderProps) {
 
           {showCta && (
             <Link
-              href="/mitmachen"
+              href="/kontakt"
               className="rounded-md bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground transition-transform hover:scale-105"
             >
-              Mitmachen
+              Kontakt
             </Link>
           )}
         </nav>
@@ -240,10 +240,10 @@ export default function Header({ hiddenIds = [] }: HeaderProps) {
                   className="mt-2"
                 >
                   <Link
-                    href="/mitmachen"
+                    href="/kontakt"
                     className="block rounded-md bg-accent px-3 py-2.5 text-center text-sm font-semibold text-accent-foreground"
                   >
-                    Mitmachen
+                    Kontakt
                   </Link>
                 </motion.div>
               )}
