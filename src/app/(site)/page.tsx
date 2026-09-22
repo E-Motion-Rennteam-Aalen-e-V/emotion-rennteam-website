@@ -38,8 +38,8 @@ export default function Home() {
       <section className="relative flex min-h-[92svh] flex-col justify-end overflow-hidden">
         <HeroMedia
           videoSrc={page?.heroVideo}
-          posterSrc={vehicle?.coverImage}
-          alt={vehicle?.name ?? "E-Motion Rennteam Aalen"}
+          posterSrc="/uploads/ert-14-26-e61-map1-sonnenuntergang.jpg"
+          alt="E61 und MAP1 bei Sonnenuntergang auf der Rennstrecke"
         />
 
         <div className="container-page relative pb-24 pt-32 sm:pb-28">
