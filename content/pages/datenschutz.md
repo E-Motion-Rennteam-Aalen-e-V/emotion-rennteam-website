@@ -44,11 +44,17 @@ Diese Website nutzt aus Sicherheitsgründen eine SSL-/TLS-Verschlüsselung zur �
 
 Diese Website wird bei einem externen Dienstleister gehostet. Die personenbezogenen Daten, die auf dieser Website erfasst werden, werden auf den Servern des Hosters gespeichert. Der Hoster wird die Daten nur insoweit verarbeiten, wie dies zur Erfüllung seiner Leistungspflichten erforderlich ist, und unsere Weisungen bezüglich dieser Daten befolgen. Mit unserem Hoster besteht, soweit erforderlich, ein Vertrag zur Auftragsverarbeitung gemäß Art. 28 DSGVO.
 
-## 10. Deine Rechte
+## 10. Geräteerkennung (Device Detection)
+
+Beim Laden dieser Website bestimmt ein im Browser ausgeführtes JavaScript-Skript den Gerätetyp (Mobilgerät, Tablet oder Desktop), um das passende Layout auszuliefern. Dabei werden folgende, ausschließlich lokal im Browser verfügbaren Signale ausgewertet: die Viewport-Breite (`window.innerWidth`), die Zeigereigenschaften (`pointer: coarse`, `hover: none` via CSS Media Queries) sowie der User-Agent-String des Browsers. Das Ergebnis (z. B. `data-device="desktop"`) wird als HTML-Attribut auf dem Wurzelelement des Dokuments gespeichert und bei jeder Größenänderung des Fensters aktualisiert. Es werden dabei keine Daten an unsere Server oder Dritte übertragen und keine Informationen im Browser (Cookie, localStorage o. Ä.) gespeichert. Rechtsgrundlage ist unser berechtigtes Interesse an einer technisch optimalen Darstellung der Website für alle Endgeräte (Art. 6 Abs. 1 lit. f DSGVO).
+
+## 11. Deine Rechte
 
 Du hast jederzeit das Recht auf Auskunft über deine bei uns gespeicherten personenbezogenen Daten, deren Herkunft und Empfänger sowie den Zweck der Datenverarbeitung (Art. 15 DSGVO). Ebenso steht dir ein Recht auf Berichtigung (Art. 16 DSGVO), Löschung (Art. 17 DSGVO), Einschränkung der Verarbeitung (Art. 18 DSGVO), Datenübertragbarkeit (Art. 20 DSGVO) sowie ein Widerspruchsrecht gegen die Verarbeitung deiner Daten (Art. 21 DSGVO) zu. Hast du uns eine Einwilligung erteilt, kannst du diese jederzeit mit Wirkung für die Zukunft widerrufen, ohne dass die Rechtmäßigkeit der bis zum Widerruf erfolgten Verarbeitung berührt wird. Wende dich hierzu an die oben genannte Kontaktadresse.
 
 ## 12. Beschwerderecht bei der Aufsichtsbehörde
+
+
 
 Unbeschadet eines anderweitigen verwaltungsrechtlichen oder gerichtlichen Rechtsbehelfs steht dir ein Beschwerderecht bei einer Datenschutz-Aufsichtsbehörde zu, insbesondere in dem Mitgliedstaat deines gewöhnlichen Aufenthaltsorts. Für uns zuständig ist:
 Der Landesbeauftragte für den Datenschutz und die Informationsfreiheit Baden-Württemberg (LfDI)
