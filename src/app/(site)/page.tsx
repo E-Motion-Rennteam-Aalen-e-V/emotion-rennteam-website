@@ -197,8 +197,8 @@ export default function Home() {
         <div className="flex gap-3 overflow-x-auto px-4 pb-4 sm:px-8 lg:px-0 lg:container-page lg:grid lg:grid-cols-3 lg:overflow-visible lg:pb-0">
           <div className="relative aspect-[4/3] w-72 flex-none overflow-hidden rounded-2xl lg:w-auto">
             <Image
-              src="/uploads/ert-14-26-studio.jpg"
-              alt="ERT 14-26 Studio"
+              src="/uploads/ert-14-26-rollout-buehne.png"
+              alt="ERT 14-26 Rollout Bühne"
               fill
               sizes="(min-width: 1024px) 33vw, 288px"
               className="object-cover transition-transform duration-700 hover:scale-105"
