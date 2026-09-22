@@ -44,7 +44,7 @@ export default function Home() {
 
         <div className="container-page relative pb-24 pt-32 sm:pb-28">
           <HeroContent
-            eyebrow="FSE"
+            eyebrow="Formula Student Electric"
             title={page?.heroTitle ?? "E-Motion Rennteam Aalen"}
             subtitle={page?.heroSubtitle ?? "Elektrisch. Ambitioniert. Aalen."}
           />
