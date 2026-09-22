@@ -43,10 +43,17 @@ export default function Footer() {
             <li><Link href="/galerie" className="transition-colors hover:text-accent-text">Galerie</Link></li>
             <li><Link href="/kontakt" className="transition-colors hover:text-accent-text">Kontakt</Link></li>
           </ul>
-          <div className="mt-6">
-            <div className="text-sm font-semibold text-foreground">Newsletter</div>
-            <p className="mt-1 text-xs text-muted">Updates direkt ins Postfach</p>
-            <div className="mt-3">
+        </div>
+      </div>
+
+      <div className="border-t border-border bg-surface-2">
+        <div className="container-page py-12">
+          <div className="mx-auto max-w-lg text-center">
+            <h2 className="text-xl font-bold text-foreground">Newsletter</h2>
+            <p className="mt-1.5 text-sm text-muted">
+              Updates zu Rollouts, Wettbewerben und Team-News direkt ins Postfach.
+            </p>
+            <div className="mt-6">
               <NewsletterForm />
             </div>
           </div>
