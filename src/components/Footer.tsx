@@ -18,7 +18,6 @@ export default function Footer() {
           />
           <p className="mt-3 max-w-xs text-sm text-muted">
             FS Electric Racing Team der Hochschule Aalen.
-            Elektrisch. Ambitioniert. Aalen.
           </p>
           <SocialIcons className="mt-4 flex gap-3" />
         </div>

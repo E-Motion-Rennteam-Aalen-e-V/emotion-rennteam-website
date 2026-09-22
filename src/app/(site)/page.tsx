@@ -46,7 +46,7 @@ export default function Home() {
           <HeroContent
             eyebrow="Formula Student Electric"
             title={page?.heroTitle ?? "E-Motion Rennteam Aalen"}
-            subtitle={page?.heroSubtitle ?? "Elektrisch. Ambitioniert. Aalen."}
+            subtitle={page?.heroSubtitle}
           />
         </div>
 

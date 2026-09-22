@@ -24,7 +24,7 @@ export default function HeroContent({
 }: {
   eyebrow: string;
   title: string;
-  subtitle: string;
+  subtitle?: string;
 }) {
   const lastSpace = title.lastIndexOf(" ");
   const titleFirstLine = lastSpace === -1 ? title : title.slice(0, lastSpace);
@@ -56,12 +56,14 @@ export default function HeroContent({
           </>
         )}
       </motion.h1>
-      <motion.p
-        variants={item}
-        className="mt-6 max-w-xl text-lg font-medium text-muted sm:text-xl"
-      >
-        {subtitle}
-      </motion.p>
+      {subtitle && (
+        <motion.p
+          variants={item}
+          className="mt-6 max-w-xl text-lg font-medium text-muted sm:text-xl"
+        >
+          {subtitle}
+        </motion.p>
+      )}
       <motion.div variants={item} className="mt-9">
         <Link
           href="/mitmachen"
