@@ -71,7 +71,7 @@ export default function ContactPage() {
             </div>
           </div>
 
-          <div className="h-64 rounded-xl border border-border overflow-hidden shadow-lg">
+          <div className="h-72 sm:h-80 rounded-xl border border-border overflow-hidden shadow-lg">
             <ContactMap />
           </div>
         </Reveal>
