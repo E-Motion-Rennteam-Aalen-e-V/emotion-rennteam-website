@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import SocialIcons from "@/components/SocialIcons";
+import NewsletterForm from "@/components/NewsletterForm";
 
 export default function Footer() {
   return (
@@ -42,15 +43,12 @@ export default function Footer() {
             <li><Link href="/galerie" className="transition-colors hover:text-accent-text">Galerie</Link></li>
             <li><Link href="/kontakt" className="transition-colors hover:text-accent-text">Kontakt</Link></li>
           </ul>
-          <div className="mt-4 space-y-1 text-sm text-muted">
-            <p>Hochschule Aalen</p>
-            <p>Beethovenstraße 1, 73430 Aalen</p>
-            <a href="mailto:info@emotion-rennteam.de" className="block hover:text-foreground">
-              info@emotion-rennteam.de
-            </a>
-            <a href="tel:+4973615762191" className="block hover:text-foreground">
-              +49 7361 5762191
-            </a>
+          <div className="mt-6">
+            <div className="text-sm font-semibold text-foreground">Newsletter</div>
+            <p className="mt-1 text-xs text-muted">Updates direkt ins Postfach</p>
+            <div className="mt-3">
+              <NewsletterForm />
+            </div>
           </div>
         </div>
       </div>

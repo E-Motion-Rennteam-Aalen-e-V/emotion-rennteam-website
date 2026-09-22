@@ -25,39 +25,6 @@ function parseStats(page: ReturnType<typeof getPage>) {
   });
 }
 
-const DEPARTMENT_HIGHLIGHTS = [
-  {
-    icon: "🔋",
-    title: "Elektrotechnik",
-    description: "Batteriesystem, Leistungselektronik und Hochvolt-Sicherheit des Fahrzeugs.",
-  },
-  {
-    icon: "🛞",
-    title: "Fahrwerk",
-    description: "Radaufhängung, Lenkung und Fahrdynamik-Abstimmung auf der Strecke.",
-  },
-  {
-    icon: "🌬️",
-    title: "Aerodynamik",
-    description: "Abtrieb und Luftwiderstand per CFD-Simulation und Flügeldesign optimiert.",
-  },
-  {
-    icon: "💻",
-    title: "Software",
-    description: "Fahrzeugsoftware, Sensorik und Datenauswertung für jede Teststrecke.",
-  },
-  {
-    icon: "⚙️",
-    title: "Powertrain",
-    description: "Motoren, Getriebe und Antriebsstrang – von der Auslegung bis zum Prüfstand.",
-  },
-  {
-    icon: "📣",
-    title: "Marketing & Sponsoring",
-    description: "Öffentlichkeitsarbeit, Partnerbetreuung und der Auftritt des Teams nach außen.",
-  },
-];
-
 export default function Home() {
   const page = getPage("home");
   const stats = parseStats(page);
@@ -184,7 +151,7 @@ export default function Home() {
           <Reveal delay={0.1} className="mt-10">
             <Link
               href="/fahrzeuge"
-              className="inline-flex items-center gap-1 text-sm font-semibold text-accent-text transition-all hover:gap-2 hover:underline"
+              className="inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition-all hover:gap-3"
             >
               Alle technischen Daten ansehen <span aria-hidden>&rarr;</span>
             </Link>
@@ -205,21 +172,10 @@ export default function Home() {
               </p>
             </div>
           </Reveal>
-          <StaggerGroup className="mx-auto mt-12 grid max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {DEPARTMENT_HIGHLIGHTS.map((dept) => (
-              <StaggerItem key={dept.title}>
-                <div className="h-full rounded-xl border border-border bg-surface p-6 transition-colors hover:border-accent/60">
-                  <div className="text-2xl">{dept.icon}</div>
-                  <h3 className="mt-3 font-semibold">{dept.title}</h3>
-                  <p className="mt-1.5 text-sm text-muted">{dept.description}</p>
-                </div>
-              </StaggerItem>
-            ))}
-          </StaggerGroup>
           <Reveal delay={0.1} className="mt-10 text-center">
             <Link
               href="/team"
-              className="inline-flex items-center gap-1 text-sm font-semibold text-accent-text transition-all hover:gap-2 hover:underline"
+              className="inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition-all hover:gap-3"
             >
               Das ganze Team kennenlernen <span aria-hidden>&rarr;</span>
             </Link>

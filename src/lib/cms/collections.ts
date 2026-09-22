@@ -199,6 +199,19 @@ export const collections: CollectionDef[] = [
     ],
   },
   {
+    name: "competition",
+    label: "Wettbewerbe",
+    path: "content/competitions",
+    fields: [
+      { name: "name", label: "Name", type: "string", isTitle: true, required: true },
+      { name: "location", label: "Ort / Rennstrecke", type: "string", required: true },
+      { name: "region", label: "Emoji-Flagge (z.B. 🇩🇪)", type: "string" },
+      { name: "teams", label: "Teams im Event (z.B. 150+)", type: "string" },
+      { name: "prestige", label: "Prestige (1–5 Sterne)", type: "number" },
+      { name: "order", label: "Reihenfolge", type: "number" },
+    ],
+  },
+  {
     name: "position",
     label: "Offene Positionen",
     path: "content/positions",

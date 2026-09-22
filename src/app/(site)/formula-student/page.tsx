@@ -7,6 +7,7 @@ import FSTimeline from "@/components/FormulaStudent/FSTimeline";
 import FSPillars from "@/components/FormulaStudent/FSPillars";
 import FSStats from "@/components/FormulaStudent/FSStats";
 import FSCompetitions from "@/components/FormulaStudent/FSCompetitions";
+import { getCompetitions } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Was ist Formula Student?",
@@ -16,6 +17,8 @@ export const metadata: Metadata = {
 };
 
 export default function FormulaStudentPage() {
+  const competitions = getCompetitions();
+
   return (
     <div className="container-page space-y-20 py-20">
       {/* Hero */}
@@ -112,7 +115,7 @@ export default function FormulaStudentPage() {
               Die besten Teams treten auf renommierten Rennstrecken an
             </p>
           </div>
-          <FSCompetitions />
+          <FSCompetitions competitions={competitions} />
         </div>
       </Reveal>
 
@@ -134,7 +137,7 @@ export default function FormulaStudentPage() {
             </Link>
             <Link
               href="/team"
-              className="inline-flex items-center gap-1 text-sm font-semibold text-accent-text transition-all hover:gap-2 hover:underline"
+              className="inline-flex items-center gap-2 rounded-full border border-accent px-6 py-3 text-sm font-semibold text-accent-text transition-all hover:gap-3 hover:bg-accent/10"
             >
               Unser Team kennenlernen <span aria-hidden>&rarr;</span>
             </Link>
