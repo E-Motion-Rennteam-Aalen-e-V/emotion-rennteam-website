@@ -79,7 +79,7 @@ export default function FormulaStudentPage() {
           <div>
             <h2 className="text-2xl font-bold">Geschichte & Meilensteine</h2>
             <p className="mt-2 text-sm text-muted">
-              Von 1981 bis heute – die Evolution der Formula Student
+              Von 1981 bis heute – die Evolution der FS
             </p>
           </div>
           <FSTimeline />
@@ -106,7 +106,7 @@ export default function FormulaStudentPage() {
         <div className="rounded-2xl border border-border bg-surface/50 p-8 text-center sm:p-12">
           <h2 className="text-2xl font-bold sm:text-3xl">Lust, selbst mitzubauen?</h2>
           <p className="mx-auto mt-3 max-w-xl text-sm text-muted">
-            Beim E-Motion Rennteam Aalen setzen wir Formula Student in die Praxis um – vom
+            Beim E-Motion Rennteam Aalen setzen wir FS in die Praxis um – vom
             CAD-Modell bis zur Zieldurchfahrt. Wir suchen laufend Studierende aus allen
             Fachrichtungen.
           </p>

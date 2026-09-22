@@ -17,7 +17,7 @@ export default function Footer() {
             className="h-10 w-auto"
           />
           <p className="mt-3 max-w-xs text-sm text-muted">
-            Formula Student Electric Racing Team der Hochschule Aalen.
+            FS Electric Racing Team der Hochschule Aalen.
             Elektrisch. Ambitioniert. Aalen.
           </p>
           <SocialIcons className="mt-4 flex gap-3" />
@@ -26,7 +26,7 @@ export default function Footer() {
         <div>
           <div className="text-sm font-semibold text-foreground">Navigation</div>
           <ul className="mt-3 space-y-2 text-sm text-muted">
-            <li><Link href="/formula-student" className="transition-colors hover:text-accent-text">Formula Student</Link></li>
+            <li><Link href="/formula-student" className="transition-colors hover:text-accent-text">FS</Link></li>
             <li><Link href="/team" className="transition-colors hover:text-accent-text">Team</Link></li>
             <li><Link href="/fahrzeuge" className="transition-colors hover:text-accent-text">Fahrzeuge</Link></li>
             <li><Link href="/erfolge" className="transition-colors hover:text-accent-text">Timeline</Link></li>
@@ -64,7 +64,7 @@ export default function Footer() {
               Datenschutz
             </Link>
           </div>
-          <span>Formula Student Germany | Hochschule Aalen</span>
+          <span>FSG | Hochschule Aalen</span>
         </div>
       </div>
     </footer>
