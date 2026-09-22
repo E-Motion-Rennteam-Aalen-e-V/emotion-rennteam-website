@@ -129,7 +129,7 @@ select:focus-visible,
 }
 
 .container-page {
-  max-width: 80rem;
+  max-width: 100rem;
   margin-left: auto;
   margin-right: auto;
   padding-inline: max(1rem, 4vw);
@@ -138,6 +138,18 @@ select:focus-visible,
 @media (min-width: 640px) {
   .container-page {
     padding-inline: 1.5rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container-page {
+    padding-inline: 3rem;
+  }
+}
+
+@media (min-width: 1600px) {
+  .container-page {
+    padding-inline: 4rem;
   }
 }
 

@@ -35,7 +35,7 @@ export default function HeroContent({
       initial="hidden"
       animate="visible"
       variants={container}
-      className="max-w-3xl"
+      className="max-w-3xl xl:max-w-4xl"
     >
       <motion.p
         variants={item}
@@ -46,7 +46,7 @@ export default function HeroContent({
       </motion.p>
       <motion.h1
         variants={item}
-        className="text-5xl font-black uppercase leading-[0.95] tracking-normal text-foreground sm:text-7xl md:text-8xl"
+        className="text-5xl font-black uppercase leading-[0.95] tracking-normal text-foreground sm:text-7xl md:text-8xl xl:text-9xl"
       >
         {titleFirstLine}
         {titleLastLine && (
