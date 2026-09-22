@@ -50,9 +50,9 @@ export default function Home() {
           />
         </div>
 
-        <div className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 animate-bounce flex-col items-center gap-2 text-foreground/50 sm:flex">
-          <span className="text-[0.65rem] font-semibold uppercase tracking-[0.3em]">Scrollen</span>
-          <span aria-hidden className="text-lg leading-none">&darr;</span>
+        <div className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 animate-bounce flex-col items-center gap-2 sm:flex">
+          <span className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-white/80 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">Scrollen</span>
+          <span aria-hidden className="text-lg leading-none text-white/80 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">&darr;</span>
         </div>
       </section>
 
@@ -197,8 +197,8 @@ export default function Home() {
         <div className="flex gap-3 overflow-x-auto px-4 pb-4 sm:px-8 lg:px-0 lg:container-page lg:grid lg:grid-cols-3 lg:overflow-visible lg:pb-0">
           <div className="relative aspect-[4/3] w-72 flex-none overflow-hidden rounded-2xl lg:w-auto">
             <Image
-              src="/uploads/ert-14-26-studio.jpg"
-              alt="ERT 14-26 Studio"
+              src="/uploads/ert-14-26-rollout-buehne.png"
+              alt="ERT 14-26 Rollout Bühne"
               fill
               sizes="(min-width: 1024px) 33vw, 288px"
               className="object-cover transition-transform duration-700 hover:scale-105"
