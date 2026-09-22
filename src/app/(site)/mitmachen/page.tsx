@@ -48,8 +48,8 @@ export default function JoinPage() {
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="relative col-span-2 aspect-[16/9] overflow-hidden rounded-2xl">
             <Image
-              src="/uploads/rollout-2026/rollout-2026-team-buehne.webp"
-              alt="E-Motion Team beim Rollout 2026"
+              src="/uploads/rollout-2026/rollout-2026-publikum.webp"
+              alt="Publikum beim Rollout 2026"
               fill
               sizes="(min-width: 640px) 50vw, 100vw"
               className="object-cover"
@@ -57,8 +57,8 @@ export default function JoinPage() {
           </div>
           <div className="relative aspect-square overflow-hidden rounded-2xl">
             <Image
-              src="/uploads/ert-14-26-nightrun-rear.jpg"
-              alt="ERT 14-26 Nightrun"
+              src="/uploads/ert-14-26-nosecone-reinhard.jpg"
+              alt="ERT 14-26 Nosecone"
               fill
               sizes="25vw"
               className="object-cover"
@@ -66,8 +66,8 @@ export default function JoinPage() {
           </div>
           <div className="relative aspect-square overflow-hidden rounded-2xl">
             <Image
-              src="/uploads/em-fahrzeug-detail.jpg"
-              alt="Fahrzeugdetail"
+              src="/uploads/rollout-2026/rollout-2026-felgendetail.webp"
+              alt="Felgendetail"
               fill
               sizes="25vw"
               className="object-cover"
