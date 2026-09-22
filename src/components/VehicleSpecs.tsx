@@ -1,4 +1,5 @@
 import type { Vehicle } from "@/lib/content";
+import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 
 type Spec = { label: string; value: string };
 
@@ -214,7 +215,11 @@ export default function VehicleSpecs({
 }) {
   return (
     <div className="mt-6 @container">
-      <div className="grid grid-cols-1 items-start gap-3 @min-[420px]:grid-cols-2">{specs.map(renderSpec)}</div>
+      <StaggerGroup className="grid grid-cols-1 items-start gap-3 @min-[420px]:grid-cols-2">
+        {specs.map((spec, i) => (
+          <StaggerItem key={i}>{renderSpec(spec, i)}</StaggerItem>
+        ))}
+      </StaggerGroup>
 
       {achievements && achievements.length > 0 && (
         <CardShell className="mt-3 border-accent-2-text/20 bg-gradient-to-br from-accent-2-text/5 to-transparent">
