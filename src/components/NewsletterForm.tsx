@@ -70,7 +70,7 @@ export default function NewsletterForm() {
               />
               <label htmlFor="newsletter-privacy" className="text-xs text-muted leading-relaxed cursor-pointer">
                 Ich stimme der{" "}
-                <Link href="/datenschutz" className="font-semibold text-accent hover:underline">
+                <Link href="/datenschutz" className="font-semibold text-accent-text hover:underline">
                   Datenschutzerklärung
                 </Link>
                 {" "}zu und akzeptiere die Speicherung meiner Daten zur Newsletter-Verwaltung.

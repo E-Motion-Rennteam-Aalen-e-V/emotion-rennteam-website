@@ -28,7 +28,7 @@ function chipClass(chip: ParsedChip): string {
   if (r === 1) return "border-yellow-400/60 text-yellow-300";
   if (r <= 3) return "border-yellow-600/50 text-yellow-400/80";
   if (r <= 5) return "border-accent/60 text-accent-text";
-  if (r <= 10) return "border-accent/30 text-accent-text/70";
+  if (r <= 10) return "border-accent/30 text-accent-text";
   return "border-border text-muted";
 }
 
@@ -101,7 +101,7 @@ export default function ResultsPage() {
                     )}
                   </div>
 
-                  <h3 className="text-lg sm:text-xl font-bold text-foreground mb-1">{result.title}</h3>
+                  <h2 className="text-lg sm:text-xl font-bold text-foreground mb-1">{result.title}</h2>
                   <p className="text-sm text-accent-text/80 font-medium mb-4">{result.event}</p>
 
                   {result.description && (() => {
@@ -118,7 +118,7 @@ export default function ResultsPage() {
                             >
                               {chip.kind === "placement"
                                 ? <><span className="font-black">#{chip.rank}</span><span>{chip.discipline}</span></>
-                                : <><span className="font-black">{chip.points}</span><span className="text-muted/70">Pkt.</span><span>{chip.discipline}</span></>
+                                : <><span className="font-black">{chip.points}</span><span className="text-muted">Pkt.</span><span>{chip.discipline}</span></>
                               }
                             </span>
                           ))}
