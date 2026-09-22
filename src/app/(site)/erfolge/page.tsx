@@ -68,51 +68,51 @@ export default function ResultsPage() {
         </div>
       </Reveal>
 
-      <div className="relative mt-16">
-        <div className="absolute left-4 top-0 h-full w-px bg-border sm:left-1/2" />
+      <div className="relative mt-20">
+        {/* Timeline on mobile, hidden on desktop */}
+        <div className="absolute left-4 top-0 h-full w-px bg-border sm:hidden" />
 
-        <div className="space-y-12">
+        <div className="grid gap-6 sm:gap-8 lg:grid-cols-2">
           {results.map((result, i) => (
             <Reveal
               key={result.slug}
               direction={i % 2 === 0 ? "left" : "right"}
-              className={`relative flex flex-col gap-4 sm:flex-row sm:items-center ${
-                i % 2 === 0 ? "sm:flex-row" : "sm:flex-row-reverse"
-              }`}
+              className="relative"
             >
-              <div className="absolute left-4 top-1.5 h-3 w-3 -translate-x-1/2 rounded-full border-2 border-accent bg-background sm:left-1/2" />
+              {/* Mobile timeline dot */}
+              <div className="absolute left-4 top-6 h-3 w-3 -translate-x-1/2 rounded-full border-2 border-accent bg-background sm:hidden" />
 
-              <div
-                className={`w-full pl-10 sm:w-1/2 sm:pl-0 ${
-                  i % 2 === 0 ? "sm:pr-12 sm:text-right" : "sm:pl-12 sm:text-left"
-                }`}
-              >
-                <div className="rounded-xl border border-border bg-surface p-6 transition-colors hover:border-accent/50">
-                  <span className="text-sm font-semibold uppercase tracking-widest text-accent-text">
-                    {result.year}
-                  </span>
-                  <h2 className="mt-1 text-xl font-bold">{result.title}</h2>
-                  <p className="mt-1 text-sm text-muted">{result.event}</p>
-                  {result.placement && (
-                    <span className="mt-3 inline-block rounded-full bg-accent-2/15 px-3 py-1 text-xs font-semibold text-accent-2-text">
-                      {result.placement}
+              <div className={i % 2 === 0 ? "sm:pl-0" : "sm:pl-0"}>
+                <div className="h-full rounded-2xl border border-border bg-surface p-6 sm:p-8 transition-all hover:border-accent/50 hover:shadow-xl hover:shadow-accent/10">
+                  <div className="flex items-start justify-between gap-4 mb-3">
+                    <span className="text-xs font-bold uppercase tracking-[0.15em] text-accent-text">
+                      {result.year}
                     </span>
-                  )}
+                    {result.placement && (
+                      <span className="shrink-0 rounded-full bg-gradient-to-r from-yellow-500/20 to-accent/20 px-3 py-1 text-xs font-bold text-yellow-300 border border-yellow-400/30">
+                        {result.placement}
+                      </span>
+                    )}
+                  </div>
+
+                  <h3 className="text-lg sm:text-xl font-bold text-foreground mb-1">{result.title}</h3>
+                  <p className="text-sm text-accent-text/80 font-medium mb-4">{result.event}</p>
+
                   {result.description && (() => {
                     const parsed = parseDescChips(result.description);
-                    if (!parsed) return <p className="mt-3 text-sm text-muted">{result.description}</p>;
+                    if (!parsed) return <p className="text-sm text-muted">{result.description}</p>;
                     return (
-                      <div className="mt-3">
-                        <p className="text-sm text-muted">{parsed.intro}</p>
-                        <div className="mt-2 flex flex-wrap gap-1.5">
+                      <div>
+                        <p className="text-xs text-muted uppercase tracking-widest font-semibold mb-3">{parsed.intro}</p>
+                        <div className="flex flex-wrap gap-2">
                           {parsed.chips.map((chip) => (
                             <span
                               key={chip.discipline}
-                              className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium ${chipClass(chip)}`}
+                              className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-semibold ${chipClass(chip)}`}
                             >
                               {chip.kind === "placement"
-                                ? <><span className="font-bold tabular-nums">#{chip.rank}</span><span>{chip.discipline}</span></>
-                                : <><span className="font-bold tabular-nums">{chip.points}</span><span className="text-muted/70">Pkt.</span><span>{chip.discipline}</span></>
+                                ? <><span className="font-black">#{chip.rank}</span><span>{chip.discipline}</span></>
+                                : <><span className="font-black">{chip.points}</span><span className="text-muted/70">Pkt.</span><span>{chip.discipline}</span></>
                               }
                             </span>
                           ))}
