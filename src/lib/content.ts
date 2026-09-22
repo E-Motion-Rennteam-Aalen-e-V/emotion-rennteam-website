@@ -196,9 +196,7 @@ const GALLERY_UPLOAD_DIRS = [
   { path: "Rollout ERT 1325", album: "Rollout ERT 1325" },
   { path: "FSAA 2026 wedp", album: "FSAA 2026" },
   { path: "FSG 2026 wedp", album: "FSG 2026" },
-  { path: "Team wdp", album: "Team" },
   { path: "rollout-2026", album: "Rollout 2026" },
-  { path: "single-bilder-upload", album: "Einzelbilder" },
 ];
 const IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp"];
 
@@ -237,6 +235,20 @@ export function getGallery(): GalleryImage[] {
   const curatedImages = new Set(curated.map((img) => img.image));
   const auto = getAutoGalleryImages().filter((img) => !curatedImages.has(img.image));
   return [...curated, ...auto];
+}
+
+export type GalleryAlbum = { name: string; images: GalleryImage[] };
+
+export function getGalleryAlbums(): GalleryAlbum[] {
+  const albums = new Map<string, GalleryImage[]>();
+  for (const image of getGallery()) {
+    albums.set(image.album, [...(albums.get(image.album) ?? []), image]);
+  }
+  return Array.from(albums.entries()).map(([name, images]) => ({ name, images }));
+}
+
+export function getGalleryAlbum(name: string): GalleryAlbum | undefined {
+  return getGalleryAlbums().find((album) => album.name === name);
 }
 
 export function getResults(): Result[] {
