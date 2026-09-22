@@ -69,8 +69,8 @@ export default function ResultsPage() {
       </Reveal>
 
       <div className="relative mt-20">
-        {/* Timeline on mobile, hidden on desktop */}
-        <div className="absolute left-4 top-0 h-full w-px bg-border sm:hidden" />
+        {/* Central timeline line: left edge on mobile, centered on desktop */}
+        <div className="absolute left-4 top-0 h-full w-px bg-border lg:left-1/2" />
 
         <div className="grid gap-6 sm:gap-8 lg:grid-cols-2">
           {results.map((result, i) => (
@@ -79,10 +79,16 @@ export default function ResultsPage() {
               direction={i % 2 === 0 ? "left" : "right"}
               className="relative"
             >
-              {/* Mobile timeline dot */}
-              <div className="absolute left-4 top-6 h-3 w-3 -translate-x-1/2 rounded-full border-2 border-accent bg-background sm:hidden" />
+              {/* Timeline dot: on the shared line, aligned per column on desktop */}
+              <span
+                className={`absolute left-4 top-6 z-10 flex h-3.5 w-3.5 -translate-x-1/2 items-center justify-center lg:top-1/2 lg:-translate-y-1/2 ${
+                  i % 2 === 0 ? "lg:left-full" : "lg:left-0"
+                }`}
+              >
+                <span className="h-3 w-3 rounded-full border-2 border-accent bg-background" />
+              </span>
 
-              <div className={i % 2 === 0 ? "sm:pl-0" : "sm:pl-0"}>
+              <div className={i % 2 === 0 ? "pl-10 lg:pl-0 lg:pr-10" : "pl-10 lg:pl-10"}>
                 <div className="h-full rounded-2xl border border-border bg-surface p-6 sm:p-8 transition-all hover:border-accent/50 hover:shadow-xl hover:shadow-accent/10">
                   <div className="flex items-start justify-between gap-4 mb-3">
                     <span className="text-xs font-bold uppercase tracking-[0.15em] text-accent-text">
