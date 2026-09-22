@@ -1,6 +1,6 @@
 ---
-title: "FSAE IT 2022"
+title: "FS Italien 2022"
 year: 2022
-event: "FSAE IT"
+event: "FS Italien"
 placement: "Platz 25 Gesamtwertung"
 ---

@@ -1,6 +1,6 @@
 ---
-title: "FS AT 2024"
+title: "FS Österreich 2024"
 year: 2024
-event: "FS AT"
+event: "FS Österreich"
 placement: "Platz 30 Gesamtwertung"
 ---

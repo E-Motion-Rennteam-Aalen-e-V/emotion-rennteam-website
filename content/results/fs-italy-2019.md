@@ -1,7 +1,7 @@
 ---
-title: "FSAE IT 2019"
+title: "FS Italien 2019"
 year: 2019
-event: "FSAE IT"
+event: "FS Italien"
 placement: "Platz 8 Gesamtwertung"
 description: "1. Platz im Cost-Wettbewerb."
 ---

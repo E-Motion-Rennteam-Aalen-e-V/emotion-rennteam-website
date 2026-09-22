@@ -1,6 +1,6 @@
 ---
-title: "FSAE IT 2017"
+title: "FS Italien 2017"
 year: 2017
-event: "FSAE IT"
+event: "FS Italien"
 placement: "Platz 7 Gesamtwertung"
 ---

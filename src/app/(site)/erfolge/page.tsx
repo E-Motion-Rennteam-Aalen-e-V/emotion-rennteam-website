@@ -23,7 +23,7 @@ export default function ResultsPage() {
             <p className="mt-4 max-w-2xl text-muted">
               Von der Teamgründung bis zu unseren besten Wettbewerbsergebnissen – eine Zeitreise
               durch die Geschichte des E-Motion Rennteams. Seit 2009 sind wir bei internationalen
-              Formula-Student-Events angetreten und landeten dabei immer wieder in den Top 5
+              FS-Events angetreten und landeten dabei immer wieder in den Top 5
               einzelner Disziplinen und in der Gesamtwertung unter den besten 10 Teams.
             </p>
           </div>
