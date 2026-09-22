@@ -50,9 +50,9 @@ export default function Home() {
           />
         </div>
 
-        <div className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 animate-bounce flex-col items-center gap-2 text-foreground/50 sm:flex">
-          <span className="text-[0.65rem] font-semibold uppercase tracking-[0.3em]">Scrollen</span>
-          <span aria-hidden className="text-lg leading-none">&darr;</span>
+        <div className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 animate-bounce flex-col items-center gap-2 sm:flex">
+          <span className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-white/80 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">Scrollen</span>
+          <span aria-hidden className="text-lg leading-none text-white/80 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">&darr;</span>
         </div>
       </section>
 
