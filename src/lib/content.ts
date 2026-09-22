@@ -84,6 +84,7 @@ export type Page = {
   title: string;
   heroTitle?: string;
   heroSubtitle?: string;
+  heroVideo?: string;
   stats?: { label: string; value: string }[];
   departmentDescriptions?: { label: string; value: string }[];
   address?: string;

@@ -1,7 +1,7 @@
 ---
 title: Startseite
 heroTitle: "E-MOTION RENNTEAM AALEN"
-heroSubtitle: "Formula Student Electric – Elektrisch. Ambitioniert. Aalen."
+heroSubtitle: "Wir entwickeln, bauen und fahren den elektrischen Rennwagen der Hochschule Aalen."
 stats:
   - label: "Studierende im Team"
     value: "60+"

@@ -128,6 +128,11 @@ export const collections: CollectionDef[] = [
       { name: "heroTitle", label: "Hero-Titel", type: "string" },
       { name: "heroSubtitle", label: "Hero-Untertitel", type: "text" },
       {
+        name: "heroVideo",
+        label: "Hero-Video-URL (nur Startseite, MP4, optional)",
+        type: "string",
+      },
+      {
         name: "stats",
         label: "Kennzahlen (nur Startseite)",
         type: "objectList",
