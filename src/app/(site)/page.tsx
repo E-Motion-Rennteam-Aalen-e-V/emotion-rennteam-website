@@ -64,6 +64,7 @@ export default function Home() {
   const vehicles = getVehicles();
   const vehicle = vehicles.find((v) => v.current) ?? vehicles[0];
   const bodyParagraphs = page?.body?.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean) ?? [];
+  const aboutSentence = bodyParagraphs[0]?.split(/(?<=[.!?])\s+/)[0] ?? "";
 
   return (
     <>
@@ -105,21 +106,55 @@ export default function Home() {
         </div>
       </div>
 
-      {bodyParagraphs.length > 0 && (
-        <section className="container-page py-24">
+      <section className="container-page py-16">
+        <StaggerGroup className="grid gap-4 sm:grid-cols-2">
+          <StaggerItem>
+            <div className="flex h-full flex-col justify-between gap-6 rounded-2xl border border-border bg-surface p-7 transition-colors hover:border-accent/60 sm:p-8">
+              <div>
+                <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
+                  Unsere Sponsoren
+                </h2>
+                <p className="mt-3 text-muted">
+                  Ohne unsere Partner wäre unser Projekt nicht möglich.
+                </p>
+              </div>
+              <Link
+                href="/sponsoren"
+                className="inline-flex w-fit items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold uppercase tracking-wide text-accent-foreground shadow-[0_8px_30px_-8px_rgba(0,113,181,0.6)] transition-all hover:scale-[1.04] hover:gap-3"
+              >
+                Zu unseren Sponsoren <span aria-hidden>&rarr;</span>
+              </Link>
+            </div>
+          </StaggerItem>
+          <StaggerItem>
+            <div className="flex h-full flex-col justify-between gap-6 rounded-2xl border border-border bg-surface p-7 transition-colors hover:border-accent/60 sm:p-8">
+              <div>
+                <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
+                  Werde Teil des Teams
+                </h2>
+                <p className="mt-3 text-muted">
+                  Wir suchen laufend motivierte Studierende für den nächsten Boliden.
+                </p>
+              </div>
+              <Link
+                href="/mitmachen"
+                className="inline-flex w-fit items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold uppercase tracking-wide text-accent-foreground shadow-[0_8px_30px_-8px_rgba(0,113,181,0.6)] transition-all hover:scale-[1.04] hover:gap-3"
+              >
+                Offene Positionen ansehen <span aria-hidden>&rarr;</span>
+              </Link>
+            </div>
+          </StaggerItem>
+        </StaggerGroup>
+      </section>
+
+      {aboutSentence && (
+        <section className="container-page py-20">
           <Reveal>
-            <div className="mx-auto max-w-3xl space-y-5 text-center">
+            <div className="mx-auto max-w-2xl space-y-3 text-center">
               <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">
                 Über uns
               </p>
-              {bodyParagraphs.map((paragraph, i) => (
-                <p
-                  key={i}
-                  className={i === 0 ? "text-lg text-foreground" : "text-base text-muted"}
-                >
-                  {paragraph}
-                </p>
-              ))}
+              <p className="text-xl font-medium text-foreground">{aboutSentence}</p>
             </div>
           </Reveal>
         </section>
@@ -164,9 +199,6 @@ export default function Home() {
               <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">
                 Fachbereiche
               </p>
-              <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-balance sm:text-4xl">
-                Ein Fahrzeug, {TEAM_DEPARTMENTS.length} Fachteams
-              </h2>
               <p className="mt-4 text-lg text-muted">
                 Von der Konstruktion bis zum Marketing – jedes Fachteam trägt seinen Teil zum
                 fertigen Rennwagen bei.
@@ -237,41 +269,6 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="container-page py-24 text-center">
-        <Reveal>
-          <h2 className="text-3xl font-extrabold tracking-tight text-balance sm:text-4xl">Unsere Sponsoren</h2>
-          <p className="mx-auto mt-4 max-w-xl text-lg text-muted">
-            Ohne unsere Partner wäre unser Projekt nicht möglich. Lernen Sie die Unternehmen
-            kennen, die uns unterstützen.
-          </p>
-          <Link
-            href="/sponsoren"
-            className="mt-8 inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3.5 text-sm font-bold uppercase tracking-wide text-accent-foreground shadow-[0_8px_30px_-8px_rgba(0,113,181,0.6)] transition-all hover:scale-[1.04] hover:gap-3"
-          >
-            Zu unseren Sponsoren <span aria-hidden>&rarr;</span>
-          </Link>
-        </Reveal>
-      </section>
-
-      <section className="border-t border-border/60 bg-surface/40 py-24 text-center">
-        <div className="container-page">
-          <Reveal>
-            <h2 className="text-3xl font-extrabold tracking-tight text-balance sm:text-4xl">
-              Werde Teil des Teams
-            </h2>
-            <p className="mx-auto mt-4 max-w-xl text-lg text-muted">
-              Egal ob Technik, Marketing oder Business Plan – wir suchen laufend motivierte
-              Studierende, die mit uns den nächsten Boliden bauen.
-            </p>
-            <Link
-              href="/mitmachen"
-              className="mt-8 inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3.5 text-sm font-bold uppercase tracking-wide text-accent-foreground shadow-[0_8px_30px_-8px_rgba(0,113,181,0.6)] transition-all hover:scale-[1.04] hover:gap-3"
-            >
-              Offene Positionen ansehen <span aria-hidden>&rarr;</span>
-            </Link>
-          </Reveal>
-        </div>
-      </section>
     </>
   );
 }
