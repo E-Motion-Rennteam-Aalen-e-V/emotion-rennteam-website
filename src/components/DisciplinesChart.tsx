@@ -136,7 +136,7 @@ export default function DisciplinesChart() {
   const dynamicDisciplines = DISCIPLINES.filter((d) => d.category === "Dynamisch");
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-14">
       {/* Split bar */}
       <div>
         <div className="mb-2 flex items-center justify-between text-xs font-medium text-muted">
