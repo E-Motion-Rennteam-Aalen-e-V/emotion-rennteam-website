@@ -58,7 +58,7 @@ export default function Home() {
 
       <div className="relative z-10 -mt-12 sm:-mt-16">
         <div className="container-page">
-          <StaggerGroup className="grid grid-cols-2 gap-3 rounded-2xl border border-border bg-surface/95 p-5 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)] backdrop-blur-md sm:grid-cols-4 sm:gap-8 sm:rounded-[1.75rem] sm:p-8">
+          <StaggerGroup className="grid grid-cols-2 gap-3 rounded-2xl border border-border bg-surface/95 p-5 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)] backdrop-blur-md sm:grid-cols-4 sm:gap-8 sm:rounded-[1.75rem] sm:p-8 xl:p-10">
             {stats.map((stat) => (
               <StaggerItem key={stat.label} className="text-center sm:text-left">
                 <div className="text-2xl font-extrabold text-foreground sm:text-3xl lg:text-4xl">
@@ -133,12 +133,12 @@ export default function Home() {
             <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">
               {vehicle.year} · Aktuelles Fahrzeug
             </p>
-            <h2 className="mx-auto mt-3 max-w-2xl text-4xl font-extrabold tracking-normal text-balance sm:text-5xl">
+            <h2 className="mx-auto mt-3 max-w-4xl text-4xl font-extrabold tracking-normal text-balance sm:text-5xl xl:text-6xl">
               {vehicle.name}
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-lg text-muted">{vehicle.tagline}</p>
           </Reveal>
-          <StaggerGroup className="mx-auto mt-12 grid max-w-4xl grid-cols-2 gap-4 sm:grid-cols-4 items-stretch">
+          <StaggerGroup className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-4 items-stretch xl:grid-cols-4 xl:gap-6">
             {vehicle.specs?.slice(0, 4).map((spec) => (
               <StaggerItem key={spec.label} className="h-full">
                 <div className="flex h-full flex-col justify-center rounded-2xl border border-border bg-surface p-5 transition-colors hover:border-accent/60">
