@@ -53,23 +53,27 @@ export default function VehiclesPage() {
                   />
                 </span>
 
-                <div className="grid gap-6 pl-10 lg:grid-cols-2 lg:items-stretch lg:gap-16 lg:pl-0">
-                  <div className={reversed ? "lg:order-2" : undefined}>
+                <div className="group grid gap-6 pl-10 lg:grid-cols-2 lg:items-start lg:gap-16 lg:pl-0">
+                  <div className={`lg:sticky lg:top-28 ${reversed ? "lg:order-2" : ""}`}>
                     {vehicle.coverImage && (
-                      <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl border border-border lg:aspect-auto lg:h-full lg:min-h-[320px]">
+                      <div className="relative aspect-[3/2] w-full overflow-hidden rounded-2xl border border-border shadow-lg shadow-black/20 transition-all duration-500 group-hover:border-accent/50 group-hover:shadow-accent/10">
                         <Image
                           src={vehicle.coverImage}
                           alt={vehicle.name}
                           fill
                           sizes="(min-width: 1024px) 50vw, 100vw"
-                          className="object-cover"
+                          className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                        <div
+                          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-transparent"
+                          aria-hidden="true"
                         />
                       </div>
                     )}
                   </div>
 
                   <div
-                    className={`rounded-2xl border border-border bg-surface p-6 transition-colors hover:border-accent/50 sm:p-8 ${
+                    className={`rounded-2xl border border-border bg-surface p-6 transition-colors duration-500 group-hover:border-accent/50 sm:p-8 ${
                       reversed ? "lg:order-1" : ""
                     }`}
                   >
