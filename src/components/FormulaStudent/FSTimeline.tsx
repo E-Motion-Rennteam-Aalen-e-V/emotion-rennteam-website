@@ -5,25 +5,25 @@ import { motion } from "framer-motion";
 const events = [
   {
     year: 1981,
-    title: "Geburt der Formula Student",
+    title: "Geburt der FS",
     description: "SAE gründet den Wettbewerb in den USA",
     highlight: true,
   },
   {
     year: 2006,
     title: "Deutschland-Start",
-    description: "Erstes Rennen am Hockenheimring unter Schirmherrschaft des VDI",
+    description: "Erstes FS-Rennen am Hockenheimring unter Schirmherrschaft des VDI",
     highlight: true,
   },
   {
     year: 2010,
-    title: "Formula Student Electric",
+    title: "FS Electric",
     description: "Einführung der elektrischen Kategorie – Zukunftstechnologie im Fokus",
     highlight: true,
   },
   {
     year: 2024,
-    title: "Global Presence",
+    title: "Globale Präsenz",
     description: "500+ Teams aus über 50 Ländern weltweit aktiv",
     highlight: false,
   },

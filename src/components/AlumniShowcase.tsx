@@ -41,7 +41,7 @@ export default function AlumniShowcase() {
           Dein Sprungbrett
         </p>
         <h2 className="mx-auto mt-2 max-w-xl text-3xl font-extrabold tracking-normal sm:text-4xl">
-          Formula Student ist der direkte Weg in die Industrie
+          FS ist der direkte Weg in die Industrie
         </h2>
         <p className="mx-auto mt-3 max-w-2xl text-muted">
           Unsere Alumni entwickeln heute Serienfahrzeuge, testen Prototypen oder bauen eigene
