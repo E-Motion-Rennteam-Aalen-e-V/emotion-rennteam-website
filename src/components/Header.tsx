@@ -6,18 +6,14 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import HeaderPulseLine from "@/components/HeaderPulseLine";
-import VehicleDropdown from "@/components/VehicleDropdown";
 import { NAV_ITEMS } from "@/lib/nav";
-import type { getVehicles } from "@/lib/content";
 
 interface HeaderProps {
   /** IDs (NavItemDef.id) of menu items hidden via das CMS - siehe src/lib/nav.ts. */
   hiddenIds?: string[];
-  /** Vehicles for the dropdown menu. */
-  vehicles?: ReturnType<typeof getVehicles>;
 }
 
-export default function Header({ hiddenIds = [], vehicles = [] }: HeaderProps) {
+export default function Header({ hiddenIds = [] }: HeaderProps) {
   const hidden = new Set(hiddenIds);
   const NAV_LINKS = NAV_ITEMS.filter((item) => item.group === "main" && !hidden.has(item.id));
   const MORE_LINKS = NAV_ITEMS.filter((item) => item.group === "more" && !hidden.has(item.id));
@@ -112,11 +108,6 @@ export default function Header({ hiddenIds = [], vehicles = [] }: HeaderProps) {
               </Link>
             );
           })}
-
-          {/* Vehicle Dropdown */}
-          {vehicles.length > 0 && (
-            <VehicleDropdown vehicles={vehicles} />
-          )}
 
           {/* Flat links on xl+ (enough space); dropdown on md–xl */}
           {MORE_LINKS.filter((l) => l.id !== "kontakt").map((link) => {
