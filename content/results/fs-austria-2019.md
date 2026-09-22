@@ -1,6 +1,6 @@
 ---
-title: "FS AT 2019"
+title: "FS Österreich 2019"
 year: 2019
-event: "FS AT"
+event: "FS Österreich"
 placement: "Platz 15 Gesamtwertung"
 ---

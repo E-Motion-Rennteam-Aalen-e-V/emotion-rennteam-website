@@ -1,6 +1,6 @@
 ---
-title: "FS AT 2016"
+title: "FS Österreich 2016"
 year: 2016
-event: "FS AT"
+event: "FS Österreich"
 placement: "Platz 17 Gesamtwertung"
 ---

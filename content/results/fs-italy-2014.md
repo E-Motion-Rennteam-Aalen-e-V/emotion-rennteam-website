@@ -1,6 +1,6 @@
 ---
-title: "FSAE IT 2014"
+title: "FS Italien 2014"
 year: 2014
-event: "FSAE IT"
+event: "FS Italien"
 placement: "Platz 12 Gesamtwertung"
 ---
