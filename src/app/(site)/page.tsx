@@ -58,13 +58,20 @@ export default function Home() {
 
       <div className="relative z-10 -mt-12 sm:-mt-16">
         <div className="container-page">
-          <StaggerGroup className="grid grid-cols-2 gap-3 rounded-2xl border border-border bg-surface/95 p-5 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)] backdrop-blur-md sm:grid-cols-4 sm:gap-8 sm:rounded-[1.75rem] sm:p-8 xl:p-10">
-            {stats.map((stat) => (
-              <StaggerItem key={stat.label} className="text-center sm:text-left">
-                <div className="text-2xl font-extrabold text-foreground sm:text-3xl lg:text-4xl">
+          <StaggerGroup className="grid grid-cols-2 overflow-hidden rounded-2xl border border-border bg-surface/95 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)] backdrop-blur-md sm:grid-cols-4 sm:rounded-[1.75rem]">
+            {stats.map((stat, i) => (
+              <StaggerItem
+                key={stat.label}
+                className={`flex flex-col items-center justify-center px-5 py-7 text-center sm:px-8 sm:py-10 ${
+                  i < stats.length - 1
+                    ? "border-r border-border [&:nth-child(2)]:border-r-0 sm:[&:nth-child(2)]:border-r"
+                    : ""
+                } [&:nth-child(1)]:border-b [&:nth-child(2)]:border-b sm:[&:nth-child(1)]:border-b-0 sm:[&:nth-child(2)]:border-b-0`}
+              >
+                <div className="text-3xl font-extrabold tabular-nums text-foreground lg:text-4xl">
                   <Counter value={stat.value} suffix={stat.suffix} />
                 </div>
-                <div className="mt-1 text-xs uppercase tracking-wide text-muted">
+                <div className="mt-2 text-xs font-medium uppercase tracking-widest text-muted">
                   {stat.label}
                 </div>
               </StaggerItem>
@@ -73,39 +80,41 @@ export default function Home() {
         </div>
       </div>
 
-      <section className="container-page py-16">
-        <StaggerGroup className="grid gap-4 sm:grid-cols-2">
-          <StaggerItem>
-            <div className="flex h-full flex-col justify-between gap-6 rounded-2xl border border-border bg-surface p-7 transition-colors hover:border-accent/60 sm:p-8">
-              <div>
+      <section className="container-page py-20">
+        <StaggerGroup className="grid gap-5 sm:grid-cols-2">
+          <StaggerItem className="h-full">
+            <div className="flex h-full flex-col gap-6 rounded-2xl border border-border bg-surface p-8 transition-colors hover:border-accent/50 sm:p-10">
+              <div className="h-0.5 w-10 rounded-full bg-accent" />
+              <div className="flex-1">
                 <h2 className="text-2xl font-extrabold tracking-normal sm:text-3xl">
                   Unsere Sponsoren
                 </h2>
-                <p className="mt-3 text-muted">
-                  Ohne unsere Partner wäre unser Projekt nicht möglich.
+                <p className="mt-3 max-w-xs text-muted">
+                  Ohne unsere Partner wäre die Entwicklung unseres Fahrzeugs nicht möglich.
                 </p>
               </div>
               <Link
                 href="/sponsoren"
-                className="inline-flex w-fit items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold uppercase tracking-wide text-accent-foreground shadow-[0_8px_30px_-8px_rgba(0,113,181,0.6)] transition-all hover:scale-[1.04] hover:gap-3"
+                className="inline-flex w-fit items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold tracking-wide text-accent-foreground shadow-[0_8px_30px_-8px_rgba(0,113,181,0.5)] transition-all hover:scale-[1.03] hover:gap-3 hover:shadow-[0_8px_30px_-8px_rgba(0,113,181,0.8)]"
               >
                 Zu unseren Sponsoren <span aria-hidden>&rarr;</span>
               </Link>
             </div>
           </StaggerItem>
-          <StaggerItem>
-            <div className="flex h-full flex-col justify-between gap-6 rounded-2xl border border-border bg-surface p-7 transition-colors hover:border-accent/60 sm:p-8">
-              <div>
+          <StaggerItem className="h-full">
+            <div className="flex h-full flex-col gap-6 rounded-2xl border border-border bg-surface p-8 transition-colors hover:border-accent/50 sm:p-10">
+              <div className="h-0.5 w-10 rounded-full bg-accent" />
+              <div className="flex-1">
                 <h2 className="text-2xl font-extrabold tracking-normal sm:text-3xl">
                   Werde Teil des Teams
                 </h2>
-                <p className="mt-3 text-muted">
-                  Wir suchen laufend motivierte Studierende für den nächsten Boliden.
+                <p className="mt-3 max-w-xs text-muted">
+                  Wir suchen laufend motivierte Studierende aus allen Fachrichtungen.
                 </p>
               </div>
               <Link
                 href="/mitmachen"
-                className="inline-flex w-fit items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold uppercase tracking-wide text-accent-foreground shadow-[0_8px_30px_-8px_rgba(0,113,181,0.6)] transition-all hover:scale-[1.04] hover:gap-3"
+                className="inline-flex w-fit items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold tracking-wide text-accent-foreground shadow-[0_8px_30px_-8px_rgba(0,113,181,0.5)] transition-all hover:scale-[1.03] hover:gap-3 hover:shadow-[0_8px_30px_-8px_rgba(0,113,181,0.8)]"
               >
                 Offene Positionen ansehen <span aria-hidden>&rarr;</span>
               </Link>
