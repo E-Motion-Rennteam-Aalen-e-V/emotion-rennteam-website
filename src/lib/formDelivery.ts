@@ -1,22 +1,11 @@
-/**
- * Delivers a validated form submission somewhere useful. If
- * FORM_WEBHOOK_URL is configured (e.g. a Slack/Teams incoming webhook, or a
- * small internal relay that sends email), the submission is POSTed there as
- * JSON. If that's not configured, or the webhook call fails, the submission
- * is appended to a local fallback file instead of only being logged -
- * console output is easy to lose (log rotation, container restarts,
- * ephemeral hosting), so this keeps a durable, operator-recoverable copy of
- * every submission that couldn't be delivered live.
- */
+import { Resend } from "resend";
 import { appendFileSync } from "node:fs";
 import path from "node:path";
 
-/** Max time to wait for the webhook before giving up and logging a failure. */
-const WEBHOOK_TIMEOUT_MS = 8000;
-
-// Same directory convention as .cms-users.json: a local, gitignored file
-// that survives log rotation and process restarts on a persistent server.
 const FALLBACK_FILE = path.join(process.cwd(), ".pending-form-submissions.jsonl");
+const RECIPIENT_EMAIL = "info@emotion-rennteam.de";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export type FormSubmission = {
   form: "contact" | "newsletter" | "mitmachen" | "sponsoring" | "mediakit";
@@ -24,14 +13,39 @@ export type FormSubmission = {
   data: Record<string, string>;
 };
 
+const formLabels: Record<FormSubmission["form"], string> = {
+  contact: "Kontaktformular",
+  newsletter: "Newsletter-Anmeldung",
+  mitmachen: "Mitgliedsantrag",
+  sponsoring: "Sponsoring-Anfrage",
+  mediakit: "Mediakit-Anfrage",
+};
+
 function persistToFallbackFile(submission: FormSubmission, reason: string): void {
   try {
     appendFileSync(FALLBACK_FILE, JSON.stringify({ ...submission, reason }) + "\n", "utf-8");
   } catch (error) {
-    // Filesystem may be read-only (some serverless hosts) - the console log
-    // below is the last resort in that case.
     console.error(`[form:${submission.form}] failed to write fallback file`, error);
   }
+}
+
+function formatSubmissionEmail(submission: FormSubmission): string {
+  const formLabel = formLabels[submission.form];
+  const dataRows = Object.entries(submission.data)
+    .map(([key, value]) => `<tr><td style="padding: 8px; border-bottom: 1px solid #e0e0e0; font-weight: 500;">${key}:</td><td style="padding: 8px; border-bottom: 1px solid #e0e0e0;">${value}</td></tr>`)
+    .join("");
+
+  return `
+    <html>
+      <body style="font-family: Arial, sans-serif; color: #333;">
+        <h2 style="color: #1a1a1a;">Neue Einreichung: ${formLabel}</h2>
+        <p><strong>Eingereicht am:</strong> ${new Date(submission.submittedAt).toLocaleString("de-DE")}</p>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+          ${dataRows}
+        </table>
+      </body>
+    </html>
+  `;
 }
 
 export async function deliverFormSubmission(
@@ -44,33 +58,32 @@ export async function deliverFormSubmission(
     data,
   };
 
-  const webhookUrl = process.env.FORM_WEBHOOK_URL;
-  if (!webhookUrl) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
     console.error(
-      `[form:${form}] ACTION REQUIRED: FORM_WEBHOOK_URL is not configured - submission written to ${FALLBACK_FILE} instead of being delivered live.`
+      `[form:${form}] ACTION REQUIRED: RESEND_API_KEY is not configured - submission written to ${FALLBACK_FILE}`
     );
-    persistToFallbackFile(submission, "no_webhook_configured");
+    persistToFallbackFile(submission, "no_api_key_configured");
     return;
   }
 
   try {
-    const response = await fetch(webhookUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(submission),
-      // Every route handler `await`s this call before responding, so a
-      // slow or unresponsive webhook endpoint would otherwise hold the
-      // visitor's form submission open indefinitely (fetch has no default
-      // timeout). Bound it so a misbehaving webhook degrades to a logged
-      // failure instead of hanging the request.
-      signal: AbortSignal.timeout(WEBHOOK_TIMEOUT_MS),
+    const fromEmail = process.env.RESEND_FROM_EMAIL || "noreply@resend.dev";
+    const response = await resend.emails.send({
+      from: fromEmail,
+      to: RECIPIENT_EMAIL,
+      subject: `[${formLabels[form]}] Neue Einreichung`,
+      html: formatSubmissionEmail(submission),
     });
-    if (!response.ok) {
-      console.error(`[form:${form}] webhook delivery failed with status ${response.status}`);
-      persistToFallbackFile(submission, `webhook_status_${response.status}`);
+
+    if (response.error) {
+      console.error(`[form:${form}] Resend delivery failed:`, response.error);
+      persistToFallbackFile(submission, "resend_error");
+    } else {
+      console.log(`[form:${form}] Email sent successfully (ID: ${response.data?.id})`);
     }
   } catch (error) {
-    console.error(`[form:${form}] webhook delivery threw`, error);
-    persistToFallbackFile(submission, "webhook_threw");
+    console.error(`[form:${form}] Resend delivery threw`, error);
+    persistToFallbackFile(submission, "resend_threw");
   }
 }
