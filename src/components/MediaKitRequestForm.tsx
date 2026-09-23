@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useFormSubmit } from "@/lib/useFormSubmit";
 import HoneypotField from "@/components/HoneypotField";
@@ -8,10 +9,17 @@ import { MEDIAKIT_CATEGORIES } from "@/lib/validation";
 
 export default function MediaKitRequestForm() {
   const { status, errors, errorMessage, submit } = useFormSubmit("/api/mediakit");
+  const [categoryError, setCategoryError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+    const hasCategory = MEDIAKIT_CATEGORIES.some(({ id }) => formData.get(`category_${id}`) === "on");
+    if (!hasCategory) {
+      setCategoryError("Bitte wähle mindestens eine Kategorie aus.");
+      return;
+    }
+    setCategoryError(null);
     const payload = Object.fromEntries(formData.entries());
     payload.consent = formData.get("consent") === "on" ? "true" : "";
     await submit(payload);
@@ -134,8 +142,8 @@ export default function MediaKitRequestForm() {
                 </label>
               ))}
             </div>
-            {errors.categories && (
-              <p className="mt-1 text-xs text-red-500">{errors.categories}</p>
+            {(errors.categories || categoryError) && (
+              <p className="mt-1 text-xs text-red-500" role="alert">{errors.categories ?? categoryError}</p>
             )}
           </div>
 

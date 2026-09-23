@@ -179,7 +179,14 @@ export default function GalleryGrid({ images, onImageError }: { images: GalleryI
                   className="object-contain bg-background"
                 />
               </div>
-              <p className="mt-4 text-center text-sm text-muted">{active.title}</p>
+              <div className="mt-4 flex items-center justify-center gap-3">
+                <p className="text-center text-sm text-muted">{active.title}</p>
+                {images.length > 1 && (
+                  <span className="text-xs text-muted/60" aria-live="polite" aria-atomic="true">
+                    {activeIndex !== null ? activeIndex + 1 : 0}/{images.length}
+                  </span>
+                )}
+              </div>
 
               <motion.button
                 ref={closeButtonRef}
@@ -189,7 +196,7 @@ export default function GalleryGrid({ images, onImageError }: { images: GalleryI
                 data-focus-trap
                 whileHover={{ scale: 1.08 }}
                 whileTap={{ scale: 0.95 }}
-                className="absolute -top-4 -right-4 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface text-foreground hover:border-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                className="absolute top-2 right-2 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface text-foreground hover:border-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
               >
                 ✕
               </motion.button>

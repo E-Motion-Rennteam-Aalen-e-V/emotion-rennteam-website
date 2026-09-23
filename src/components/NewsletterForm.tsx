@@ -81,14 +81,20 @@ export default function NewsletterForm() {
               />
               <span>
                 Ich stimme der{" "}
-                <Link href="/datenschutz" className="font-semibold text-accent-text hover:underline">
+                <Link href="/datenschutz" className="font-semibold text-accent-text underline">
                   Datenschutzerklärung
                 </Link>
                 {" "}zu und akzeptiere die Speicherung meiner Daten zur Newsletter-Verwaltung.
               </span>
             </label>
 
-            <p className="text-xs text-muted">Abmeldung jederzeit möglich – kein Spam, versprochen.</p>
+            <p className="text-xs text-muted">
+              Abmeldung jederzeit möglich –{" "}
+              <Link href="/kontakt" className="text-accent-text underline">
+                kontaktiere uns einfach
+              </Link>
+              {" "}und wir tragen dich aus.
+            </p>
           </form>
         </motion.div>
       )}
