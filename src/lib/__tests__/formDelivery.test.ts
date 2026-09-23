@@ -65,7 +65,7 @@ describe("deliverFormSubmission", () => {
     expect(sendEmailMock).toHaveBeenCalledTimes(1);
     const [call] = sendEmailMock.mock.calls;
     expect(call[0].from).toBe("noreply@emotion-rennteam.de");
-    expect(call[0].to).toBe("info@emotion-rennteam.de");
+    expect(call[0].to).toBe("denny.svalina@emotion-rennteam.de");
     expect(call[0].subject).toContain("Sponsoring-Anfrage");
     expect(call[0].html).toContain("Acme");
     expect(consoleLogSpy).toHaveBeenCalledWith(
