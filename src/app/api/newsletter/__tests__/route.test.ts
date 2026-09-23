@@ -21,7 +21,7 @@ describe("POST /api/newsletter", () => {
       .spyOn(formDelivery, "deliverFormSubmission")
       .mockResolvedValue(undefined);
 
-    const response = await POST(postRequest({ email: "ada@example.com" }));
+    const response = await POST(postRequest({ email: "ada@example.com", consent: true }));
     const json = await response.json();
 
     expect(response.status).toBe(200);
@@ -29,8 +29,16 @@ describe("POST /api/newsletter", () => {
     expect(deliverSpy).toHaveBeenCalledWith("newsletter", { email: "ada@example.com" });
   });
 
+  it("rejects a submission without consent", async () => {
+    const response = await POST(postRequest({ email: "ada@example.com" }));
+    const json = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(json.errors.consent).toBeDefined();
+  });
+
   it("rejects an invalid email address", async () => {
-    const response = await POST(postRequest({ email: "not-an-email" }));
+    const response = await POST(postRequest({ email: "not-an-email", consent: true }));
     const json = await response.json();
 
     expect(response.status).toBe(400);
@@ -54,7 +62,7 @@ describe("POST /api/newsletter", () => {
       .mockResolvedValue(undefined);
 
     const response = await POST(
-      postRequest({ email: "ada@example.com", website: "http://spam.example" })
+      postRequest({ email: "ada@example.com", consent: true, website: "http://spam.example" })
     );
     const json = await response.json();
 
@@ -69,7 +77,7 @@ describe("POST /api/newsletter", () => {
 
     let lastResponse;
     for (let i = 0; i < 6; i += 1) {
-      lastResponse = await POST(postRequest({ email: "ada@example.com" }, ip));
+      lastResponse = await POST(postRequest({ email: "ada@example.com", consent: true }, ip));
     }
 
     expect(lastResponse?.status).toBe(429);

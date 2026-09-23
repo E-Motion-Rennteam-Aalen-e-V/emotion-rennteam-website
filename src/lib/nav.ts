@@ -17,11 +17,11 @@ export const NAV_ITEMS: NavItemDef[] = [
   { id: "fahrzeuge", href: "/fahrzeuge", label: "Fahrzeuge", group: "main" },
   { id: "sponsoren", href: "/sponsoren", label: "Sponsoren", group: "main" },
   { id: "mitmachen", href: "/mitmachen", label: "Mitmachen", group: "main" },
-  { id: "formula-student", href: "/formula-student", label: "Formular Student", group: "more" },
+  { id: "formula-student", href: "/formula-student", label: "Formula Student", group: "more" },
   { id: "galerie", href: "/galerie", label: "Galerie", group: "more" },
   { id: "erfolge", href: "/erfolge", label: "Chronik", group: "more" },
   { id: "blog", href: "/blog", label: "Blog", group: "more" },
-  { id: "kontakt", href: "/kontakt", label: "Kontakt", group: "more" },
+  { id: "kontakt", href: "/kontakt", label: "Kontakt", group: "cta" },
 ];
 
 export function isNavItemVisible(id: string, visibility: Record<string, boolean>): boolean {

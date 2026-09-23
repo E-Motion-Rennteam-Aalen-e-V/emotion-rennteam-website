@@ -166,6 +166,7 @@ export default function Header({ hiddenIds = [] }: HeaderProps) {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -8, scale: 0.97 }}
                   transition={{ duration: 0.15 }}
+                  role="menu"
                   className="absolute right-0 top-full mt-3 w-52 origin-top-right rounded-xl border border-border bg-surface p-1.5 shadow-2xl"
                 >
                   {MORE_LINKS.map((link) => {
@@ -175,6 +176,7 @@ export default function Header({ hiddenIds = [] }: HeaderProps) {
                       <Link
                         key={link.href}
                         href={link.href}
+                        role="menuitem"
                         className={`block rounded-lg px-3.5 py-2.5 text-sm transition-colors ${
                           linkActive
                             ? "bg-accent/10 font-semibold text-accent"

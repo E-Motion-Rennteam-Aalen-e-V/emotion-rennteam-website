@@ -120,6 +120,8 @@ export function validateNewsletterForm(body: unknown): ValidationResult<Newslett
   if (!email) errors.email = "Bitte gib deine E-Mail-Adresse an.";
   else if (!isValidEmail(email)) errors.email = "Bitte gib eine gültige E-Mail-Adresse an.";
 
+  if (!data.consent) errors.consent = "Bitte stimme der Datenverarbeitung zu.";
+
   if (Object.keys(errors).length > 0) return { valid: false, errors };
   return { valid: true, isBot: isBotSubmission(data), data: { email } };
 }
