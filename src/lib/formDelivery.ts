@@ -3,7 +3,10 @@ import { appendFileSync } from "node:fs";
 import path from "node:path";
 
 const FALLBACK_FILE = path.join(process.cwd(), ".pending-form-submissions.jsonl");
-const RECIPIENT_EMAIL = "info@emotion-rennteam.de";
+// TEMPORARY: Resend's unverified sandbox sender can only deliver to the
+// account owner's own address. Revert to "info@emotion-rennteam.de" once
+// the emotion-rennteam.de domain is verified in Resend.
+const RECIPIENT_EMAIL = "denny.svalina@emotion-rennteam.de";
 
 export type FormSubmission = {
   form: "contact" | "newsletter" | "mitmachen" | "sponsoring" | "mediakit";
