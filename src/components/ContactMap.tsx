@@ -1,50 +1,33 @@
 "use client";
 
-import { Map, MapControls, MapMarker, MarkerContent, MarkerPopup } from "@/components/ui/map";
-import { MapPin } from "lucide-react";
-
 // Hochschule Aalen, Beethovenstraße 1, 73430 Aalen
-const ADDRESS_COORDS: [number, number] = [10.0932, 48.8383];
+const LAT = 48.8383;
+const LNG = 10.0932;
 
 const MAPS_LINK =
   "https://www.google.com/maps/search/?api=1&query=Hochschule+Aalen+Beethovenstra%C3%9Fe+1+73430+Aalen";
 
+// OpenStreetMap embed — already allowed by CSP (frame-src https://www.openstreetmap.org).
+// bbox is ±0.02° around the marker to give ~2-3 blocks of context.
+const OSM_EMBED = `https://www.openstreetmap.org/export/embed.html?bbox=${LNG - 0.025}%2C${LAT - 0.012}%2C${LNG + 0.025}%2C${LAT + 0.012}&layer=mapnik&marker=${LAT}%2C${LNG}`;
+
 export default function ContactMap() {
   return (
     <div className="relative h-full w-full overflow-hidden rounded-xl border border-border bg-surface">
-      <Map theme="dark" center={ADDRESS_COORDS} zoom={15}>
-        <MapControls showZoom />
-        <MapMarker longitude={ADDRESS_COORDS[0]} latitude={ADDRESS_COORDS[1]}>
-          <MarkerContent>
-            <MapPin
-              className="fill-accent stroke-white"
-              size={32}
-              aria-label="Standort Hochschule Aalen"
-            />
-          </MarkerContent>
-          <MarkerPopup>
-            <div className="space-y-1">
-              <p className="text-foreground text-sm font-semibold">Hochschule Aalen</p>
-              <p className="text-muted-foreground text-xs">
-                Beethovenstraße 1
-                <br />
-                73430 Aalen
-              </p>
-              <a
-                href={MAPS_LINK}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-accent-text mt-1 inline-block text-xs font-medium underline underline-offset-2"
-              >
-                In Google Maps öffnen →
-              </a>
-            </div>
-          </MarkerPopup>
-        </MapMarker>
-      </Map>
+      {/* OSM iframe with invert+hue-rotate for a dark-map appearance */}
+      <iframe
+        src={OSM_EMBED}
+        title="Karte – Hochschule Aalen"
+        loading="lazy"
+        referrerPolicy="no-referrer"
+        className="absolute inset-0 h-full w-full border-0"
+        style={{ filter: "invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9)" }}
+        sandbox="allow-scripts allow-same-origin"
+        aria-label="Interaktive Karte: Hochschule Aalen, Beethovenstraße 1, 73430 Aalen"
+      />
 
       {/* Address card overlay */}
-      <div className="pointer-events-none absolute bottom-4 left-4 right-4 sm:left-6 sm:right-auto sm:w-64">
+      <div className="pointer-events-none absolute bottom-4 left-4 right-4 z-10 sm:left-6 sm:right-auto sm:w-64">
         <div className="pointer-events-auto rounded-xl border border-border/80 bg-background/90 p-4 shadow-xl backdrop-blur-md">
           <div className="mb-3 flex items-center gap-2">
             <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-accent-foreground text-sm">

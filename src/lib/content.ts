@@ -192,7 +192,7 @@ export function getBlogPostBySlug(slug: string): BlogPost | undefined {
 const GALLERY_UPLOAD_DIRS = [
   { path: "galerie-upload", album: "Weitere Bilder" },
   { path: "FS Bofingen ERT1325", album: "FS Bofingen ERT1325" },
-  { path: "Fotos Ferdiand ERT1325", album: "Fotos Ferdiand ERT1325" },
+  { path: "Fotos Ferdinand ERT1325", album: "Fotos Ferdinand ERT1325" },
   { path: "Rollout ERT 1325", album: "Rollout ERT 1325" },
   { path: "FSAA 2026 wedp", album: "FSAA 2026" },
   { path: "FSG 2026 wedp", album: "FSG 2026" },
