@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useFormSubmit } from "@/lib/useFormSubmit";
 import HoneypotField from "@/components/HoneypotField";
 import { CONTACT_SUBJECTS } from "@/lib/validation";
+import { trackPixelEvent } from "@/lib/metaPixel";
 
 export default function ContactForm() {
   const { status, errors, errorMessage, submit } = useFormSubmit("/api/contact");
@@ -14,7 +15,8 @@ export default function ContactForm() {
     const formData = new FormData(e.currentTarget);
     const payload = Object.fromEntries(formData.entries());
     payload.consent = formData.get("consent") === "on" ? "true" : "";
-    await submit(payload);
+    const ok = await submit(payload);
+    if (ok) trackPixelEvent("Contact");
   }
 
   return (

@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { getNews, getNewsBySlug } from "@/lib/content";
 import { renderMarkdown } from "@/lib/markdown";
 import Reveal from "@/components/motion/Reveal";
+import ShareButtons from "@/components/ShareButtons";
 import { getArticleJsonLd } from "@/lib/structuredData";
 
 export function generateStaticParams() {
@@ -83,6 +84,8 @@ export default async function NewsDetailPage({
           })}
         </time>
         <h1 className="mt-2 text-4xl font-extrabold tracking-normal text-balance sm:text-5xl">{post.title}</h1>
+
+        <ShareButtons path={`/news/${post.slug}`} title={post.title} className="mt-6" />
 
         {post.coverImage && (
           <div className="relative mt-8 aspect-[16/9] w-full overflow-hidden rounded-2xl border border-border">
