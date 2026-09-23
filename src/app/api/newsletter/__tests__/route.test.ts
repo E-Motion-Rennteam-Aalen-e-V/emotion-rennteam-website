@@ -82,4 +82,16 @@ describe("POST /api/newsletter", () => {
 
     expect(lastResponse?.status).toBe(429);
   });
+
+  it("rate-limits repeated submissions to the same email address across IPs", async () => {
+    vi.spyOn(formDelivery, "deliverFormSubmission").mockResolvedValue(undefined);
+    const email = `newsletter-flood-${Math.random()}@example.com`;
+
+    let lastResponse;
+    for (let i = 0; i < 6; i += 1) {
+      lastResponse = await POST(postRequest({ email, consent: true }, `${i}.0.0.1`));
+    }
+
+    expect(lastResponse?.status).toBe(429);
+  });
 });

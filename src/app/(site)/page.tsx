@@ -95,7 +95,7 @@ export default function Home() {
                 href="/sponsoren"
                 className="inline-flex w-fit items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold tracking-wide text-accent-foreground shadow-[0_8px_30px_-8px_rgba(0,113,181,0.5)] transition-all hover:scale-[1.03] hover:gap-3 hover:shadow-[0_8px_30px_-8px_rgba(0,113,181,0.8)]"
               >
-                Zu unseren Sponsoren <span aria-hidden>&rarr;</span>
+                Zu unseren Sponsoren <span aria-hidden="true">&rarr;</span>
               </Link>
             </div>
           </StaggerItem>
@@ -114,7 +114,7 @@ export default function Home() {
                 href="/mitmachen"
                 className="inline-flex w-fit items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold tracking-wide text-accent-foreground shadow-[0_8px_30px_-8px_rgba(0,113,181,0.5)] transition-all hover:scale-[1.03] hover:gap-3 hover:shadow-[0_8px_30px_-8px_rgba(0,113,181,0.8)]"
               >
-                Offene Positionen ansehen <span aria-hidden>&rarr;</span>
+                Offene Positionen ansehen <span aria-hidden="true">&rarr;</span>
               </Link>
             </div>
           </StaggerItem>
@@ -160,7 +160,7 @@ export default function Home() {
               href="/fahrzeuge"
               className="inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition-all hover:gap-3"
             >
-              Alle technischen Daten ansehen <span aria-hidden>&rarr;</span>
+              Alle technischen Daten ansehen <span aria-hidden="true">&rarr;</span>
             </Link>
           </Reveal>
         </section>
@@ -184,7 +184,7 @@ export default function Home() {
               href="/team"
               className="inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition-all hover:gap-3"
             >
-              Das ganze Team kennenlernen <span aria-hidden>&rarr;</span>
+              Das ganze Team kennenlernen <span aria-hidden="true">&rarr;</span>
             </Link>
           </Reveal>
         </div>

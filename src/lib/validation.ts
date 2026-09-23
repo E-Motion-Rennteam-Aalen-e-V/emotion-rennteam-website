@@ -119,6 +119,7 @@ export function validateNewsletterForm(body: unknown): ValidationResult<Newslett
   const email = readField(data, "email");
   if (!email) errors.email = "Bitte gib deine E-Mail-Adresse an.";
   else if (!isValidEmail(email)) errors.email = "Bitte gib eine gültige E-Mail-Adresse an.";
+  else if (isDisposableEmail(email)) errors.email = "Bitte nutze eine reguläre, dauerhafte E-Mail-Adresse.";
 
   if (!data.consent) errors.consent = "Bitte stimme der Datenverarbeitung zu.";
 

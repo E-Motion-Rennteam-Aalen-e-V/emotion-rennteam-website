@@ -95,9 +95,9 @@ export default function ImageCarousel() {
 
       {/* Indicator Dots */}
       <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-2">
-        {CAROUSEL_IMAGES.map((_, i) => (
+        {CAROUSEL_IMAGES.map((img, i) => (
           <motion.button
-            key={i}
+            key={img.src}
             onClick={() => {
               setCurrent(i);
               setAutoPlay(false);
