@@ -1,46 +1,51 @@
 "use client";
 
-import { useState } from "react";
+import { Map, MapControls, MapMarker, MarkerContent, MarkerPopup } from "@/components/ui/map";
+import { MapPin } from "lucide-react";
 
-const MAPS_EMBED_URL =
-  "https://maps.google.com/maps?q=Hochschule+Aalen+Beethovenstrase+1+73430+Aalen&t=&z=15&ie=UTF8&iwloc=&output=embed";
+// Hochschule Aalen, Beethovenstraße 1, 73430 Aalen
+const ADDRESS_COORDS: [number, number] = [10.0932, 48.8383];
 
 const MAPS_LINK =
   "https://www.google.com/maps/search/?api=1&query=Hochschule+Aalen+Beethovenstra%C3%9Fe+1+73430+Aalen";
 
 export default function ContactMap() {
-  const [loaded, setLoaded] = useState(false);
-
   return (
     <div className="relative h-full w-full overflow-hidden rounded-xl border border-border bg-surface">
-      {/* Skeleton shown until iframe loads */}
-      {!loaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-surface">
-          <div className="h-10 w-10 animate-spin rounded-full border-2 border-border border-t-accent" />
-        </div>
-      )}
-
-      {/* Google Maps iframe — dark-themed via CSS filter */}
-      <iframe
-        src={MAPS_EMBED_URL}
-        title="Standort Hochschule Aalen"
-        loading="lazy"
-        referrerPolicy="no-referrer-when-downgrade"
-        onLoad={() => setLoaded(true)}
-        className="absolute inset-0 h-full w-full border-0"
-        style={{
-          /* Invert colors → dark map; hue-rotate corrects blues back to blue */
-          filter: "invert(92%) hue-rotate(180deg) saturate(0.75) brightness(0.88) contrast(1.05)",
-          opacity: loaded ? 1 : 0,
-          transition: "opacity 0.4s ease",
-        }}
-        aria-hidden={!loaded}
-      />
+      <Map theme="dark" center={ADDRESS_COORDS} zoom={15}>
+        <MapControls showZoom />
+        <MapMarker longitude={ADDRESS_COORDS[0]} latitude={ADDRESS_COORDS[1]}>
+          <MarkerContent>
+            <MapPin
+              className="fill-accent stroke-white"
+              size={32}
+              aria-label="Standort Hochschule Aalen"
+            />
+          </MarkerContent>
+          <MarkerPopup>
+            <div className="space-y-1">
+              <p className="text-foreground text-sm font-semibold">Hochschule Aalen</p>
+              <p className="text-muted-foreground text-xs">
+                Beethovenstraße 1
+                <br />
+                73430 Aalen
+              </p>
+              <a
+                href={MAPS_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-accent-text mt-1 inline-block text-xs font-medium underline underline-offset-2"
+              >
+                In Google Maps öffnen →
+              </a>
+            </div>
+          </MarkerPopup>
+        </MapMarker>
+      </Map>
 
       {/* Address card overlay */}
-      <div className="pointer-events-none absolute inset-0" aria-hidden />
-      <div className="absolute bottom-4 left-4 right-4 sm:left-6 sm:right-auto sm:w-64">
-        <div className="rounded-xl border border-border/80 bg-background/90 p-4 shadow-xl backdrop-blur-md">
+      <div className="pointer-events-none absolute bottom-4 left-4 right-4 sm:left-6 sm:right-auto sm:w-64">
+        <div className="pointer-events-auto rounded-xl border border-border/80 bg-background/90 p-4 shadow-xl backdrop-blur-md">
           <div className="mb-3 flex items-center gap-2">
             <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-accent-foreground text-sm">
               📍
