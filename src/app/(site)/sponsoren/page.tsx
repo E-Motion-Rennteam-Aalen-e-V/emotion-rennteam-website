@@ -5,6 +5,7 @@ import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import SponsorForm from "@/components/SponsorForm";
 import SponsorCard from "@/components/SponsorCard";
+import ShareButtons from "@/components/ShareButtons";
 
 export const metadata: Metadata = {
   title: "Sponsoren",
@@ -29,6 +30,7 @@ export default function SponsorsPage() {
               Ohne die Unterstützung unserer Sponsoren wäre die Entwicklung unseres Fahrzeugs nicht
               möglich. Vielen Dank an alle Partner!
             </p>
+            <ShareButtons path="/sponsoren" title="Sponsoren – E-Motion Rennteam Aalen" className="mt-6" />
           </div>
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl sm:w-80 lg:w-96">
             <Image

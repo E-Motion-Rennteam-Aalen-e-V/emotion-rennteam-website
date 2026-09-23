@@ -28,7 +28,7 @@ export default function Footer() {
             <li><Link href="/formula-student" className="transition-colors hover:text-accent-text">Formula Student</Link></li>
             <li><Link href="/team" className="transition-colors hover:text-accent-text">Team</Link></li>
             <li><Link href="/fahrzeuge" className="transition-colors hover:text-accent-text">Fahrzeuge</Link></li>
-            <li><Link href="/erfolge" className="transition-colors hover:text-accent-text">Timeline</Link></li>
+            <li><Link href="/erfolge" className="transition-colors hover:text-accent-text">Chronik</Link></li>
             <li><Link href="/sponsoren" className="transition-colors hover:text-accent-text">Sponsoren</Link></li>
             <li><Link href="/mitmachen" className="transition-colors hover:text-accent-text">Mitmachen</Link></li>
           </ul>

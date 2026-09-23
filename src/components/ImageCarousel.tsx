@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import ImageWithFallback from "@/components/ImageWithFallback";
 
 const CAROUSEL_IMAGES = [
   { src: "/uploads/ert-14-26-detail.jpg", alt: "Detailansicht des ERT 14-26" },
@@ -44,6 +44,16 @@ export default function ImageCarousel() {
     setUserNavigated(true);
   };
 
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "ArrowRight") next();
+      else if (e.key === "ArrowLeft") prev();
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div
       className="relative w-full h-full bg-gradient-to-br from-surface to-surface/50"
@@ -60,7 +70,7 @@ export default function ImageCarousel() {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <Image
+          <ImageWithFallback
             src={CAROUSEL_IMAGES[current].src}
             alt={CAROUSEL_IMAGES[current].alt}
             fill
@@ -95,9 +105,9 @@ export default function ImageCarousel() {
 
       {/* Indicator Dots */}
       <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-2">
-        {CAROUSEL_IMAGES.map((_, i) => (
+        {CAROUSEL_IMAGES.map((img, i) => (
           <motion.button
-            key={i}
+            key={img.src}
             onClick={() => {
               setCurrent(i);
               setAutoPlay(false);

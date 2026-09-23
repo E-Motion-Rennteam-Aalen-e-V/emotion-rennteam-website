@@ -111,9 +111,9 @@ export default function ResultsPage() {
                       <div>
                         <p className="text-xs text-muted uppercase tracking-widest font-semibold mb-3">{parsed.intro}</p>
                         <div className="flex flex-wrap gap-2">
-                          {parsed.chips.map((chip) => (
+                          {parsed.chips.map((chip, i) => (
                             <span
-                              key={chip.discipline}
+                              key={`${chip.kind}-${chip.discipline}-${i}`}
                               className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-semibold ${chipClass(chip)}`}
                             >
                               {chip.kind === "placement"
