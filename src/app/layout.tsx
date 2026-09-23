@@ -5,6 +5,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import MotionProvider from "@/components/MotionProvider";
 import CookieConsent from "@/components/CookieConsent";
+import MetaPixel from "@/components/MetaPixel";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import { getOrganizationJsonLdScript } from "@/lib/structuredData";
 import { DEVICE_BOOTSTRAP_SCRIPT } from "@/lib/device";
@@ -76,6 +77,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <MotionProvider>{children}</MotionProvider>
         <CookieConsent />
+        <MetaPixel />
       </body>
     </html>
   );
