@@ -1,40 +1,43 @@
 import { Resend } from "resend";
 
 const ADMIN_EMAIL = "denny.svalina@emotion-rennteam.de";
-const NEWSLETTER_SEGMENT_ID = "newsletter_subscribers";
 
-export interface NewsletterContact {
-  email: string;
-  subscribedAt: string;
-  source: "web" | "admin";
+function getSegmentId(): string | null {
+  return process.env.RESEND_NEWSLETTER_SEGMENT_ID ?? null;
 }
 
 /**
- * Speichert Newsletter-Kontakt in Resend und erstellt/aktualisiert Segment
+ * Speichert Newsletter-Kontakt in Resend (global oder einem Segment zugeordnet)
  */
 export async function addNewsletterSubscriber(email: string, apiKey: string): Promise<boolean> {
   try {
     const client = new Resend(apiKey);
+    const segmentId = getSegmentId();
 
-    // 1. Kontakt in Resend hinzufügen/aktualisieren
-    const contactResult = await client.contacts.create({
-      email,
-      unsubscribed: false,
-      custom_attributes: {
-        subscribed_at: new Date().toISOString(),
-        source: "website",
-      },
-    });
+    const contactPayload = segmentId
+      ? {
+          email,
+          unsubscribed: false,
+          properties: { subscribed_at: new Date().toISOString(), source: "website" },
+          segments: [{ id: segmentId }],
+        }
+      : {
+          email,
+          unsubscribed: false,
+          properties: { subscribed_at: new Date().toISOString(), source: "website" },
+        };
+
+    const contactResult = await client.contacts.create(contactPayload);
 
     if (contactResult.error) {
-      // Wenn Kontakt bereits existiert, ist das auch ok
+      // Kontakt bereits vorhanden ist kein Fehler
       if (!contactResult.error.message?.includes("already exists")) {
         console.error("[newsletter] Resend contact creation failed:", contactResult.error);
         return false;
       }
     }
 
-    console.log(`[newsletter] Subscriber added: ${email}`);
+    console.log(`[newsletter] Subscriber added/exists: ${email}`);
     return true;
   } catch (error) {
     console.error("[newsletter] Failed to add subscriber:", error);
@@ -43,7 +46,7 @@ export async function addNewsletterSubscriber(email: string, apiKey: string): Pr
 }
 
 /**
- * Versendet Benachrichtigungen an Admin + generischer Willkommens-Email an Nutzer
+ * Sendet Admin-Benachrichtigung + Willkommens-E-Mail an neuen Abonnenten
  */
 export async function sendNewsletterNotifications(
   email: string,
@@ -52,54 +55,44 @@ export async function sendNewsletterNotifications(
 ): Promise<{ adminNotified: boolean; userWelcomed: boolean }> {
   try {
     const client = new Resend(apiKey);
+    const now = new Date().toLocaleString("de-DE");
 
-    // Admin-Benachrichtigung
-    const adminResult = await client.emails.send({
-      from: fromEmail,
-      to: ADMIN_EMAIL,
-      subject: "Neue Newsletter-Anmeldung",
-      html: `
-        <html>
-          <body style="font-family: Arial, sans-serif; color: #333;">
-            <h2 style="color: #1a1a1a;">Neue Newsletter-Anmeldung</h2>
-            <p><strong>E-Mail:</strong> ${email}</p>
-            <p><strong>Anmeldezeitpunkt:</strong> ${new Date().toLocaleString("de-DE")}</p>
-            <hr style="margin: 20px 0; border: none; border-top: 1px solid #e0e0e0;">
-            <p><small>Diese Person ist jetzt für den Newsletter angemeldet und kann über Resend damit verwaltet werden.</small></p>
-          </body>
-        </html>
-      `,
-    });
-
-    const adminNotified = !adminResult.error;
-    if (adminResult.error) {
-      console.error("[newsletter] Failed to send admin notification:", adminResult.error);
-    }
-
-    // Willkommens-Email an Nutzer (nur Basic Info)
-    const userResult = await client.emails.send({
-      from: fromEmail,
-      to: email,
-      subject: "Willkommen zum Newsletter",
-      html: `
-        <html>
-          <body style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #1a1a1a;">Willkommen! 🏁</h2>
+    const [adminResult, userResult] = await Promise.all([
+      client.emails.send({
+        from: fromEmail,
+        to: ADMIN_EMAIL,
+        subject: "Neue Newsletter-Anmeldung",
+        html: `
+          <html><body style="font-family:Arial,sans-serif;color:#333;max-width:600px;margin:0 auto">
+            <h2>Neue Newsletter-Anmeldung</h2>
+            <table style="border-collapse:collapse;width:100%">
+              <tr><td style="padding:8px;border-bottom:1px solid #e0e0e0;font-weight:500">E-Mail:</td><td style="padding:8px;border-bottom:1px solid #e0e0e0">${email}</td></tr>
+              <tr><td style="padding:8px;font-weight:500">Zeitpunkt:</td><td style="padding:8px">${now}</td></tr>
+            </table>
+            <p style="margin-top:16px;color:#666;font-size:14px">Dieser Kontakt wurde automatisch in Resend gespeichert.</p>
+          </body></html>
+        `,
+      }),
+      client.emails.send({
+        from: fromEmail,
+        to: email,
+        subject: "Willkommen beim E-Motion Rennteam Newsletter!",
+        html: `
+          <html><body style="font-family:Arial,sans-serif;color:#333;max-width:600px;margin:0 auto">
+            <h2 style="color:#1a1a1a">Willkommen! 🏁</h2>
             <p>Vielen Dank für deine Anmeldung zu unserem Newsletter!</p>
-            <p>Du wirst in Zukunft Updates und Blog-Artikel von uns erhalten.</p>
-            <hr style="margin: 20px 0; border: none; border-top: 1px solid #e0e0e0;">
-            <p><small>Du kannst dich jederzeit abmelden, wenn du keine E-Mails mehr erhalten möchtest.</small></p>
-          </body>
-        </html>
-      `,
-    });
+            <p>Du wirst ab sofort über neue Blog-Artikel, Rennergebnisse und Team-Updates informiert.</p>
+            <hr style="border:none;border-top:1px solid #e0e0e0;margin:24px 0">
+            <p style="font-size:12px;color:#999">Wenn du diese E-Mail nicht angefordert hast, kannst du sie ignorieren. Du kannst dich jederzeit abmelden.</p>
+          </body></html>
+        `,
+      }),
+    ]);
 
-    const userWelcomed = !userResult.error;
-    if (userResult.error) {
-      console.error("[newsletter] Failed to send welcome email:", userResult.error);
-    }
-
-    return { adminNotified, userWelcomed };
+    return {
+      adminNotified: !adminResult.error,
+      userWelcomed: !userResult.error,
+    };
   } catch (error) {
     console.error("[newsletter] Failed to send notifications:", error);
     return { adminNotified: false, userWelcomed: false };
@@ -107,53 +100,59 @@ export async function sendNewsletterNotifications(
 }
 
 /**
- * Erstellt oder aktualisiert Newsletter-Template für Blog-Posts
+ * Erstellt ein Template in Resend für Blog-Post-Versand.
+ * Gibt die Template-ID zurück oder null bei Fehler.
  */
 export async function ensureNewsletterTemplate(apiKey: string): Promise<string | null> {
   try {
     const client = new Resend(apiKey);
 
-    // Template erstellen
     const templateResult = await client.templates.create({
-      name: "Newsletter - Blog Post",
-      description: "Template für Blog-Artikel Newsletter",
+      name: "Newsletter – Blog Artikel",
+      subject: "Neuer Artikel: {{blog_title}}",
+      from: process.env.RESEND_FROM_EMAIL || undefined,
       html: `
-        <html>
-          <body style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto;">
-            <h2>{{ blog_title }}</h2>
-            <p>{{ blog_excerpt }}</p>
-
-            {{{blog_content}}}
-
-            <hr style="margin: 20px 0; border: none; border-top: 1px solid #e0e0e0;">
-            <p>
-              <a href="{{ blog_url }}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px;">
-                Vollständigen Artikel lesen
-              </a>
-            </p>
-          </body>
-        </html>
+        <html><body style="font-family:Arial,sans-serif;color:#333;max-width:600px;margin:0 auto">
+          <h2 style="color:#1a1a1a">{{blog_title}}</h2>
+          <p style="color:#555;font-size:16px;line-height:1.6">{{blog_excerpt}}</p>
+          <hr style="border:none;border-top:1px solid #e0e0e0;margin:24px 0">
+          <div style="line-height:1.8">{{{blog_content}}}</div>
+          <hr style="border:none;border-top:1px solid #e0e0e0;margin:24px 0">
+          <a href="{{blog_url}}" style="display:inline-block;padding:12px 24px;background:#111;color:#fff;text-decoration:none;border-radius:4px;font-weight:600">
+            Vollständigen Artikel lesen →
+          </a>
+          <p style="margin-top:24px;font-size:12px;color:#999">
+            Du erhältst diese E-Mail, weil du den E-Motion Rennteam Newsletter abonniert hast.
+          </p>
+        </body></html>
       `,
+      variables: [
+        { key: "blog_title", type: "string", fallbackValue: "Neuer Artikel" },
+        { key: "blog_excerpt", type: "string", fallbackValue: "" },
+        { key: "blog_content", type: "string", fallbackValue: "" },
+        { key: "blog_url", type: "string", fallbackValue: "https://emotion-rennteam.de/blog" },
+      ],
     });
 
     if (templateResult.error) {
-      console.error("[newsletter] Failed to create template:", templateResult.error);
+      console.error("[newsletter] Template creation failed:", templateResult.error);
       return null;
     }
 
     console.log(`[newsletter] Template created: ${templateResult.data?.id}`);
-    return templateResult.data?.id || null;
+    return templateResult.data?.id ?? null;
   } catch (error) {
-    console.error("[newsletter] Failed to ensure template:", error);
+    console.error("[newsletter] Failed to create template:", error);
     return null;
   }
 }
 
 /**
- * Versendet Newsletter mit Blog-Post an alle Abonnenten
+ * Versendet Newsletter an alle Abonnenten im konfigurierten Segment.
+ * Erstellt zuerst einen Broadcast-Draft und versendet ihn dann.
  */
 export async function sendBlogPostNewsletter(
-  templateId: string,
+  segmentOrAudienceId: string,
   blogData: {
     title: string;
     excerpt: string;
@@ -166,20 +165,49 @@ export async function sendBlogPostNewsletter(
   try {
     const client = new Resend(apiKey);
 
-    const broadcastResult = await client.broadcasts.create({
+    // 1. Broadcast erstellen
+    const createResult = await client.broadcasts.create({
+      name: `Blog: ${blogData.title}`,
+      subject: `Neuer Artikel: ${blogData.title}`,
       from: fromEmail,
-      template_id: templateId,
-      audience_list_ids: [NEWSLETTER_SEGMENT_ID],
-      subject: `[Blog] ${blogData.title}`,
+      segmentId: segmentOrAudienceId,
+      html: `
+        <html><body style="font-family:Arial,sans-serif;color:#333;max-width:600px;margin:0 auto">
+          <h2 style="color:#1a1a1a">${blogData.title}</h2>
+          <p style="color:#555;font-size:16px;line-height:1.6">${blogData.excerpt}</p>
+          <hr style="border:none;border-top:1px solid #e0e0e0;margin:24px 0">
+          <div style="line-height:1.8">${blogData.content}</div>
+          <hr style="border:none;border-top:1px solid #e0e0e0;margin:24px 0">
+          <a href="${blogData.url}" style="display:inline-block;padding:12px 24px;background:#111;color:#fff;text-decoration:none;border-radius:4px;font-weight:600">
+            Vollständigen Artikel lesen →
+          </a>
+          <p style="margin-top:24px;font-size:12px;color:#999">
+            Du erhältst diese E-Mail, weil du den E-Motion Rennteam Newsletter abonniert hast.
+          </p>
+        </body></html>
+      `,
     });
 
-    if (broadcastResult.error) {
-      console.error("[newsletter] Failed to create broadcast:", broadcastResult.error);
+    if (createResult.error) {
+      console.error("[newsletter] Broadcast creation failed:", createResult.error);
       return { success: false };
     }
 
-    console.log(`[newsletter] Broadcast created: ${broadcastResult.data?.id}`);
-    return { success: true, broadcastId: broadcastResult.data?.id };
+    const broadcastId = createResult.data?.id;
+    if (!broadcastId) {
+      console.error("[newsletter] No broadcast ID returned");
+      return { success: false };
+    }
+
+    // 2. Broadcast sofort versenden
+    const sendResult = await client.broadcasts.send(broadcastId);
+    if (sendResult.error) {
+      console.error("[newsletter] Broadcast send failed:", sendResult.error);
+      return { success: false };
+    }
+
+    console.log(`[newsletter] Broadcast sent: ${broadcastId}`);
+    return { success: true, broadcastId };
   } catch (error) {
     console.error("[newsletter] Failed to send newsletter:", error);
     return { success: false };
