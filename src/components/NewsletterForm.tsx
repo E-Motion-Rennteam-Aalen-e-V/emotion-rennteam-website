@@ -88,7 +88,13 @@ export default function NewsletterForm() {
               </span>
             </label>
 
-            <p className="text-xs text-muted">Abmeldung jederzeit möglich – kein Spam, versprochen.</p>
+            <p className="text-xs text-muted">
+              Abmeldung jederzeit möglich –{" "}
+              <Link href="/kontakt" className="text-accent-text hover:underline">
+                kontaktiere uns einfach
+              </Link>
+              {" "}und wir tragen dich aus.
+            </p>
           </form>
         </motion.div>
       )}
