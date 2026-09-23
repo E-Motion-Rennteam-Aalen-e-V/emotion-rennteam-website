@@ -40,9 +40,9 @@ export default function HumanCreatedBadge({ className = "h-28 w-28" }: { classNa
       {[
         [26, 100],
         [174, 100],
-      ].map(([cx, cy], i) => (
+      ].map(([cx, cy]) => (
         <path
-          key={i}
+          key={`${cx}-${cy}`}
           d="M0,-8 L2.2,-2.5 8,-2.5 3.2,1 5,7.5 0,4 -5,7.5 -3.2,1 -8,-2.5 -2.2,-2.5 Z"
           transform={`translate(${cx} ${cy}) scale(0.75)`}
           fill="currentColor"

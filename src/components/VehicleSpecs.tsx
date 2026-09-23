@@ -152,20 +152,20 @@ function renderSpec(spec: Spec, i: number) {
   const label = spec.label.toLowerCase();
 
   if (label === "spitzname") {
-    return <NicknameCard key={i} spec={spec} />;
+    return <NicknameCard key={spec.label} spec={spec} />;
   }
 
   if (label === "leistung") {
     const parsed = parseNumericSpec(spec.value);
     if (parsed) {
-      return <PowerGauge key={i} label={spec.label} num={parsed.num} unit={parsed.unit} subtext={parsed.subtext} />;
+      return <PowerGauge key={spec.label} label={spec.label} num={parsed.num} unit={parsed.unit} subtext={parsed.subtext} />;
     }
   }
 
   if (label.includes("batterie") || label.includes("akku")) {
     const parsed = parseNumericSpec(spec.value);
     if (parsed) {
-      return <BatteryCard key={i} label={spec.label} num={parsed.num} unit={parsed.unit} subtext={parsed.subtext} />;
+      return <BatteryCard key={spec.label} label={spec.label} num={parsed.num} unit={parsed.unit} subtext={parsed.subtext} />;
     }
   }
 
@@ -176,7 +176,7 @@ function renderSpec(spec: Spec, i: number) {
     if (parsed) {
       return (
         <StatCard
-          key={i}
+          key={spec.label}
           label={cleanLabel}
           value={parsed.num}
           unit={parsed.unit}
@@ -190,20 +190,20 @@ function renderSpec(spec: Spec, i: number) {
   if (label === "antrieb") {
     const m = spec.value.match(/\d+/);
     if (m) {
-      return <StatCard key={i} label={spec.label} value={`${m[0]}×`} subtext={spec.value} />;
+      return <StatCard key={spec.label} label={spec.label} value={`${m[0]}×`} subtext={spec.value} />;
     }
   }
 
   if (label === "getriebe" && RATIO_RE.test(spec.value)) {
-    return <StatCard key={i} label={spec.label} value={spec.value.trim()} subtext="Übersetzung" />;
+    return <StatCard key={spec.label} label={spec.label} value={spec.value.trim()} subtext="Übersetzung" />;
   }
 
   const parsed = parseNumericSpec(spec.value);
   if (parsed) {
-    return <StatCard key={i} label={spec.label} value={parsed.num} unit={parsed.unit} subtext={parsed.subtext} />;
+    return <StatCard key={spec.label} label={spec.label} value={parsed.num} unit={parsed.unit} subtext={parsed.subtext} />;
   }
 
-  return <InfoCard key={i} label={spec.label} value={spec.value} />;
+  return <InfoCard key={spec.label} label={spec.label} value={spec.value} />;
 }
 
 export default function VehicleSpecs({
@@ -217,7 +217,7 @@ export default function VehicleSpecs({
     <div className="mt-6 @container">
       <StaggerGroup className="grid grid-cols-1 items-start gap-3 @min-[420px]:grid-cols-2">
         {specs.map((spec, i) => (
-          <StaggerItem key={i}>{renderSpec(spec, i)}</StaggerItem>
+          <StaggerItem key={spec.label}>{renderSpec(spec, i)}</StaggerItem>
         ))}
       </StaggerGroup>
 
