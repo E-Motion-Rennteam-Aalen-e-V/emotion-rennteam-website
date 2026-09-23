@@ -67,8 +67,8 @@ export default function SponsorsPage() {
         <div className="text-center">
           <h2 className="text-2xl font-bold">Interesse an einem Sponsoring?</h2>
           <p className="mx-auto mt-3 max-w-xl text-muted">
-            Werdet Teil unseres Erfolgs und unterstützt das E-Motion Rennteam Aalen. Füllt einfach
-            das Formular aus – wir stellen euch unsere Sponsoring-Pakete individuell vor.
+            Werden Sie Teil unseres Erfolgs und unterstützen Sie das E-Motion Rennteam Aalen. Füllen Sie
+            einfach das Formular aus – wir stellen Ihnen unsere Sponsoring-Pakete individuell vor.
           </p>
         </div>
         <div className="mx-auto mt-8 max-w-2xl">

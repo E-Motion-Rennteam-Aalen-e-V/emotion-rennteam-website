@@ -48,7 +48,14 @@ export const metadata: Metadata = {
     url: SITE_URL,
     locale: "de_DE",
     type: "website",
-    images: ["/uploads/ert-14-26-studio.jpg"],
+    images: [
+      {
+        url: "/uploads/ert-14-26-studio.jpg",
+        alt: "ERT 14-26 – Formula Student Electric Rennwagen des E-Motion Rennteams Aalen",
+        width: 1200,
+        height: 630,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
