@@ -93,7 +93,10 @@ async function sendCustomerConfirmationEmail(
   customerEmail: string
 ): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return;
+  if (!apiKey) {
+    console.warn(`[form:${form}] RESEND_API_KEY not configured - skipping customer confirmation`);
+    return;
+  }
 
   try {
     const fromEmail = process.env.RESEND_FROM_EMAIL || "noreply@resend.dev";
@@ -108,12 +111,17 @@ async function sendCustomerConfirmationEmail(
     });
 
     if (response.error) {
-      console.error(`[form:${form}] Customer confirmation delivery failed:`, response.error);
+      console.error(
+        `[form:${form}] Customer confirmation delivery failed to ${customerEmail}:`,
+        response.error
+      );
     } else {
-      console.log(`[form:${form}] Customer confirmation sent to ${customerEmail} (ID: ${response.data?.id})`);
+      console.log(
+        `[form:${form}] Customer confirmation sent to ${customerEmail} (ID: ${response.data?.id})`
+      );
     }
   } catch (error) {
-    console.error(`[form:${form}] Customer confirmation threw`, error);
+    console.error(`[form:${form}] Customer confirmation threw:`, error);
   }
 }
 
