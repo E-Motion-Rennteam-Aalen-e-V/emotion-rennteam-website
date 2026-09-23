@@ -13,7 +13,7 @@ export function NewsletterSignup({ className = "", onSuccess }: NewsletterSignup
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [formRenderedAt] = useState(Date.now());
+  const [formRenderedAt] = useState(() => Date.now());
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
