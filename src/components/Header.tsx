@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
+import ImageWithFallback from "@/components/ImageWithFallback";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -75,7 +75,7 @@ export default function Header({ hiddenIds = [] }: HeaderProps) {
       <div className="relative">
       <div className="container-page flex h-20 items-center justify-between lg:h-24">
         <Link href="/" className="group relative -ml-3 flex items-center">
-          <Image
+          <ImageWithFallback
             src="/uploads/logo.png"
             alt="E-Motion Rennteam Aalen"
             width={1000}

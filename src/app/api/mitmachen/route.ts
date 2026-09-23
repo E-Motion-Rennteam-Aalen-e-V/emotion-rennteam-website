@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
   if (!checkRateLimit(`mitmachen:${ip}`, 5, 10 * 60 * 1000)) {
     return NextResponse.json(
       { ok: false, error: "Zu viele Anfragen. Bitte versuche es später erneut." },
-      { status: 429 }
+      { status: 429, headers: { "Retry-After": "600" } }
     );
   }
 
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
   if (!checkRateLimit(`email:${result.data.email.toLowerCase()}`, 5, 60 * 60 * 1000)) {
     return NextResponse.json(
       { ok: false, error: "Zu viele Anfragen. Bitte versuche es später erneut." },
-      { status: 429 }
+      { status: 429, headers: { "Retry-After": "3600" } }
     );
   }
 
