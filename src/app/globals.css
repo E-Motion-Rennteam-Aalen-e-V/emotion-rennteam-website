@@ -22,6 +22,12 @@
   --accent-2-text: #7c8bc9;
   --accent-foreground: #ffffff;
   --border: #232635;
+  /* mapcn/shadcn tokens not otherwise used on this single-theme (dark-only)
+     site — added for the @/components/ui/map registry component. */
+  --popover: var(--surface);
+  --popover-foreground: var(--foreground);
+  --muted-foreground: var(--muted);
+  --ring: var(--accent);
 }
 
 @theme inline {
@@ -36,6 +42,10 @@
   --color-accent-2-text: var(--accent-2-text);
   --color-accent-foreground: var(--accent-foreground);
   --color-border: var(--border);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-ring: var(--ring);
   --font-sans: var(--font-body);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-heading);
@@ -276,5 +286,40 @@ select:focus-visible,
   .sponsor-card--tier,
   .sponsor-card__shimmer {
     animation: none !important;
+  }
+}
+
+/* mapcn (@/components/ui/map): restyle MapLibre's default popup chrome and
+   attribution control to match this site's dark theme. */
+@layer base {
+  .maplibregl-popup-content {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  .maplibregl-popup-tip {
+    display: none !important;
+  }
+
+  .maplibregl-ctrl-attrib {
+    background: var(--background) !important;
+    color: var(--muted) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 0.375rem !important;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
+  }
+
+  .maplibregl-ctrl-attrib a {
+    color: var(--muted) !important;
+  }
+
+  .maplibregl-ctrl-attrib a:hover {
+    color: var(--foreground) !important;
+  }
+
+  .maplibregl-ctrl-attrib-button {
+    background: transparent !important;
   }
 }

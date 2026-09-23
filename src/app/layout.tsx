@@ -56,6 +56,9 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
     images: ["/uploads/ert-14-26-studio.jpg"],
   },
+  verification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
+    : undefined,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
