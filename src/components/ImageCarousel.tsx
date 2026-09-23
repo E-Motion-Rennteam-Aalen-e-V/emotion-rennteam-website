@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import ImageWithFallback from "@/components/ImageWithFallback";
 
 const CAROUSEL_IMAGES = [
   { src: "/uploads/ert-14-26-detail.jpg", alt: "Detailansicht des ERT 14-26" },
@@ -70,7 +70,7 @@ export default function ImageCarousel() {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <Image
+          <ImageWithFallback
             src={CAROUSEL_IMAGES[current].src}
             alt={CAROUSEL_IMAGES[current].alt}
             fill
