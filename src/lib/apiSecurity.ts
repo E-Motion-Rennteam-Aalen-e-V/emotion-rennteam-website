@@ -16,6 +16,12 @@ export function isTrustedOrigin(request: NextRequest): boolean {
   if (!origin) return true;
 
   try {
+    const originHostname = new URL(origin).hostname;
+    // Allow requests where origin matches the actual host serving the request
+    // (covers all Vercel deployment URLs without needing NEXT_PUBLIC_SITE_URL)
+    const host = request.headers.get("host");
+    if (host && originHostname === host.split(":")[0]) return true;
+    // Also allow the configured SITE_URL (production custom domain)
     return new URL(origin).origin === new URL(SITE_URL).origin;
   } catch {
     return false;
