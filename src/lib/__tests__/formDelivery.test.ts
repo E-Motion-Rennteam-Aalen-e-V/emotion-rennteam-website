@@ -1,39 +1,46 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const appendFileSyncMock = vi.hoisted(() => vi.fn());
+const sendEmailMock = vi.hoisted(() => vi.fn());
+
 vi.mock("node:fs", () => ({
   appendFileSync: appendFileSyncMock,
   default: { appendFileSync: appendFileSyncMock },
 }));
 
+vi.mock("resend", () => ({
+  Resend: function Resend() {
+    return { emails: { send: sendEmailMock } };
+  },
+}));
+
 import { deliverFormSubmission } from "@/lib/formDelivery";
 
 describe("deliverFormSubmission", () => {
-  const originalWebhookUrl = process.env.FORM_WEBHOOK_URL;
+  const originalApiKey = process.env.RESEND_API_KEY;
   let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
+  let consoleLogSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
     appendFileSyncMock.mockReset();
+    sendEmailMock.mockReset();
     consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    consoleLogSpy = vi.spyOn(console, "log").mockImplementation(() => {});
   });
 
   afterEach(() => {
-    if (originalWebhookUrl === undefined) delete process.env.FORM_WEBHOOK_URL;
-    else process.env.FORM_WEBHOOK_URL = originalWebhookUrl;
-    vi.unstubAllGlobals();
+    if (originalApiKey === undefined) delete process.env.RESEND_API_KEY;
+    else process.env.RESEND_API_KEY = originalApiKey;
     vi.restoreAllMocks();
   });
 
-  it("persists to the local fallback file and logs loudly when FORM_WEBHOOK_URL is unset", async () => {
-    delete process.env.FORM_WEBHOOK_URL;
-    const fetchMock = vi.fn();
-    vi.stubGlobal("fetch", fetchMock);
+  it("persists to fallback file and logs error when RESEND_API_KEY is unset", async () => {
+    delete process.env.RESEND_API_KEY;
 
     await deliverFormSubmission("contact", { name: "Ada", email: "ada@example.com" });
 
-    expect(fetchMock).not.toHaveBeenCalled();
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-      expect.stringContaining("[form:contact] ACTION REQUIRED: FORM_WEBHOOK_URL is not configured")
+      expect.stringContaining("[form:contact] ACTION REQUIRED: RESEND_API_KEY is not configured")
     );
     expect(appendFileSyncMock).toHaveBeenCalledTimes(1);
     const [, contents] = appendFileSyncMock.mock.calls[0];
@@ -41,79 +48,64 @@ describe("deliverFormSubmission", () => {
     expect(written).toMatchObject({
       form: "contact",
       data: { name: "Ada", email: "ada@example.com" },
-      reason: "no_webhook_configured",
+      reason: "no_api_key_configured",
     });
   });
 
-  it("POSTs the submission as JSON when FORM_WEBHOOK_URL is configured", async () => {
-    process.env.FORM_WEBHOOK_URL = "https://hooks.example.com/incoming";
-    const fetchMock = vi.fn().mockResolvedValue({ ok: true, status: 200 });
-    vi.stubGlobal("fetch", fetchMock);
+  it("sends email via Resend when API key is configured", async () => {
+    process.env.RESEND_API_KEY = "re_test_key";
+    process.env.RESEND_FROM_EMAIL = "noreply@emotion-rennteam.de";
+    sendEmailMock.mockResolvedValue({
+      data: { id: "email_123" },
+      error: null,
+    });
 
-    await deliverFormSubmission("sponsoring", { email: "team@example.com" });
+    await deliverFormSubmission("sponsoring", { company: "Acme" });
 
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    const [url, init] = fetchMock.mock.calls[0];
-    expect(url).toBe("https://hooks.example.com/incoming");
-    expect(init.method).toBe("POST");
-    expect(init.headers).toEqual({ "Content-Type": "application/json" });
-    expect(init.signal).toBeInstanceOf(AbortSignal);
-    const body = JSON.parse(init.body);
-    expect(body.form).toBe("sponsoring");
-    expect(body.data).toEqual({ email: "team@example.com" });
-    expect(consoleErrorSpy).not.toHaveBeenCalled();
+    expect(sendEmailMock).toHaveBeenCalledTimes(1);
+    const [call] = sendEmailMock.mock.calls;
+    expect(call[0].from).toBe("noreply@emotion-rennteam.de");
+    expect(call[0].to).toBe("info@emotion-rennteam.de");
+    expect(call[0].subject).toContain("Sponsoring-Anfrage");
+    expect(call[0].html).toContain("Acme");
+    expect(consoleLogSpy).toHaveBeenCalledWith(
+      expect.stringContaining("[form:sponsoring] Email sent successfully")
+    );
     expect(appendFileSyncMock).not.toHaveBeenCalled();
   });
 
-  it("logs an error and persists to the fallback file when the webhook responds with a non-2xx status", async () => {
-    process.env.FORM_WEBHOOK_URL = "https://hooks.example.com/incoming";
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 500 }));
+  it("logs error and persists to fallback when Resend returns error", async () => {
+    process.env.RESEND_API_KEY = "re_test_key";
+    const testError = { message: "Invalid email" };
+    sendEmailMock.mockResolvedValue({
+      data: null,
+      error: testError,
+    });
 
-    await expect(
-      deliverFormSubmission("sponsoring", { company: "Acme" })
-    ).resolves.toBeUndefined();
+    await deliverFormSubmission("mitmachen", { name: "Bob" });
 
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-      "[form:sponsoring] webhook delivery failed with status 500"
+      "[form:mitmachen] Resend delivery failed:",
+      testError
     );
     expect(appendFileSyncMock).toHaveBeenCalledTimes(1);
     const written = JSON.parse(appendFileSyncMock.mock.calls[0][1] as string);
-    expect(written.reason).toBe("webhook_status_500");
+    expect(written.reason).toBe("resend_error");
   });
 
-  it("logs an error and persists to the fallback file when the webhook request aborts or times out", async () => {
-    process.env.FORM_WEBHOOK_URL = "https://hooks.example.com/incoming";
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockRejectedValue(new DOMException("The operation was aborted.", "TimeoutError"))
-    );
+  it("logs error and persists to fallback when Resend throws", async () => {
+    process.env.RESEND_API_KEY = "re_test_key";
+    const testError = new Error("Network error");
+    sendEmailMock.mockRejectedValue(testError);
 
-    await expect(
-      deliverFormSubmission("mitmachen", { name: "Ada" })
-    ).resolves.toBeUndefined();
+    await deliverFormSubmission("newsletter", { email: "test@example.com" });
 
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-      "[form:mitmachen] webhook delivery threw",
-      expect.any(DOMException)
+      "[form:newsletter] Resend delivery threw",
+      testError
     );
     expect(appendFileSyncMock).toHaveBeenCalledTimes(1);
     const written = JSON.parse(appendFileSyncMock.mock.calls[0][1] as string);
-    expect(written.reason).toBe("webhook_threw");
-  });
-
-  it("passes an AbortSignal that fires well before typical serverless function timeouts", async () => {
-    process.env.FORM_WEBHOOK_URL = "https://hooks.example.com/incoming";
-    let capturedSignal: AbortSignal | undefined;
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockImplementation((_url: string, init: RequestInit) => {
-        capturedSignal = init.signal as AbortSignal;
-        return Promise.resolve({ ok: true, status: 200 });
-      })
-    );
-
-    await deliverFormSubmission("contact", { name: "Ada" });
-
-    expect(capturedSignal?.aborted).toBe(false);
+    expect(written.reason).toBe("resend_threw");
   });
 });

@@ -5,15 +5,6 @@ import path from "node:path";
 const FALLBACK_FILE = path.join(process.cwd(), ".pending-form-submissions.jsonl");
 const RECIPIENT_EMAIL = "info@emotion-rennteam.de";
 
-let resend: Resend | null = null;
-
-function getResendClient(): Resend {
-  if (!resend) {
-    resend = new Resend(process.env.RESEND_API_KEY);
-  }
-  return resend;
-}
-
 export type FormSubmission = {
   form: "contact" | "newsletter" | "mitmachen" | "sponsoring" | "mediakit";
   submittedAt: string;
@@ -76,7 +67,7 @@ export async function deliverFormSubmission(
 
   try {
     const fromEmail = process.env.RESEND_FROM_EMAIL || "noreply@resend.dev";
-    const client = getResendClient();
+    const client = new Resend(apiKey);
     const response = await client.emails.send({
       from: fromEmail,
       to: RECIPIENT_EMAIL,
