@@ -72,6 +72,7 @@ export default function NewsletterForm() {
             >
               <input
                 id="newsletter-privacy"
+                name="consent"
                 type="checkbox"
                 checked={privacyChecked}
                 onChange={(e) => setPrivacyChecked(e.target.checked)}
