@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { getNews, getNewsBySlug } from "@/lib/content";
 import { renderMarkdown } from "@/lib/markdown";
 import Reveal from "@/components/motion/Reveal";
+import { getArticleJsonLd } from "@/lib/structuredData";
 
 export function generateStaticParams() {
   return getNews().map((post) => ({ slug: post.slug }));
@@ -23,7 +24,19 @@ export async function generateMetadata({
     title: post.title,
     description: post.excerpt,
     alternates: { canonical: `/news/${post.slug}` },
-    openGraph: post.coverImage ? { images: [{ url: post.coverImage }] } : undefined,
+    openGraph: {
+      type: "article",
+      publishedTime: post.date,
+      title: post.title,
+      description: post.excerpt,
+      images: post.coverImage ? [{ url: post.coverImage }] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.excerpt,
+      images: post.coverImage ? [post.coverImage] : undefined,
+    },
   };
 }
 
@@ -37,9 +50,20 @@ export default async function NewsDetailPage({
   if (!post) notFound();
 
   const bodyHtml = await renderMarkdown(post.body);
+  const articleJsonLd = getArticleJsonLd({
+    title: post.title,
+    description: post.excerpt,
+    path: `/news/${post.slug}`,
+    date: post.date,
+    coverImage: post.coverImage,
+  });
 
   return (
     <div className="container-page py-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
       <Reveal className="mx-auto max-w-3xl">
         <Link
           href="/news"
