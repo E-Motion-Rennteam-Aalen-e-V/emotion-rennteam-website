@@ -1,20 +1,29 @@
 "use client";
 
 import Link from "next/link";
+import { useCallback, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useFormSubmit } from "@/lib/useFormSubmit";
 import HoneypotField from "@/components/HoneypotField";
 import { CONTACT_SUBJECTS } from "@/lib/validation";
 import { trackPixelEvent } from "@/lib/metaPixel";
+import Dropzone, { type DroppedFile } from "@/components/ui/Dropzone";
 
 export default function ContactForm() {
   const { status, errors, errorMessage, submit } = useFormSubmit("/api/contact");
+  const [attachments, setAttachments] = useState<DroppedFile[]>([]);
+
+  const handleFiles = useCallback((files: DroppedFile[]) => setAttachments(files), []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const payload = Object.fromEntries(formData.entries());
     payload.consent = formData.get("consent") === "on" ? "true" : "";
+    if (attachments.length > 0) {
+      const fileList = attachments.map((f) => `${f.file.name} (${(f.file.size / 1024 / 1024).toFixed(2)} MB)`).join(", ");
+      payload.message = `${payload.message}\n\n---\nAngehängte Dateien: ${fileList}`;
+    }
     const ok = await submit(payload);
     if (ok) trackPixelEvent("Contact");
   }
@@ -122,6 +131,14 @@ export default function ContactForm() {
               </p>
             )}
           </div>
+          {/* Optional file attachments */}
+          <div>
+            <p className="mb-1.5 text-sm font-medium text-muted">
+              Anhänge <span className="text-xs font-normal">(optional)</span>
+            </p>
+            <Dropzone onChange={handleFiles} />
+          </div>
+
           <div className="flex flex-col gap-1">
             <div className="flex items-start gap-2.5">
               <input
