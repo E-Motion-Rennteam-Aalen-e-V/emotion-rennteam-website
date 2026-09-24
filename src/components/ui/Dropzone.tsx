@@ -192,7 +192,7 @@ export default function Dropzone({
           </span>{" "}
           · auch einfügen möglich
         </p>
-        <p className="mt-2 text-xs text-muted/70">
+        <p className="mt-2 text-xs text-muted">
           PNG, JPG, WebP, GIF oder PDF · max. {maxSizeMb} MB · bis zu {maxFiles} Dateien
         </p>
 
