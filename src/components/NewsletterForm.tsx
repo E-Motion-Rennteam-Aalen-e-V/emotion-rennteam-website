@@ -7,7 +7,7 @@ import { useFormSubmit } from "@/lib/useFormSubmit";
 import HoneypotField from "@/components/HoneypotField";
 
 export default function NewsletterForm() {
-  const { status, errorMessage, submit } = useFormSubmit("/api/newsletter");
+  const { status, errorMessage, submit } = useFormSubmit("/api/newsletter/subscribe");
   const [privacyChecked, setPrivacyChecked] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {

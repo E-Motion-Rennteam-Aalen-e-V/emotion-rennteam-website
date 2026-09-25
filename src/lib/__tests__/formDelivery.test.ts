@@ -18,6 +18,7 @@ import { deliverFormSubmission } from "@/lib/formDelivery";
 
 describe("deliverFormSubmission", () => {
   const originalApiKey = process.env.RESEND_API_KEY;
+  const originalRecipient = process.env.RESEND_RECIPIENT_EMAIL;
   let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
   let consoleLogSpy: ReturnType<typeof vi.spyOn>;
 
@@ -31,6 +32,8 @@ describe("deliverFormSubmission", () => {
   afterEach(() => {
     if (originalApiKey === undefined) delete process.env.RESEND_API_KEY;
     else process.env.RESEND_API_KEY = originalApiKey;
+    if (originalRecipient === undefined) delete process.env.RESEND_RECIPIENT_EMAIL;
+    else process.env.RESEND_RECIPIENT_EMAIL = originalRecipient;
     vi.restoreAllMocks();
   });
 
@@ -55,6 +58,7 @@ describe("deliverFormSubmission", () => {
   it("sends email via Resend when API key is configured", async () => {
     process.env.RESEND_API_KEY = "re_test_key";
     process.env.RESEND_FROM_EMAIL = "noreply@emotion-rennteam.de";
+    process.env.RESEND_RECIPIENT_EMAIL = "info@emotion-rennteam.de";
     sendEmailMock.mockResolvedValue({
       data: { id: "email_123" },
       error: null,
@@ -65,7 +69,7 @@ describe("deliverFormSubmission", () => {
     expect(sendEmailMock).toHaveBeenCalledTimes(1);
     const [call] = sendEmailMock.mock.calls;
     expect(call[0].from).toBe("noreply@emotion-rennteam.de");
-    expect(call[0].to).toBe("denny.svalina@emotion-rennteam.de");
+    expect(call[0].to).toBe("info@emotion-rennteam.de");
     expect(call[0].subject).toContain("Sponsoring-Anfrage");
     expect(call[0].html).toContain("Acme");
     expect(consoleLogSpy).toHaveBeenCalledWith(

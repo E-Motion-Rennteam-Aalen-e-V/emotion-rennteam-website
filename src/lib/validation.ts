@@ -123,8 +123,6 @@ export function validateNewsletterForm(body: unknown): ValidationResult<Newslett
 
   if (!data.consent) errors.consent = "Bitte stimme der Datenverarbeitung zu.";
 
-  if (!data.consent) errors.consent = "Bitte stimme der Datenverarbeitung zu.";
-
   if (Object.keys(errors).length > 0) return { valid: false, errors };
   return { valid: true, isBot: isBotSubmission(data), data: { email } };
 }

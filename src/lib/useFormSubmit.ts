@@ -55,7 +55,10 @@ export function useFormSubmit(endpoint: string) {
 
         setErrors(result?.errors ?? {});
         setErrorMessage(
-          result?.error ?? "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+          result?.error ??
+            (result?.errors && Object.keys(result.errors).length > 0
+              ? null
+              : "Etwas ist schiefgelaufen. Bitte versuche es erneut.")
         );
         setStatus("error");
         return false;
