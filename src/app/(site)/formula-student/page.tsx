@@ -7,10 +7,16 @@ import FSTimeline from "@/components/FormulaStudent/FSTimeline";
 import FSPillars from "@/components/FormulaStudent/FSPillars";
 import FSStats from "@/components/FormulaStudent/FSStats";
 export const metadata: Metadata = {
-  title: "Was ist Formula Student?",
+  title: "Formula Student – Internationaler Konstruktionswettbewerb erklärt",
   description:
-    "Formula Student erklärt: der internationale Konstruktionswettbewerb, bei dem Studierendenteams eigene Rennwagen entwickeln, bauen und gegeneinander antreten lassen.",
+    "Was ist Formula Student? Der internationale Konstruktionswettbewerb, bei dem Studierendenteams eigene Rennwagen entwickeln, bauen und gegeneinander antreten lassen.",
   alternates: { canonical: "/formula-student" },
+  openGraph: {
+    title: "Formula Student – E-Motion Rennteam Aalen",
+    description: "Alles über den internationalen Formula-Student-Wettbewerb: Disziplinen, Regeln und warum wir mitmachen.",
+    type: "website",
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
+  },
 };
 
 export default function FormulaStudentPage() {

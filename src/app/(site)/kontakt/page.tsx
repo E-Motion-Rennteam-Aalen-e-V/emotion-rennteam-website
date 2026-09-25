@@ -7,10 +7,16 @@ import ContactMap from "@/components/ContactMap";
 import Reveal from "@/components/motion/Reveal";
 
 export const metadata: Metadata = {
-  title: "Kontakt",
+  title: "Kontakt – Schreib uns eine Nachricht",
   description:
-    "Kontaktiere das E-Motion Rennteam Aalen: Fragen, Kooperationen oder Sponsoring-Anfragen an die Hochschule Aalen.",
+    "Kontaktiere das E-Motion Rennteam Aalen: Fragen, Kooperationen oder Sponsoring-Anfragen – wir freuen uns auf deine Nachricht.",
   alternates: { canonical: "/kontakt" },
+  openGraph: {
+    title: "Kontakt – E-Motion Rennteam Aalen",
+    description: "Fragen, Kooperationen oder Sponsoring-Anfragen an das Formula-Student-Team der Hochschule Aalen.",
+    type: "website",
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
+  },
 };
 
 export default function ContactPage() {

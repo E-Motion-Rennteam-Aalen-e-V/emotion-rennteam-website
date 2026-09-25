@@ -12,10 +12,16 @@ import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 
 export const metadata: Metadata = {
-  title: "Team",
+  title: "Unser Team – Studierende & Fachbereiche",
   description:
-    "Das Team hinter dem E-Motion Rennteam Aalen: Studierende aus allen Fachbereichen, die gemeinsam einen Formula-Student-Electric-Rennwagen entwickeln.",
+    "Das Team des E-Motion Rennteams Aalen: über 50 Studierende aus allen Fachbereichen der Hochschule Aalen entwickeln gemeinsam einen Formula-Student-Electric-Rennwagen.",
   alternates: { canonical: "/team" },
+  openGraph: {
+    title: "Unser Team – E-Motion Rennteam Aalen",
+    description: "Über 50 Studierende aus allen Fachbereichen der Hochschule Aalen, die gemeinsam einen FSE-Rennwagen bauen.",
+    type: "website",
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
+  },
 };
 
 const TEAM_DESCRIPTIONS: Record<string, string> = {

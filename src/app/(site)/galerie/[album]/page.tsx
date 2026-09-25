@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getGalleryAlbum, getGalleryAlbums } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import GalleryGrid from "@/components/GalleryGrid";
+import { getBreadcrumbJsonLd } from "@/lib/structuredData";
 
 export function generateStaticParams() {
   return getGalleryAlbums().map((album) => ({ album: album.name }));
@@ -20,8 +21,16 @@ export async function generateMetadata({
 
   return {
     title: `${album.name} – Galerie`,
-    description: `Bilder aus dem Album "${album.name}" des E-Motion Rennteams Aalen.`,
+    description: `Bilder aus dem Album "${album.name}" des E-Motion Rennteams Aalen: Fotos vom Fahrzeugbau, Wettbewerben und Team-Events.`,
     alternates: { canonical: `/galerie/${encodeURIComponent(album.name)}` },
+    openGraph: {
+      title: `${album.name} – Galerie · E-Motion Rennteam Aalen`,
+      description: `${album.images.length} Fotos aus dem Album "${album.name}".`,
+      type: "website",
+      images: album.images[0]
+        ? [{ url: album.images[0].src, width: 1200, height: 630 }]
+        : [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
+    },
   };
 }
 
@@ -34,8 +43,17 @@ export default async function GalleryAlbumPage({
   const album = getGalleryAlbum(decodeURIComponent(albumParam));
   if (!album) notFound();
 
+  const breadcrumbJsonLd = getBreadcrumbJsonLd([
+    { name: "Galerie", path: "/galerie" },
+    { name: album.name, path: `/galerie/${encodeURIComponent(album.name)}` },
+  ]);
+
   return (
     <div className="container-page py-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <Reveal>
         <Link
           href="/galerie"

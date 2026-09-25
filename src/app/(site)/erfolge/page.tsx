@@ -33,10 +33,16 @@ function chipClass(chip: ParsedChip): string {
 }
 
 export const metadata: Metadata = {
-  title: "Timeline",
+  title: "Erfolge & Meilensteine",
   description:
-    "Die Timeline des E-Motion Rennteams Aalen: Platzierungen, Events und Meilensteine der Teamgeschichte im Überblick.",
+    "Die Erfolgschronik des E-Motion Rennteams Aalen: Platzierungen, Wettbewerbsergebnisse und Meilensteine seit der Teamgründung 2009.",
   alternates: { canonical: "/erfolge" },
+  openGraph: {
+    title: "Erfolge & Meilensteine – E-Motion Rennteam Aalen",
+    description: "Platzierungen, Wettbewerbsergebnisse und Meilensteine des Formula-Student-Teams seit 2009.",
+    type: "website",
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
+  },
 };
 
 export default function ResultsPage() {
