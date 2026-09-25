@@ -28,7 +28,7 @@ export async function generateMetadata({
       description: `${album.images.length} Fotos aus dem Album "${album.name}".`,
       type: "website",
       images: album.images[0]
-        ? [{ url: album.images[0].src, width: 1200, height: 630 }]
+        ? [{ url: album.images[0].image, width: 1200, height: 630 }]
         : [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
     },
   };
