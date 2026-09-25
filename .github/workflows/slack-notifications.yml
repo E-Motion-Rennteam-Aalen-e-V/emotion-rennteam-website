@@ -1,0 +1,396 @@
+name: Slack Notifications – web-engineering
+
+on:
+  # Issues: erstellt, geschlossen, wieder geöffnet, als Label markiert
+  issues:
+    types: [opened, closed, reopened, labeled]
+
+  # Pull Requests: geöffnet, zusammengeführt, geschlossen, Review angefordert
+  pull_request:
+    types: [opened, closed, review_requested]
+    branches: [main, website]
+
+  # CI-Ergebnis auf main + alle Feature-Branches
+  workflow_run:
+    workflows: ["CI", "Branch E2E Agent – Endnutzer-Test"]
+    types: [completed]
+
+  # Deployment-Events (Vercel / externe Deployments via GitHub Deployments API)
+  deployment_status: {}
+
+  # Manuell auslösbar für Tests
+  workflow_dispatch:
+    inputs:
+      test_message:
+        description: "Test-Nachricht an Slack"
+        required: false
+        default: "🔔 Manueller Test der Slack-Integration"
+
+jobs:
+  # ──────────────────────────────────────────────
+  # 1. ISSUE-BENACHRICHTIGUNGEN
+  # ──────────────────────────────────────────────
+  notify-issue:
+    name: "Slack – Issue"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues'
+
+    steps:
+      - name: Issue-Nachricht senden
+        uses: actions/github-script@v7
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_WEB_ENGINEERING }}
+        with:
+          script: |
+            const https = require('https');
+            const url = new URL(process.env.SLACK_WEBHOOK_URL);
+
+            const issue = context.payload.issue;
+            const action = context.payload.action;
+            const sender = context.payload.sender.login;
+            const repo = context.repo.repo;
+
+            const actionMap = {
+              opened:   { icon: '🆕', text: 'Neues Issue erstellt' },
+              closed:   { icon: '✅', text: 'Issue geschlossen' },
+              reopened: { icon: '🔄', text: 'Issue wieder geöffnet' },
+              labeled:  { icon: '🏷️',  text: `Label hinzugefügt: *${context.payload.label?.name}*` },
+            };
+            const { icon, text } = actionMap[action] || { icon: '📋', text: action };
+
+            // Prioritäts-Farbe
+            const labels = (issue.labels || []).map(l => l.name);
+            const color =
+              labels.includes('P0-critical') ? '#FF0000' :
+              labels.includes('P1-high')     ? '#FF8C00' :
+              labels.includes('bug')         ? '#E01E5A' :
+              labels.includes('e2e-failure') ? '#FF8C00' :
+              action === 'closed'            ? '#2EB67D' : '#36C5F0';
+
+            const labelText = labels.length > 0
+              ? labels.map(l => `\`${l}\``).join(' ')
+              : '_keine_';
+
+            const body = (issue.body || '').substring(0, 200);
+            const bodyPreview = body ? `\n>${body.replace(/\n/g, '\n>')}${issue.body?.length > 200 ? '…' : ''}` : '';
+
+            const payload = {
+              attachments: [{
+                color,
+                blocks: [
+                  {
+                    type: 'section',
+                    text: {
+                      type: 'mrkdwn',
+                      text: `${icon} *${text}* in \`${repo}\`\n*<${issue.html_url}|#${issue.number}: ${issue.title}>*${bodyPreview}`,
+                    },
+                  },
+                  {
+                    type: 'context',
+                    elements: [
+                      { type: 'mrkdwn', text: `👤 *${sender}*` },
+                      { type: 'mrkdwn', text: `🏷️ ${labelText}` },
+                      { type: 'mrkdwn', text: `🕐 ${new Date().toLocaleString('de-DE', { timeZone: 'Europe/Berlin' })}` },
+                    ],
+                  },
+                ],
+              }],
+            };
+
+            await new Promise((resolve, reject) => {
+              const data = JSON.stringify(payload);
+              const req = https.request({ hostname: url.hostname, path: url.pathname, method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data) } }, res => {
+                res.on('data', () => {});
+                res.on('end', resolve);
+              });
+              req.on('error', reject);
+              req.write(data);
+              req.end();
+            });
+
+  # ──────────────────────────────────────────────
+  # 2. PULL-REQUEST-BENACHRICHTIGUNGEN
+  # ──────────────────────────────────────────────
+  notify-pr:
+    name: "Slack – Pull Request"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: PR-Nachricht senden
+        uses: actions/github-script@v7
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_WEB_ENGINEERING }}
+        with:
+          script: |
+            const https = require('https');
+            const url = new URL(process.env.SLACK_WEBHOOK_URL);
+
+            const pr = context.payload.pull_request;
+            const action = context.payload.action;
+            const sender = context.payload.sender.login;
+            const repo = context.repo.repo;
+
+            const isMerged = action === 'closed' && pr.merged;
+
+            const actionMap = {
+              opened:           { icon: '📬', text: 'Neuer Pull Request', color: '#36C5F0' },
+              review_requested: { icon: '👀', text: 'Review angefordert', color: '#ECB22E' },
+              closed:           isMerged
+                                  ? { icon: '🚀', text: 'Pull Request gemergt', color: '#2EB67D' }
+                                  : { icon: '🗑️', text: 'Pull Request geschlossen', color: '#E01E5A' },
+            };
+            const { icon, text, color } = actionMap[action] || { icon: '📋', text: action, color: '#36C5F0' };
+
+            const reviewer = context.payload.requested_reviewer?.login;
+            const reviewerText = reviewer ? `\n👤 *Review angefordert bei:* ${reviewer}` : '';
+
+            const payload = {
+              attachments: [{
+                color,
+                blocks: [
+                  {
+                    type: 'section',
+                    text: {
+                      type: 'mrkdwn',
+                      text: `${icon} *${text}* in \`${repo}\`\n*<${pr.html_url}|#${pr.number}: ${pr.title}>*${reviewerText}`,
+                    },
+                  },
+                  {
+                    type: 'context',
+                    elements: [
+                      { type: 'mrkdwn', text: `👤 *${sender}*` },
+                      { type: 'mrkdwn', text: `🌿 \`${pr.head.ref}\` → \`${pr.base.ref}\`` },
+                      { type: 'mrkdwn', text: `📝 +${pr.additions} / -${pr.deletions} in ${pr.changed_files} Datei(en)` },
+                    ],
+                  },
+                ],
+              }],
+            };
+
+            await new Promise((resolve, reject) => {
+              const data = JSON.stringify(payload);
+              const req = https.request({ hostname: url.hostname, path: url.pathname, method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data) } }, res => {
+                res.on('data', () => {});
+                res.on('end', resolve);
+              });
+              req.on('error', reject);
+              req.write(data);
+              req.end();
+            });
+
+  # ──────────────────────────────────────────────
+  # 3. CI / E2E WORKFLOW-ERGEBNIS
+  # ──────────────────────────────────────────────
+  notify-workflow:
+    name: "Slack – CI/E2E Ergebnis"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_run'
+
+    steps:
+      - name: Workflow-Ergebnis senden
+        uses: actions/github-script@v7
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_WEB_ENGINEERING }}
+        with:
+          script: |
+            const https = require('https');
+            const url = new URL(process.env.SLACK_WEBHOOK_URL);
+
+            const run = context.payload.workflow_run;
+            const conclusion = run.conclusion; // success | failure | cancelled | skipped | timed_out
+            const workflowName = run.name;
+            const branch = run.head_branch;
+            const commit = run.head_sha.substring(0, 7);
+            const commitMsg = run.head_commit?.message?.split('\n')[0] || '';
+            const actor = run.triggering_actor?.login || run.actor?.login || 'unbekannt';
+            const runUrl = run.html_url;
+
+            // Nur bei Fehler oder Wiederherstellung benachrichtigen (kein Spam bei jedem grünen Run)
+            if (conclusion === 'success') {
+              // Nur melden wenn letzter Run fehlschlug (Recovery) — hier immer ausgeben
+              // In Produktion: prüfe vorherigen Run-Status via API
+            }
+
+            const conclusionMap = {
+              success:    { icon: '✅', text: 'erfolgreich',  color: '#2EB67D' },
+              failure:    { icon: '❌', text: 'FEHLGESCHLAGEN', color: '#E01E5A' },
+              cancelled:  { icon: '⏹️', text: 'abgebrochen',  color: '#ECB22E' },
+              timed_out:  { icon: '⏱️', text: 'TIMEOUT',      color: '#FF8C00' },
+              skipped:    { icon: '⏭️', text: 'übersprungen', color: '#868686' },
+            };
+            const { icon, text, color } = conclusionMap[conclusion] || { icon: '📋', text: conclusion, color: '#36C5F0' };
+
+            // Nur bei Fehler/Timeout aktiv melden, sonst nur bei Erfolg nach Fehler
+            if (conclusion === 'skipped' || conclusion === 'cancelled') return;
+
+            const payload = {
+              attachments: [{
+                color,
+                blocks: [
+                  {
+                    type: 'section',
+                    text: {
+                      type: 'mrkdwn',
+                      text: `${icon} *${workflowName}* ${text}\n🌿 Branch: \`${branch}\` · Commit: \`${commit}\`\n> ${commitMsg}`,
+                    },
+                    accessory: {
+                      type: 'button',
+                      text: { type: 'plain_text', text: 'CI-Log ansehen' },
+                      url: runUrl,
+                    },
+                  },
+                  {
+                    type: 'context',
+                    elements: [
+                      { type: 'mrkdwn', text: `👤 *${actor}*` },
+                      { type: 'mrkdwn', text: `🕐 ${new Date().toLocaleString('de-DE', { timeZone: 'Europe/Berlin' })}` },
+                    ],
+                  },
+                ],
+              }],
+            };
+
+            await new Promise((resolve, reject) => {
+              const data = JSON.stringify(payload);
+              const req = https.request({ hostname: url.hostname, path: url.pathname, method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data) } }, res => {
+                res.on('data', () => {});
+                res.on('end', resolve);
+              });
+              req.on('error', reject);
+              req.write(data);
+              req.end();
+            });
+
+  # ──────────────────────────────────────────────
+  # 4. DEPLOYMENT-STATUS (Vercel / GitHub Deployments)
+  # ──────────────────────────────────────────────
+  notify-deployment:
+    name: "Slack – Deployment"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'deployment_status'
+
+    steps:
+      - name: Deployment-Nachricht senden
+        uses: actions/github-script@v7
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_WEB_ENGINEERING }}
+        with:
+          script: |
+            const https = require('https');
+            const url = new URL(process.env.SLACK_WEBHOOK_URL);
+
+            const ds = context.payload.deployment_status;
+            const deployment = context.payload.deployment;
+            const state = ds.state; // pending | in_progress | success | failure | error | inactive
+            const env = deployment.environment || 'unbekannt';
+            const branch = deployment.ref;
+            const creator = deployment.creator?.login || 'unbekannt';
+            const deployUrl = ds.target_url || ds.environment_url || '';
+            const repo = context.repo.repo;
+
+            // Nur relevante Zustände melden
+            if (['pending', 'inactive', 'queued'].includes(state)) return;
+
+            const stateMap = {
+              in_progress: { icon: '🚧', text: 'Deployment läuft…',        color: '#ECB22E' },
+              success:     { icon: '🚀', text: 'Deployment erfolgreich',   color: '#2EB67D' },
+              failure:     { icon: '💥', text: 'DEPLOYMENT FEHLGESCHLAGEN', color: '#E01E5A' },
+              error:       { icon: '🔥', text: 'DEPLOYMENT ERROR',          color: '#E01E5A' },
+            };
+            const { icon, text, color } = stateMap[state] || { icon: '📦', text: state, color: '#36C5F0' };
+
+            const envEmoji = env.toLowerCase().includes('prod') ? '🌐' : env.toLowerCase().includes('preview') ? '🔍' : '🧪';
+            const urlBlock = deployUrl ? `\n🔗 <${deployUrl}|${deployUrl.length > 60 ? deployUrl.substring(0, 60) + '…' : deployUrl}>` : '';
+
+            const payload = {
+              attachments: [{
+                color,
+                blocks: [
+                  {
+                    type: 'section',
+                    text: {
+                      type: 'mrkdwn',
+                      text: `${icon} *${text}* · \`${repo}\`\n${envEmoji} Umgebung: *${env}* · 🌿 Branch: \`${branch}\`${urlBlock}`,
+                    },
+                    ...(deployUrl ? {
+                      accessory: {
+                        type: 'button',
+                        text: { type: 'plain_text', text: state === 'success' ? '🌐 Website öffnen' : '📋 Details' },
+                        url: deployUrl,
+                      },
+                    } : {}),
+                  },
+                  {
+                    type: 'context',
+                    elements: [
+                      { type: 'mrkdwn', text: `👤 *${creator}*` },
+                      { type: 'mrkdwn', text: `🕐 ${new Date().toLocaleString('de-DE', { timeZone: 'Europe/Berlin' })}` },
+                    ],
+                  },
+                ],
+              }],
+            };
+
+            await new Promise((resolve, reject) => {
+              const data = JSON.stringify(payload);
+              const req = https.request({ hostname: url.hostname, path: url.pathname, method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data) } }, res => {
+                res.on('data', () => {});
+                res.on('end', resolve);
+              });
+              req.on('error', reject);
+              req.write(data);
+              req.end();
+            });
+
+  # ──────────────────────────────────────────────
+  # 5. MANUELLER TEST
+  # ──────────────────────────────────────────────
+  notify-manual-test:
+    name: "Slack – Manueller Test"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Test-Nachricht senden
+        uses: actions/github-script@v7
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_WEB_ENGINEERING }}
+        with:
+          script: |
+            const https = require('https');
+            const url = new URL(process.env.SLACK_WEBHOOK_URL);
+
+            const msg = '${{ github.event.inputs.test_message }}';
+            const sender = context.actor;
+
+            const payload = {
+              attachments: [{
+                color: '#36C5F0',
+                blocks: [
+                  {
+                    type: 'section',
+                    text: { type: 'mrkdwn', text: `🔔 *Slack-Integration Test*\n${msg}` },
+                  },
+                  {
+                    type: 'context',
+                    elements: [
+                      { type: 'mrkdwn', text: `👤 *${sender}*` },
+                      { type: 'mrkdwn', text: `🕐 ${new Date().toLocaleString('de-DE', { timeZone: 'Europe/Berlin' })}` },
+                    ],
+                  },
+                ],
+              }],
+            };
+
+            await new Promise((resolve, reject) => {
+              const data = JSON.stringify(payload);
+              const req = https.request({ hostname: url.hostname, path: url.pathname, method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data) } }, res => {
+                res.on('data', () => {});
+                res.on('end', resolve);
+              });
+              req.on('error', reject);
+              req.write(data);
+              req.end();
+            });
+            console.log('Test-Nachricht gesendet');

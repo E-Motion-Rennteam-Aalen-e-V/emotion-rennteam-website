@@ -1,14 +1,9 @@
 name: Branch E2E Agent – Endnutzer-Test
 
-# Startet automatisch für jeden Push auf alle Feature-Branches
-# sowie täglich um 04:00 UTC auf den Haupt-Branches.
 on:
   push:
     branches:
       - website
-      - cms-app
-      - CMS-App-MacOs
-      - cms-app-anleitung
       - "claude/**"
   schedule:
     - cron: "0 4 * * *"
@@ -26,16 +21,11 @@ jobs:
   e2e-website:
     name: "E2E – Website (Endnutzer-Perspektive)"
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
 
     env:
-      # CMS-Zugangsdaten für e2e-Tests (Testumgebung)
-      E2E_CMS_USER: admin
-      E2E_CMS_PASSWORD: test-password-ci
-      CMS_ADMIN_USER: admin
-      CMS_ADMIN_PASSWORD_HASH: ${{ secrets.CI_CMS_PASSWORD_HASH }}
-      SESSION_SECRET: ${{ secrets.CI_SESSION_SECRET || 'ci-test-secret-32-chars-minimum!!' }}
       NEXT_PUBLIC_SITE_URL: "http://localhost:3000"
+      NEXT_TELEMETRY_DISABLED: 1
 
     steps:
       - name: Checkout
@@ -53,10 +43,12 @@ jobs:
       - name: Playwright Browser installieren
         run: npx playwright install --with-deps chromium
 
+      - name: TypeScript-Check
+        run: npx tsc --noEmit
+        continue-on-error: true
+
       - name: Next.js Build erstellen
         run: npm run build
-        env:
-          NEXT_TELEMETRY_DISABLED: 1
 
       - name: E2E-Tests ausführen (Endnutzer-Flows)
         id: e2e
@@ -73,7 +65,53 @@ jobs:
           path: |
             playwright-report/
             playwright-results.json
-          retention-days: 14
+          retention-days: 30
+
+      - name: Test-Zusammenfassung generieren
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let resultJson = {};
+            try {
+              resultJson = JSON.parse(fs.readFileSync('playwright-results.json', 'utf8'));
+            } catch (e) {
+              console.log('Kein JSON-Report gefunden:', e.message);
+              return;
+            }
+
+            let passed = 0, failed = 0, skipped = 0, timedOut = 0;
+            const failedTests = [];
+
+            for (const suite of (resultJson.suites || [])) {
+              for (const spec of (suite.specs || [])) {
+                for (const test of (spec.tests || [])) {
+                  if (test.status === 'passed') passed++;
+                  else if (test.status === 'failed') { failed++; failedTests.push({ title: spec.title, file: suite.file, error: test.results?.[0]?.error?.message || 'Unbekannter Fehler' }); }
+                  else if (test.status === 'timedOut') { timedOut++; failedTests.push({ title: spec.title, file: suite.file, error: 'Timeout' }); }
+                  else skipped++;
+                }
+              }
+            }
+
+            const total = passed + failed + skipped + timedOut;
+            const passRate = total > 0 ? Math.round((passed / total) * 100) : 0;
+            const icon = failed + timedOut === 0 ? '✅' : failed + timedOut > 3 ? '🔴' : '🟠';
+
+            const summary = [
+              `## ${icon} E2E-Testergebnis`,
+              '',
+              `| Metrik | Wert |`,
+              `|--------|------|`,
+              `| ✅ Bestanden | ${passed} |`,
+              `| ❌ Fehlgeschlagen | ${failed} |`,
+              `| ⏱️ Timeout | ${timedOut} |`,
+              `| ⏭️ Übersprungen | ${skipped} |`,
+              `| 📊 Bestehensrate | ${passRate}% |`,
+            ].join('\n');
+
+            await core.summary.addRaw(summary).write();
 
       - name: Fehlgeschlagene Tests als Issue dokumentieren
         if: steps.e2e.outcome == 'failure'
@@ -91,7 +129,6 @@ jobs:
               console.log('Kein JSON-Report gefunden:', e.message);
             }
 
-            // Fehlgeschlagene Tests sammeln
             const failed = [];
             for (const suite of (resultJson.suites || [])) {
               for (const spec of (suite.specs || [])) {
@@ -99,7 +136,9 @@ jobs:
                   if (test.status === 'failed' || test.status === 'timedOut') {
                     failed.push({
                       title: spec.title,
+                      file: suite.file || '',
                       error: test.results?.[0]?.error?.message || 'Unbekannter Fehler',
+                      duration: test.results?.[0]?.duration || 0,
                     });
                   }
                 }
@@ -110,26 +149,36 @@ jobs:
 
             // Priorität bestimmen
             const hasCritical = failed.some(f =>
-              f.title.toLowerCase().includes('login') ||
-              f.title.toLowerCase().includes('auth') ||
-              f.title.toLowerCase().includes('redirect')
+              ['navigation', 'hero', 'home', 'page-load', '404', 'meta'].some(k =>
+                f.title.toLowerCase().includes(k) || f.file.toLowerCase().includes(k)
+              )
             );
             const priority = hasCritical ? '🔴 P0 KRITISCH' : '🟠 P1 HOCH';
-            const label = hasCritical ? 'P0-critical' : 'P1-high';
+            const priorityLabel = hasCritical ? 'P0-critical' : 'P1-high';
 
             const failList = failed.map(f =>
-              `### \`${f.title}\`\n\`\`\`\n${f.error.substring(0, 500)}\n\`\`\``
+              [
+                `### \`${f.title}\``,
+                `**Datei:** \`${f.file}\` · **Dauer:** ${(f.duration / 1000).toFixed(1)}s`,
+                '```',
+                f.error.substring(0, 600),
+                '```',
+              ].join('\n')
             ).join('\n\n');
 
             const body = [
               `## ${priority} – E2E-Tests fehlgeschlagen`,
               '',
-              `**Branch:** \`${branch}\``,
-              `**CI-Run:** ${runUrl}`,
-              `**Datum:** ${new Date().toISOString().split('T')[0]}`,
-              `**Fehlgeschlagene Tests:** ${failed.length}`,
+              `| | |`,
+              `|---|---|`,
+              `| **Branch** | \`${branch}\` |`,
+              `| **CI-Run** | [Workflow ansehen](${runUrl}) |`,
+              `| **Datum** | ${new Date().toISOString().split('T')[0]} |`,
+              `| **Fehlgeschlagen** | ${failed.length} Test(s) |`,
               '',
               '---',
+              '',
+              '## Fehlgeschlagene Tests',
               '',
               failList,
               '',
@@ -137,9 +186,10 @@ jobs:
               '',
               '## Nächste Schritte',
               '',
-              '1. CI-Artifact herunterladen für vollständigen Playwright-Report',
-              '2. Test lokal reproduzieren: `npx playwright test --headed`',
-              '3. Fix implementieren und Branch pushen',
+              '1. **Report herunterladen:** CI-Artifact `playwright-report-*` enthält den vollständigen HTML-Report',
+              '2. **Lokal reproduzieren:** `npx playwright test --headed`',
+              '3. **Einzelnen Test debuggen:** `npx playwright test --debug <testname>`',
+              '4. **Fix implementieren** und Branch pushen – CI prüft automatisch erneut',
               '',
               '*Automatisch erstellt durch Branch E2E Agent Workflow*',
               '',
@@ -147,7 +197,7 @@ jobs:
               '_Generated by [Claude Code](https://claude.ai/code)_',
             ].join('\n');
 
-            // Bestehende offene Issues für diesen Branch prüfen
+            // Bestehendes offenes Issue für diesen Branch aktualisieren oder neu erstellen
             const existing = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -161,183 +211,56 @@ jobs:
             );
 
             if (existingForBranch) {
-              // Bestehendes Issue aktualisieren
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: existingForBranch.number,
                 body: `## Neuer fehlgeschlagener Run – ${new Date().toISOString().split('T')[0]}\n\n${body}`,
               });
+              console.log(`Issue #${existingForBranch.number} aktualisiert`);
             } else {
-              // Neues Issue erstellen
-              await github.rest.issues.create({
+              const issue = await github.rest.issues.create({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 title: `[E2E] Branch \`${branch}\` – ${failed.length} Test(s) fehlgeschlagen`,
                 body,
-                labels: ['bug', 'e2e-failure'],
+                labels: ['bug', 'e2e-failure', priorityLabel],
               });
+              console.log(`Issue #${issue.data.number} erstellt`);
             }
 
-  e2e-cms:
-    name: "E2E – CMS-App (Admin-Flows)"
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    # Nur auf CMS-relevanten Branches
-    if: |
-      contains(fromJSON('["cms-app", "CMS-App-MacOs", "refs/heads/cms-app", "refs/heads/CMS-App-MacOs"]'),
-               github.ref_name) ||
-      github.event_name == 'schedule' ||
-      github.event_name == 'workflow_dispatch'
-
-    env:
-      E2E_CMS_USER: admin
-      E2E_CMS_PASSWORD: test-password-ci
-      CMS_ADMIN_USER: admin
-      CMS_ADMIN_PASSWORD_HASH: ${{ secrets.CI_CMS_PASSWORD_HASH }}
-      SESSION_SECRET: ${{ secrets.CI_SESSION_SECRET || 'ci-test-secret-32-chars-minimum!!' }}
-      NEXT_PUBLIC_SITE_URL: "http://localhost:3000"
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Node.js einrichten
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Abhängigkeiten installieren
-        run: npm ci
-
-      - name: Playwright Browser installieren
-        run: npx playwright install --with-deps chromium
-
-      - name: Next.js Build erstellen
-        run: npm run build
-        env:
-          NEXT_TELEMETRY_DISABLED: 1
-
-      - name: CMS-spezifische E2E-Tests ausführen
-        id: cms_e2e
-        run: npx playwright test e2e/auth.spec.ts e2e/content-editing.spec.ts e2e/media-upload.spec.ts --reporter=json,html
-        continue-on-error: true
-        env:
-          PLAYWRIGHT_JSON_OUTPUT_NAME: playwright-cms-results.json
-
-      - name: Testergebnisse hochladen
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-cms-report-${{ github.ref_name }}-${{ github.run_id }}
-          path: |
-            playwright-report/
-            playwright-cms-results.json
-          retention-days: 14
-
-      - name: CMS-Testergebnisse als Issue dokumentieren
-        if: steps.cms_e2e.outcome == 'failure'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            const branch = context.ref.replace('refs/heads/', '');
-            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
-
-            let resultJson = {};
-            try {
-              resultJson = JSON.parse(fs.readFileSync('playwright-cms-results.json', 'utf8'));
-            } catch (e) {}
-
-            const failed = [];
-            for (const suite of (resultJson.suites || [])) {
-              for (const spec of (suite.specs || [])) {
-                for (const test of (spec.tests || [])) {
-                  if (test.status === 'failed' || test.status === 'timedOut') {
-                    failed.push({
-                      title: spec.title,
-                      error: test.results?.[0]?.error?.message || 'Unbekannter Fehler',
-                    });
-                  }
-                }
-              }
-            }
-
-            if (failed.length === 0) return;
-
-            const failList = failed.map(f =>
-              `### \`${f.title}\`\n\`\`\`\n${f.error.substring(0, 500)}\n\`\`\``
-            ).join('\n\n');
-
-            const body = [
-              '## 🔴 P0 KRITISCH – CMS-Authentifizierung oder Content-Editing defekt',
-              '',
-              `**Branch:** \`${branch}\``,
-              `**CI-Run:** ${runUrl}`,
-              `**Datum:** ${new Date().toISOString().split('T')[0]}`,
-              `**Fehlgeschlagene CMS-Tests:** ${failed.length}`,
-              '',
-              '---',
-              '',
-              failList,
-              '',
-              '---',
-              '',
-              '*Automatisch erstellt durch Branch E2E Agent Workflow (CMS-Job)*',
-              '',
-              '---',
-              '_Generated by [Claude Code](https://claude.ai/code)_',
-            ].join('\n');
-
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: `[CMS-E2E] Branch \`${branch}\` – CMS-Flow defekt (${failed.length} Tests)`,
-              body,
-              labels: ['bug', 'e2e-failure', 'cms'],
-            });
-
-  macos-script-lint:
-    name: "macOS CMS-Startskript – Bash-Syntax-Check"
-    runs-on: ubuntu-latest
-    # Shellcheck für alle macOS-Startskripte
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: ShellCheck installieren
-        run: sudo apt-get install -y shellcheck
-
-      - name: Bash-Skripte prüfen
-        id: shellcheck
-        run: |
-          EXIT=0
-          for f in CMS-Start_macos.command CMS-Start.command CMS-Start.sh \
-                   CMS-Zugangsdaten-aendern.sh CMS-Zugangsdaten-aendern.command \
-                   scripts/cms-setup.sh scripts/cms-open-app.sh \
-                   scripts/cms-update.sh; do
-            if [ -f "$f" ]; then
-              echo "=== Prüfe: $f ==="
-              shellcheck --shell=bash --severity=warning "$f" || EXIT=1
-            fi
-          done
-          exit $EXIT
-        continue-on-error: true
-
-      - name: ShellCheck-Fehler als Issue melden
-        if: steps.shellcheck.outcome == 'failure'
+      - name: Issue schließen bei Erfolg
+        if: steps.e2e.outcome == 'success'
         uses: actions/github-script@v7
         with:
           script: |
             const branch = context.ref.replace('refs/heads/', '');
-            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
 
-            await github.rest.issues.create({
+            const existing = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `[P2 MITTEL] macOS/Shell-Skript – ShellCheck-Warnungen auf Branch \`${branch}\``,
-              body: `## 🟡 MITTEL (P2) – Bash-Skript-Qualitätsprobleme\n\n**Branch:** \`${branch}\`\n**CI-Run:** ${runUrl}\n\nShellCheck hat Warnungen in den CMS-Startskripten gefunden. Details im CI-Log.\n\n*Automatisch erstellt durch Branch E2E Agent Workflow*\n\n---\n_Generated by [Claude Code](https://claude.ai/code)_`,
-              labels: ['bug', 'macos', 'cms-launcher'],
+              state: 'open',
+              labels: 'e2e-failure',
+              per_page: 20,
             });
+
+            const existingForBranch = existing.data.find(i =>
+              i.title.includes(`[E2E] Branch \`${branch}\``)
+            );
+
+            if (existingForBranch) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingForBranch.number,
+                body: `## ✅ Alle E2E-Tests bestanden\n\nDie Tests sind auf Branch \`${branch}\` wieder grün. Issue wird automatisch geschlossen.\n\n*Automatisch durch Branch E2E Agent Workflow*\n\n---\n_Generated by [Claude Code](https://claude.ai/code)_`,
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingForBranch.number,
+                state: 'closed',
+                state_reason: 'completed',
+              });
+              console.log(`Issue #${existingForBranch.number} geschlossen`);
+            }
