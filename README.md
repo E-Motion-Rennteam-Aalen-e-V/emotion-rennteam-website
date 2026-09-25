@@ -121,7 +121,10 @@ Projekteinstellungen des Hosting-Anbieters):
 | `CMS_ADMIN_USER` | Benutzername des Hauptadministrators. |
 | `CMS_ADMIN_PASSWORD_HASH` | Passwort-Hash des Hauptadministrators, erzeugt mit `node scripts/cms-hash-password.mjs "passwort"`. |
 | `GITHUB_TOKEN`, `GITHUB_OWNER`, `GITHUB_REPO` | Optional. Wenn gesetzt, committet das CMS jede Änderung automatisch ins Repository. Ohne diese Variablen werden Änderungen nur lokal auf dem Server gespeichert (nicht persistent auf den meisten Hosting-Plattformen). |
-| `FORM_WEBHOOK_URL` | Optional. Ziel-Webhook (z. B. Slack/Teams-Incoming-Webhook oder eigener E-Mail-Relay) für Kontakt-/Bewerbungs-/Sponsoring-/Mediakit-Formulare. Ohne diese Variable landen Einsendungen nur im Server-Log. |
+| `RESEND_API_KEY` | Pflicht für E-Mail-Zustellung. API-Key aus dem [Resend-Dashboard](https://resend.com). Ohne diesen Key werden Formular-Einsendungen und Newsletter nur lokal gepuffert. |
+| `RESEND_FROM_EMAIL` | Absender-Adresse für alle ausgehenden E-Mails (z. B. `noreply@emotion-rennteam.de`). Muss in Resend als verifizierte Domain eingetragen sein. Fallback: `noreply@resend.dev`. |
+| `RESEND_RECIPIENT_EMAIL` | Empfänger-Adresse für Formular-Einsendungen (Kontakt, Bewerbung, Sponsoring, Mediakit). Fallback: `info@emotion-rennteam.de`. |
+| `NEWSLETTER_CONFIRM_SECRET` | Pflicht für Double-Opt-In. Zufälliger String (≥32 Zeichen) zum HMAC-Signieren der Newsletter-Bestätigungs-Links. Generieren: `openssl rand -base64 32`. |
 
 ---
 
@@ -129,13 +132,8 @@ Projekteinstellungen des Hosting-Anbieters):
 
 Checkliste vor dem Go-Live:
 
-- **`FORM_WEBHOOK_URL` setzen.** Ohne diese Variable werden Formular-
-  Einsendungen (Kontakt, Bewerbung, Sponsoring, Mediakit) nicht live
-  zugestellt, sondern nur lokal in `.pending-form-submissions.jsonl`
-  gepuffert (siehe `src/lib/formDelivery.ts`) — inklusive eines lauten
-  `console.error`, damit das in jedem Log-/Monitoring-System auffällt.
-  Diese Datei ist ein Notfall-Fallback, kein Ersatz für einen echten
-  Webhook: sie sollte regelmäßig geprüft/geleert werden.
+- **`RESEND_API_KEY` und `RESEND_FROM_EMAIL` setzen.** Ohne diese Variablen werden Formular-Einsendungen (Kontakt, Bewerbung, Sponsoring, Mediakit) nicht live zugestellt, sondern nur lokal in `.pending-form-submissions.jsonl` gepuffert (siehe `src/lib/formDelivery.ts`) — inklusive eines lauten `console.error`. Diese Datei ist ein Notfall-Fallback, kein Ersatz für eine funktionierende E-Mail-Konfiguration: sie sollte regelmäßig geprüft/geleert werden.
+- **`NEWSLETTER_CONFIRM_SECRET` setzen.** Ohne diesen Secret schlägt der Double-Opt-In für Newsletter-Anmeldungen fehl. Generieren mit `openssl rand -base64 32`.
 - **TLS/Reverse-Proxy zwingend.** `next.config.ts` setzt strikte
   Security-Header inkl. HSTS und `upgrade-insecure-requests`. Läuft
   `next start` direkt ohne TLS-terminierenden Reverse-Proxy davor, sperren

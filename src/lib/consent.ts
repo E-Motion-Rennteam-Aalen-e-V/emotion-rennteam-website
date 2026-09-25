@@ -44,7 +44,8 @@ export function getConsentServerSnapshot(): ConsentValue {
 
 export function writeConsentCookie(value: ConsentValue) {
   const maxAge = COOKIE_MAX_AGE_DAYS * 24 * 60 * 60;
-  document.cookie = `${COOKIE_NAME}=${value}; max-age=${maxAge}; path=/; SameSite=Lax`;
+  const secure = window.location.protocol === "https:" ? "; Secure" : "";
+  document.cookie = `${COOKIE_NAME}=${value}; max-age=${maxAge}; path=/; SameSite=Lax${secure}`;
   for (const callback of listeners) callback();
 }
 

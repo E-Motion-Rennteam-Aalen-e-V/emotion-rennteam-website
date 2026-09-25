@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
   }
 
   const ip = getClientIp(request);
-  if (!checkRateLimit(`newsletter:${ip}`, 5, 10 * 60 * 1000)) {
+  if (!checkRateLimit(`newsletter_notify:${ip}`, 5, 10 * 60 * 1000)) {
     return NextResponse.json(
       { ok: false, error: "Zu viele Anfragen. Bitte versuche es später erneut." },
       { status: 429 }

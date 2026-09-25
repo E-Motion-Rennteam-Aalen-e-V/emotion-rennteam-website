@@ -4,12 +4,14 @@ Kritische Punkte vor Production-Deployment auf `emotion-rennteam.de`:
 
 ## ⚠️ Blocker – Ohne diese funktioniert nichts:
 
-### 1. **FORM_WEBHOOK_URL** (`.env.local`)
-- **Problem**: Contact forms gehen aktuell ins Void (werden nur lokal gepuffert)
-- **Lösung**: Slack/Email-Webhook setzen
-  - Option A: Slack Incoming Webhook (einfach, live-Notifications)
-  - Option B: Email-Relay (interne Service oder SendGrid/Mailgun)
-- **Status**: ❌ Nicht gesetzt → Formulare funktionieren nicht live
+### 1. **Resend E-Mail-Konfiguration** (`.env.local`)
+- **Problem**: Kontaktformulare und Newsletter werden ohne Resend-Konfiguration nur lokal gepuffert
+- **Lösung**: Resend API-Key und E-Mail-Adressen setzen
+  - `RESEND_API_KEY` – API-Key aus dem Resend-Dashboard (resend.com)
+  - `RESEND_FROM_EMAIL` – Absender-Adresse (z. B. `noreply@emotion-rennteam.de`, muss in Resend verifiziert sein)
+  - `RESEND_RECIPIENT_EMAIL` – Empfänger-Adresse für Formular-Einsendungen (z. B. `info@emotion-rennteam.de`)
+  - `NEWSLETTER_CONFIRM_SECRET` – Zufälliger String (≥32 Zeichen) für HMAC-Signierung der Newsletter-Bestätigungs-Links
+- **Status**: ❌ Nicht gesetzt → Formulare und Newsletter funktionieren nicht live
 
 ### 2. **CMS Credentials** (`.env.local`)
 - **CMS_SESSION_SECRET** (Zeile 29)
@@ -43,7 +45,7 @@ Kritische Punkte vor Production-Deployment auf `emotion-rennteam.de`:
 - [ ] `.env.local` mit allen 3 Blocker-Werten gefüllt
 - [ ] `npm run cms:hash-password` für Admin-Passwort ausführen
 - [ ] `openssl rand -base64 32` für CMS_SESSION_SECRET generieren
-- [ ] Slack/Email-Webhook konfigurieren und als FORM_WEBHOOK_URL setzen
+- [ ] Resend-Konfiguration: `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `RESEND_RECIPIENT_EMAIL`, `NEWSLETTER_CONFIRM_SECRET` setzen
 - [ ] NEXT_PUBLIC_SITE_URL = `https://emotion-rennteam.de`
 - [ ] `.env.local` liegt NICHT im Repo (is `.gitignore`d)
 - [ ] Lokal testen: `npm run dev` → Contact-Form → Slack/Email-Check
@@ -54,7 +56,8 @@ Kritische Punkte vor Production-Deployment auf `emotion-rennteam.de`:
 ## 🚨 Häufige Fehler
 
 - ❌ Leeres CMS_SESSION_SECRET → Sessions können gefälscht werden
-- ❌ Leeres FORM_WEBHOOK_URL → Forms verloren
+- ❌ Leeres RESEND_API_KEY → Formulare/Newsletter nicht zugestellt
+- ❌ Leeres NEWSLETTER_CONFIRM_SECRET → Newsletter-Bestätigung schlägt fehl
 - ❌ NEXT_PUBLIC_SITE_URL != emotion-rennteam.de → SEO bricht
 - ❌ `.env.local` ins Repo committed → Secrets leaked
 

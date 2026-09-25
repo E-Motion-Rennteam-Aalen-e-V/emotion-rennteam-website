@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { validateNewsletterForm } from "@/lib/validation";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { hasJsonContentType, isTrustedOrigin } from "@/lib/apiSecurity";
-import { addNewsletterSubscriber, sendNewsletterNotifications } from "@/lib/newsletter";
+import { createConfirmToken } from "@/lib/newsletterToken";
+import { Resend } from "resend";
 
 export const runtime = "nodejs";
 
@@ -15,7 +16,7 @@ export async function POST(request: NextRequest) {
   }
 
   const ip = getClientIp(request);
-  if (!checkRateLimit(`newsletter:${ip}`, 3, 60 * 60 * 1000)) {
+  if (!checkRateLimit(`newsletter_sub:${ip}`, 3, 60 * 60 * 1000)) {
     return NextResponse.json(
       { ok: false, error: "Zu viele Anmeldeversuche. Bitte versuche es später erneut." },
       { status: 429, headers: { "Retry-After": "3600" } }
@@ -34,10 +35,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, errors: result.errors }, { status: 400 });
   }
 
-  // Rate limit per email
-  if (!checkRateLimit(`newsletter:${result.data.email.toLowerCase()}`, 1, 30 * 24 * 60 * 60 * 1000)) {
+  if (!checkRateLimit(`newsletter_sub:${result.data.email.toLowerCase()}`, 1, 30 * 24 * 60 * 60 * 1000)) {
     return NextResponse.json(
-      { ok: false, error: "Diese E-Mail-Adresse ist bereits angemeldet." },
+      { ok: false, error: "Diese E-Mail-Adresse wurde bereits angemeldet. Bitte prüfe dein Postfach." },
       { status: 429, headers: { "Retry-After": "2592000" } }
     );
   }
@@ -48,9 +48,18 @@ export async function POST(request: NextRequest) {
 
   const apiKey = process.env.RESEND_API_KEY;
   const fromEmail = process.env.RESEND_FROM_EMAIL || "noreply@resend.dev";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://emotion-rennteam.de";
 
   if (!apiKey) {
-    console.error("[newsletter] ACTION REQUIRED: RESEND_API_KEY is not configured");
+    console.error("[newsletter/subscribe] RESEND_API_KEY not configured");
+    return NextResponse.json(
+      { ok: false, error: "Newsletter-System nicht verfügbar. Bitte versuche es später erneut." },
+      { status: 503 }
+    );
+  }
+
+  if (!process.env.NEWSLETTER_CONFIRM_SECRET) {
+    console.error("[newsletter/subscribe] NEWSLETTER_CONFIRM_SECRET not configured");
     return NextResponse.json(
       { ok: false, error: "Newsletter-System nicht verfügbar. Bitte versuche es später erneut." },
       { status: 503 }
@@ -58,29 +67,42 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    // 1. In Resend als Kontakt speichern
-    const subscriberAdded = await addNewsletterSubscriber(result.data.email, apiKey);
-    if (!subscriberAdded) {
-      throw new Error("Failed to add subscriber to Resend");
-    }
+    const token = createConfirmToken(result.data.email);
+    const confirmUrl = `${siteUrl}/newsletter/confirm?token=${token}`;
+    const client = new Resend(apiKey);
 
-    // 2. Benachrichtigungen versenden
-    const { adminNotified, userWelcomed } = await sendNewsletterNotifications(
-      result.data.email,
-      apiKey,
-      fromEmail
-    );
+    const sendResult = await client.emails.send({
+      from: fromEmail,
+      to: result.data.email,
+      subject: "Bitte bestätige deine Newsletter-Anmeldung",
+      html: `
+        <html><body style="font-family:Arial,sans-serif;color:#333;max-width:600px;margin:0 auto">
+          <h2 style="color:#1a1a1a">Fast geschafft! ✉️</h2>
+          <p>Bitte bestätige deine Anmeldung zum <strong>E-Motion Rennteam Newsletter</strong>, indem du auf den Button klickst:</p>
+          <p style="margin:32px 0">
+            <a href="${confirmUrl}" style="display:inline-block;padding:14px 28px;background:#0071b5;color:#fff;text-decoration:none;border-radius:6px;font-weight:600;font-size:15px">
+              Newsletter bestätigen
+            </a>
+          </p>
+          <p style="font-size:13px;color:#666">Dieser Link ist 24 Stunden gültig.</p>
+          <hr style="border:none;border-top:1px solid #e0e0e0;margin:24px 0">
+          <p style="font-size:12px;color:#999">Wenn du dich nicht angemeldet hast, kannst du diese E-Mail ignorieren.</p>
+        </body></html>
+      `,
+    });
 
-    if (!adminNotified || !userWelcomed) {
-      console.warn(
-        `[newsletter] Notifications partially failed for ${result.data.email}: admin=${adminNotified}, user=${userWelcomed}`
+    if (sendResult.error) {
+      console.error("[newsletter/subscribe] Confirmation email failed:", sendResult.error);
+      return NextResponse.json(
+        { ok: false, error: "E-Mail konnte nicht gesendet werden. Bitte versuche es später erneut." },
+        { status: 503 }
       );
     }
 
+    console.log(`[newsletter/subscribe] Confirmation email sent to ${result.data.email}`);
     return NextResponse.json({ ok: true });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Interner Fehler.";
-    console.error("[newsletter] Subscription failed:", message, err);
+    console.error("[newsletter/subscribe] Error:", err);
     return NextResponse.json(
       { ok: false, error: "Newsletter-Anmeldung fehlgeschlagen. Bitte versuche es später erneut." },
       { status: 503 }

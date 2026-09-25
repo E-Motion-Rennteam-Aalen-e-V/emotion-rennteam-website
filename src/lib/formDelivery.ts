@@ -3,10 +3,7 @@ import { appendFileSync } from "node:fs";
 import path from "node:path";
 
 const FALLBACK_FILE = path.join(process.cwd(), ".pending-form-submissions.jsonl");
-// TEMPORARY: Resend's unverified sandbox sender can only deliver to the
-// account owner's own address. Revert to "info@emotion-rennteam.de" once
-// the emotion-rennteam.de domain is verified in Resend.
-const RECIPIENT_EMAIL = "denny.svalina@emotion-rennteam.de";
+const RECIPIENT_EMAIL = process.env.RESEND_RECIPIENT_EMAIL || "info@emotion-rennteam.de";
 
 export type FormSubmission = {
   form: "contact" | "newsletter" | "mitmachen" | "sponsoring" | "mediakit";
@@ -30,10 +27,19 @@ function persistToFallbackFile(submission: FormSubmission, reason: string): void
   }
 }
 
+function escHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;");
+}
+
 function formatSubmissionEmail(submission: FormSubmission): string {
   const formLabel = formLabels[submission.form];
   const dataRows = Object.entries(submission.data)
-    .map(([key, value]) => `<tr><td style="padding: 8px; border-bottom: 1px solid #e0e0e0; font-weight: 500;">${key}:</td><td style="padding: 8px; border-bottom: 1px solid #e0e0e0;">${value}</td></tr>`)
+    .map(([key, value]) => `<tr><td style="padding: 8px; border-bottom: 1px solid #e0e0e0; font-weight: 500;">${escHtml(key)}:</td><td style="padding: 8px; border-bottom: 1px solid #e0e0e0;">${escHtml(value)}</td></tr>`)
     .join("");
 
   return `

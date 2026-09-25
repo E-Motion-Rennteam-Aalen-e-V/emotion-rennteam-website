@@ -1,6 +1,15 @@
 import { Resend } from "resend";
 
-const ADMIN_EMAIL = "denny.svalina@emotion-rennteam.de";
+const ADMIN_EMAIL = process.env.RESEND_RECIPIENT_EMAIL || "info@emotion-rennteam.de";
+
+function escHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;");
+}
 
 function getSegmentId(): string | null {
   return process.env.RESEND_NEWSLETTER_SEGMENT_ID ?? null;
@@ -66,7 +75,7 @@ export async function sendNewsletterNotifications(
           <html><body style="font-family:Arial,sans-serif;color:#333;max-width:600px;margin:0 auto">
             <h2>Neue Newsletter-Anmeldung</h2>
             <table style="border-collapse:collapse;width:100%">
-              <tr><td style="padding:8px;border-bottom:1px solid #e0e0e0;font-weight:500">E-Mail:</td><td style="padding:8px;border-bottom:1px solid #e0e0e0">${email}</td></tr>
+              <tr><td style="padding:8px;border-bottom:1px solid #e0e0e0;font-weight:500">E-Mail:</td><td style="padding:8px;border-bottom:1px solid #e0e0e0">${escHtml(email)}</td></tr>
               <tr><td style="padding:8px;font-weight:500">Zeitpunkt:</td><td style="padding:8px">${now}</td></tr>
             </table>
             <p style="margin-top:16px;color:#666;font-size:14px">Dieser Kontakt wurde automatisch in Resend gespeichert.</p>
@@ -173,12 +182,12 @@ export async function sendBlogPostNewsletter(
       segmentId: segmentOrAudienceId,
       html: `
         <html><body style="font-family:Arial,sans-serif;color:#333;max-width:600px;margin:0 auto">
-          <h2 style="color:#1a1a1a">${blogData.title}</h2>
-          <p style="color:#555;font-size:16px;line-height:1.6">${blogData.excerpt}</p>
+          <h2 style="color:#1a1a1a">${escHtml(blogData.title)}</h2>
+          <p style="color:#555;font-size:16px;line-height:1.6">${escHtml(blogData.excerpt)}</p>
           <hr style="border:none;border-top:1px solid #e0e0e0;margin:24px 0">
-          <div style="line-height:1.8">${blogData.content}</div>
+          <div style="line-height:1.8">${escHtml(blogData.content)}</div>
           <hr style="border:none;border-top:1px solid #e0e0e0;margin:24px 0">
-          <a href="${blogData.url}" style="display:inline-block;padding:12px 24px;background:#111;color:#fff;text-decoration:none;border-radius:4px;font-weight:600">
+          <a href="${escHtml(blogData.url)}" style="display:inline-block;padding:12px 24px;background:#111;color:#fff;text-decoration:none;border-radius:4px;font-weight:600">
             Vollständigen Artikel lesen →
           </a>
           <p style="margin-top:24px;font-size:12px;color:#999">
