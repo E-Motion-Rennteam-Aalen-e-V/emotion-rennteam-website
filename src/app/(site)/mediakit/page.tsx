@@ -3,10 +3,16 @@ import Reveal from "@/components/motion/Reveal";
 import MediaKitRequestForm from "@/components/MediaKitRequestForm";
 
 export const metadata: Metadata = {
-  title: "Mediakit",
+  title: "Mediakit – Pressefotos & Logos anfragen",
   description:
-    "Bild- und Videomaterial vom E-Motion Rennteam Aalen anfragen: Team-, Fahrzeug- und Renneinsatzfotos sowie Logos für Presse und Sponsoren.",
+    "Presse- und Medienmaterial des E-Motion Rennteams Aalen: Fahrzeug- und Teamfotos, Logos und Videos für Presse, Partner und Sponsoren.",
   alternates: { canonical: "/mediakit" },
+  openGraph: {
+    title: "Mediakit – E-Motion Rennteam Aalen",
+    description: "Pressefotos, Fahrzeugbilder und Logos des Formula-Student-Teams der Hochschule Aalen anfragen.",
+    type: "website",
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
+  },
 };
 
 export default function MediaKitPage() {

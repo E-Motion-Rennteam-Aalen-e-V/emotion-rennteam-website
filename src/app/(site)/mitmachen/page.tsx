@@ -7,10 +7,16 @@ import MemberApplicationForm from "@/components/MemberApplicationForm";
 import AlumniShowcase from "@/components/AlumniShowcase";
 
 export const metadata: Metadata = {
-  title: "Mitmachen",
+  title: "Mitmachen – Jetzt bewerben & Teil des Teams werden",
   description:
-    "Werde Teil des E-Motion Rennteams Aalen: offene Positionen in allen Fachbereichen für Studierende der Hochschule Aalen.",
+    "Werde Teil des E-Motion Rennteams Aalen: offene Positionen in Konstruktion, Elektronik, Software und Marketing für Studierende der Hochschule Aalen.",
   alternates: { canonical: "/mitmachen" },
+  openGraph: {
+    title: "Mitmachen – E-Motion Rennteam Aalen",
+    description: "Jetzt bewerben: offene Positionen in allen Fachbereichen für Studierende der Hochschule Aalen.",
+    type: "website",
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
+  },
 };
 
 export default function JoinPage() {

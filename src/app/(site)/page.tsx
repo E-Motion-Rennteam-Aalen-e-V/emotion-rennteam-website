@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { getPage, getVehicles, TEAM_DEPARTMENTS } from "@/lib/content";
@@ -6,6 +7,31 @@ import HeroContent from "@/components/motion/HeroContent";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import Counter from "@/components/motion/Counter";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+
+export const metadata: Metadata = {
+  title: "E-Motion Rennteam Aalen | Formula Student Electric",
+  description:
+    "Das Formula-Student-Electric-Team der Hochschule Aalen. Über 50 Studierende entwickeln und bauen eigenständig Elektro-Rennwagen für den internationalen Wettbewerb.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: "E-Motion Rennteam Aalen | Formula Student Electric",
+    description:
+      "Das Formula-Student-Electric-Team der Hochschule Aalen. Über 50 Studierende entwickeln und bauen eigenständig Elektro-Rennwagen für den internationalen Wettbewerb.",
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    locale: "de_DE",
+    type: "website",
+    images: [
+      {
+        url: "/uploads/ert-14-26-studio.jpg",
+        alt: "ERT 14-26 – Formula Student Electric Rennwagen des E-Motion Rennteams Aalen",
+        width: 1200,
+        height: 630,
+      },
+    ],
+  },
+};
 
 const DEFAULT_STATS = [
   { value: 50, suffix: "+", label: "Studierende im Team" },

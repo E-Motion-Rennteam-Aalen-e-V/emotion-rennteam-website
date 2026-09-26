@@ -6,10 +6,16 @@ import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import ImageWithFallback from "@/components/ImageWithFallback";
 
 export const metadata: Metadata = {
-  title: "Galerie",
+  title: "Galerie – Fotos & Impressionen",
   description:
-    "Bildergalerie des E-Motion Rennteams Aalen: Impressionen von Fahrzeugbau, Testfahrten, Events und Wettbewerben, nach Album sortiert.",
+    "Bildergalerie des E-Motion Rennteams Aalen: Impressionen von Fahrzeugbau, Testfahrten, Rollout-Events und Formula-Student-Wettbewerben.",
   alternates: { canonical: "/galerie" },
+  openGraph: {
+    title: "Galerie – E-Motion Rennteam Aalen",
+    description: "Fotos vom Fahrzeugbau, Testfahrten und internationalen Formula-Student-Wettbewerben.",
+    type: "website",
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
+  },
 };
 
 export default function GalleryPage() {

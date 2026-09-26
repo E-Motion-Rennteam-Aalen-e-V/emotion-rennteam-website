@@ -22,7 +22,7 @@ export default function Footer() {
           <SocialIcons className="mt-4 flex gap-3" />
         </div>
 
-        <div>
+        <nav aria-label="Hauptnavigation Footer">
           <div className="text-sm font-semibold text-foreground">Navigation</div>
           <ul className="mt-3 space-y-2 text-sm text-muted">
             <li><Link href="/formula-student" className="transition-colors hover:text-accent-text">Formula Student</Link></li>
@@ -32,9 +32,9 @@ export default function Footer() {
             <li><Link href="/sponsoren" className="transition-colors hover:text-accent-text">Sponsoren</Link></li>
             <li><Link href="/mitmachen" className="transition-colors hover:text-accent-text">Mitmachen</Link></li>
           </ul>
-        </div>
+        </nav>
 
-        <div>
+        <nav aria-label="Aktuelles Footer">
           <div className="text-sm font-semibold text-foreground">Aktuelles</div>
           <ul className="mt-3 space-y-2 text-sm text-muted">
             <li><Link href="/news" className="transition-colors hover:text-accent-text">News</Link></li>
@@ -42,7 +42,7 @@ export default function Footer() {
             <li><Link href="/galerie" className="transition-colors hover:text-accent-text">Galerie</Link></li>
             <li><Link href="/kontakt" className="transition-colors hover:text-accent-text">Kontakt</Link></li>
           </ul>
-        </div>
+        </nav>
       </div>
 
       <div className="border-t border-border bg-surface-2">

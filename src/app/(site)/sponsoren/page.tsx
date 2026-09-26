@@ -8,10 +8,16 @@ import SponsorCard from "@/components/SponsorCard";
 import ShareButtons from "@/components/ShareButtons";
 
 export const metadata: Metadata = {
-  title: "Sponsoren",
+  title: "Sponsoren & Partner – Jetzt Sponsor werden",
   description:
-    "Unsere Sponsoren und Partner: Unternehmen, die das E-Motion Rennteam Aalen unterstützen. Werde jetzt Sponsor.",
+    "Unsere Sponsoren und Partner: Unternehmen, die das E-Motion Rennteam Aalen bei Formula Student unterstützen. Jetzt Sponsor werden und sichtbar sein.",
   alternates: { canonical: "/sponsoren" },
+  openGraph: {
+    title: "Sponsoren & Partner – E-Motion Rennteam Aalen",
+    description: "Unternehmen, die das Formula-Student-Team der Hochschule Aalen unterstützen. Jetzt Sponsor werden.",
+    type: "website",
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
+  },
 };
 
 const TIERS: Sponsor["tier"][] = ["Platin", "Gold", "Silber", "Bronze", "Partner"];

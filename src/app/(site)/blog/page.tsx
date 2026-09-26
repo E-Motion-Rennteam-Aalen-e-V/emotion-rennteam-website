@@ -7,10 +7,16 @@ import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import NewsletterForm from "@/components/NewsletterForm";
 
 export const metadata: Metadata = {
-  title: "Blog",
+  title: "Blog – Einblicke aus dem Teamalltag",
   description:
-    "Einblicke aus dem Teamalltag des E-Motion Rennteams Aalen – Werkstatt, Onboarding und Geschichten hinter dem Fahrzeug.",
+    "Einblicke aus dem Teamalltag des E-Motion Rennteams Aalen – Werkstatt, Onboarding und Geschichten hinter dem Formula-Student-Fahrzeug.",
   alternates: { canonical: "/blog" },
+  openGraph: {
+    title: "Blog – E-Motion Rennteam Aalen",
+    description: "Einblicke aus dem Teamalltag: Werkstatt, Onboarding und Geschichten hinter dem Formula-Student-Fahrzeug.",
+    type: "website",
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
+  },
 };
 
 export default function BlogPage() {

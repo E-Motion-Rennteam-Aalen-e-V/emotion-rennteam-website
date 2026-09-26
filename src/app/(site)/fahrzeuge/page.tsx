@@ -5,10 +5,16 @@ import Reveal from "@/components/motion/Reveal";
 import VehicleSpecs from "@/components/VehicleSpecs";
 
 export const metadata: Metadata = {
-  title: "Fahrzeuge",
+  title: "Fahrzeuge – Formula Student Electric Rennwagen",
   description:
-    "Die Rennwagen des E-Motion Rennteams Aalen: technische Daten, Baujahre und Entwicklung unserer Formula-Student-Electric-Boliden.",
+    "Die Rennwagen des E-Motion Rennteams Aalen: technische Daten, Baujahre und Entwicklungsgeschichte unserer selbst gebauten Formula-Student-Electric-Boliden.",
   alternates: { canonical: "/fahrzeuge" },
+  openGraph: {
+    title: "Fahrzeuge – Formula Student Electric Rennwagen",
+    description: "Technische Daten und Entwicklungsgeschichte unserer selbst gebauten FSE-Boliden.",
+    type: "website",
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
+  },
 };
 
 export default function VehiclesPage() {

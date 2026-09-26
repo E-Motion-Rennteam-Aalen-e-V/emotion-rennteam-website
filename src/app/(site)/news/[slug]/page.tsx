@@ -6,7 +6,7 @@ import { getNews, getNewsBySlug } from "@/lib/content";
 import { renderMarkdown } from "@/lib/markdown";
 import Reveal from "@/components/motion/Reveal";
 import ShareButtons from "@/components/ShareButtons";
-import { getArticleJsonLd } from "@/lib/structuredData";
+import { getArticleJsonLd, getBreadcrumbJsonLd } from "@/lib/structuredData";
 
 export function generateStaticParams() {
   return getNews().map((post) => ({ slug: post.slug }));
@@ -58,12 +58,20 @@ export default async function NewsDetailPage({
     date: post.date,
     coverImage: post.coverImage,
   });
+  const breadcrumbJsonLd = getBreadcrumbJsonLd([
+    { name: "News", path: "/news" },
+    { name: post.title, path: `/news/${post.slug}` },
+  ]);
 
   return (
     <div className="container-page py-20">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <Reveal className="mx-auto max-w-3xl">
         <Link
