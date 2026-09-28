@@ -29,15 +29,13 @@ export default function TeamContent({ members, teamDescriptions }: TeamContentPr
                     : 'hover:-translate-y-1 hover:border-accent/60 hover:shadow-[0_0_30px_-10px_rgba(0,113,181,0.35)]'
                 }`}
               >
-                {/* Executive click overlay — sits behind content in z-order */}
-                {isExecutive && (
-                  <button
-                    type="button"
-                    onClick={() => setSelectedMember(member)}
-                    aria-label={`${member.name} – Profil öffnen`}
-                    className="absolute inset-0 z-0 cursor-pointer rounded-xl"
-                  />
-                )}
+                {/* Click overlay for all members */}
+                <button
+                  type="button"
+                  onClick={() => setSelectedMember(member)}
+                  aria-label={`${member.name} – Visitenkarte öffnen`}
+                  className="absolute inset-0 z-0 cursor-pointer rounded-xl"
+                />
 
                 {/* Executive Badge */}
                 {isExecutive && (
