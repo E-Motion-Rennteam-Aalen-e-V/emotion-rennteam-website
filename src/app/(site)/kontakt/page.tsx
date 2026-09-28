@@ -8,6 +8,26 @@ import Reveal from "@/components/motion/Reveal";
 import { getBreadcrumbJsonLd } from "@/lib/structuredData";
 import { SITE_URL } from "@/lib/site";
 
+const contactPageJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ContactPage",
+  name: "Kontakt – E-Motion Rennteam Aalen",
+  url: `${SITE_URL}/kontakt`,
+  mainEntity: {
+    "@type": "Organization",
+    name: "E-Motion Rennteam Aalen e.V.",
+    email: "info@emotion-rennteam.de",
+    telephone: "+49-7361-5762191",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "Beethovenstraße 1",
+      postalCode: "73430",
+      addressLocality: "Aalen",
+      addressCountry: "DE",
+    },
+  },
+};
+
 export const metadata: Metadata = {
   title: "Kontakt – Schreib uns eine Nachricht",
   description:
