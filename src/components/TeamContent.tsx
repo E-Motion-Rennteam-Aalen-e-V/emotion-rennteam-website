@@ -19,6 +19,8 @@ export default function TeamContent({ members, teamDescriptions }: TeamContentPr
       <StaggerGroup className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {members.map((member) => {
           const isExecutive = ['ceo', 'cto', 'cfo'].includes(member.roleLevel || '');
+          const hasCard = isExecutive || ['Teamleiter', 'Leitung'].includes((member.role || '').trim());
+          const hasLinkedin = !!member.linkedin && /^https:\/\/(www\.)?linkedin\.com\//.test(member.linkedin);
 
           return (
             <StaggerItem key={member.slug}>
@@ -29,14 +31,6 @@ export default function TeamContent({ members, teamDescriptions }: TeamContentPr
                     : 'hover:-translate-y-1 hover:border-accent/60 hover:shadow-[0_0_30px_-10px_rgba(0,113,181,0.35)]'
                 }`}
               >
-                {/* Click overlay for all members */}
-                <button
-                  type="button"
-                  onClick={() => setSelectedMember(member)}
-                  aria-label={`${member.name} – Visitenkarte öffnen`}
-                  className="absolute inset-0 z-0 cursor-pointer rounded-xl"
-                />
-
                 {/* Executive Badge */}
                 {isExecutive && (
                   <div className="relative z-10 -mt-1 mb-2 flex justify-end">
@@ -76,18 +70,39 @@ export default function TeamContent({ members, teamDescriptions }: TeamContentPr
                 {/* Content */}
                 <div className="relative z-10 mt-4 flex items-center justify-between gap-2">
                   <h4 className="font-sans font-semibold leading-normal">{member.name}</h4>
-                  {member.linkedin && /^https:\/\/(www\.)?linkedin\.com\//.test(member.linkedin) && (
-                    <a
-                      href={member.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={`${member.name} auf LinkedIn (öffnet in neuem Tab)`}
-                      className="text-accent transition-colors hover:text-accent-text"
-                    >
-                      <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
-                        <path d="M4.98 3.5C4.98 4.881 3.87 6 2.5 6S0 4.881 0 3.5 1.12 1 2.5 1s2.48 1.119 2.48 2.5zM.24 8.25h4.52V23H.24V8.25zM8.5 8.25h4.33v2.02h.06c.6-1.14 2.07-2.34 4.26-2.34 4.55 0 5.39 3 5.39 6.9V23h-4.52v-6.7c0-1.6-.03-3.66-2.23-3.66-2.24 0-2.58 1.75-2.58 3.55V23H8.5V8.25z" />
-                      </svg>
-                    </a>
+                  {(hasCard || hasLinkedin) && (
+                    <div className="flex items-center gap-2">
+                      {hasCard && (
+                        <button
+                          type="button"
+                          onClick={() => setSelectedMember(member)}
+                          aria-label={`${member.name} – Visitenkarte öffnen`}
+                          title="Visitenkarte"
+                          className="text-accent transition-colors hover:text-accent-text"
+                        >
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                            <rect x="2.5" y="5" width="19" height="14" rx="2" />
+                            <circle cx="8.5" cy="11" r="2" />
+                            <path d="M5.5 16c.4-1.6 1.6-2.5 3-2.5s2.6.9 3 2.5" />
+                            <line x1="14" y1="10" x2="18.5" y2="10" />
+                            <line x1="14" y1="13.5" x2="18.5" y2="13.5" />
+                          </svg>
+                        </button>
+                      )}
+                      {hasLinkedin && (
+                        <a
+                          href={member.linkedin}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`${member.name} auf LinkedIn (öffnet in neuem Tab)`}
+                          className="text-accent transition-colors hover:text-accent-text"
+                        >
+                          <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
+                            <path d="M4.98 3.5C4.98 4.881 3.87 6 2.5 6S0 4.881 0 3.5 1.12 1 2.5 1s2.48 1.119 2.48 2.5zM.24 8.25h4.52V23H.24V8.25zM8.5 8.25h4.33v2.02h.06c.6-1.14 2.07-2.34 4.26-2.34 4.55 0 5.39 3 5.39 6.9V23h-4.52v-6.7c0-1.6-.03-3.66-2.23-3.66-2.24 0-2.58 1.75-2.58 3.55V23H8.5V8.25z" />
+                          </svg>
+                        </a>
+                      )}
+                    </div>
                   )}
                 </div>
                 <p className="relative z-10 text-sm text-accent-text">{member.role}</p>
