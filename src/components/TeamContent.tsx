@@ -20,7 +20,7 @@ export default function TeamContent({ members, teamDescriptions }: TeamContentPr
         {members.map((member) => {
           const isExecutive = ['ceo', 'cto', 'cfo'].includes(member.roleLevel || '');
           const hasLinkedin = !!member.linkedin && /^https:\/\/(www\.)?linkedin\.com\//.test(member.linkedin);
-          const hasCard = (isExecutive || ['Teamleiter', 'Leitung'].includes((member.role || '').trim())) && hasLinkedin;
+          const hasCard = hasLinkedin;
 
           return (
             <StaggerItem key={member.slug}>
