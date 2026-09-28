@@ -22,28 +22,34 @@ export default function TeamContent({ members, teamDescriptions }: TeamContentPr
 
           return (
             <StaggerItem key={member.slug}>
-              <button
-                onClick={() => {
-                  if (isExecutive) {
-                    setSelectedMember(member);
-                  }
-                }}
-                type="button"
+              <div
                 className={`group relative h-full w-full rounded-xl border border-border bg-surface p-5 text-left transition-all duration-300 ${
                   isExecutive
-                    ? 'cursor-pointer ring-2 ring-accent/40 hover:-translate-y-1 hover:border-accent/60 hover:ring-accent/80 hover:shadow-[0_0_40px_-10px_rgba(0,113,181,0.5)]'
+                    ? 'ring-2 ring-accent/40 hover:-translate-y-1 hover:border-accent/60 hover:ring-accent/80 hover:shadow-[0_0_40px_-10px_rgba(0,113,181,0.5)]'
                     : 'hover:-translate-y-1 hover:border-accent/60 hover:shadow-[0_0_30px_-10px_rgba(0,113,181,0.35)]'
                 }`}
               >
+                {/* Executive click overlay — sits behind content in z-order */}
+                {isExecutive && (
+                  <button
+                    type="button"
+                    onClick={() => setSelectedMember(member)}
+                    aria-label={`${member.name} – Profil öffnen`}
+                    className="absolute inset-0 z-0 cursor-pointer rounded-xl"
+                  />
+                )}
+
                 {/* Executive Badge */}
                 {isExecutive && (
-                  <div className="absolute right-3 top-3 z-10 rounded-full bg-accent/20 px-2.5 py-1 text-xs font-semibold text-accent">
-                    Executive
+                  <div className="relative z-10 -mt-1 mb-2 flex justify-end">
+                    <span className="rounded-full bg-accent/20 px-2.5 py-1 text-xs font-semibold text-accent">
+                      Executive
+                    </span>
                   </div>
                 )}
 
                 {/* Photo */}
-                <div className="aspect-square overflow-hidden rounded-lg bg-surface-2">
+                <div className="relative z-10 aspect-square overflow-hidden rounded-lg bg-surface-2">
                   {member.photo ? (
                     <Image
                       src={member.photo}
@@ -70,14 +76,13 @@ export default function TeamContent({ members, teamDescriptions }: TeamContentPr
                 </div>
 
                 {/* Content */}
-                <div className="mt-4 flex items-center justify-between gap-2">
+                <div className="relative z-10 mt-4 flex items-center justify-between gap-2">
                   <h4 className="font-sans font-semibold leading-normal">{member.name}</h4>
                   {member.linkedin && /^https:\/\/(www\.)?linkedin\.com\//.test(member.linkedin) && (
                     <a
                       href={member.linkedin}
                       target="_blank"
                       rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
                       aria-label={`${member.name} auf LinkedIn (öffnet in neuem Tab)`}
                       className="text-accent transition-colors hover:text-accent-text"
                     >
@@ -87,9 +92,9 @@ export default function TeamContent({ members, teamDescriptions }: TeamContentPr
                     </a>
                   )}
                 </div>
-                <p className="text-sm text-accent-text">{member.role}</p>
-                {member.body && <p className="mt-2 text-sm text-muted">{member.body}</p>}
-              </button>
+                <p className="relative z-10 text-sm text-accent-text">{member.role}</p>
+                {member.body && <p className="relative z-10 mt-2 text-sm text-muted">{member.body}</p>}
+              </div>
             </StaggerItem>
           );
         })}
