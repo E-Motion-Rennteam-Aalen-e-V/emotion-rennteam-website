@@ -10,19 +10,12 @@ export const metadata: Metadata = {
   title: "Galerie – Fotos & Impressionen",
   description:
     "Bildergalerie des E-Motion Rennteams Aalen: Impressionen von Fahrzeugbau, Testfahrten, Rollout-Events und Formula-Student-Wettbewerben.",
-  keywords: [
-    "Formula Student Fotos",
-    "E-Motion Rennteam Bilder",
-    "Rennwagen Galerie",
-    "Formula Student Wettbewerb Fotos",
-    "Rollout Bilder",
-  ],
   alternates: { canonical: "/galerie" },
   openGraph: {
     title: "Galerie – E-Motion Rennteam Aalen",
     description: "Fotos vom Fahrzeugbau, Testfahrten und internationalen Formula-Student-Wettbewerben.",
     type: "website",
-    images: [{ url: "/uploads/ert-14-26-studio.jpg", alt: "Bildergalerie des E-Motion Rennteams Aalen", width: 1200, height: 630 }],
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
   },
 };
 

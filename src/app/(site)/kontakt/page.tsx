@@ -12,38 +12,12 @@ export const metadata: Metadata = {
   title: "Kontakt – Schreib uns eine Nachricht",
   description:
     "Kontaktiere das E-Motion Rennteam Aalen: Fragen, Kooperationen oder Sponsoring-Anfragen – wir freuen uns auf deine Nachricht.",
-  keywords: [
-    "E-Motion Rennteam Kontakt",
-    "Formula Student Aalen Kontakt",
-    "Hochschule Aalen Rennteam Adresse",
-    "Sponsoring Anfrage",
-  ],
   alternates: { canonical: "/kontakt" },
   openGraph: {
     title: "Kontakt – E-Motion Rennteam Aalen",
     description: "Fragen, Kooperationen oder Sponsoring-Anfragen an das Formula-Student-Team der Hochschule Aalen.",
     type: "website",
-    images: [{ url: "/uploads/ert-14-26-studio.jpg", alt: "E-Motion Rennteam Aalen – Kontakt aufnehmen", width: 1200, height: 630 }],
-  },
-};
-
-const contactPageJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "ContactPage",
-  name: "Kontakt – E-Motion Rennteam Aalen",
-  url: `${SITE_URL}/kontakt`,
-  mainEntity: {
-    "@type": "Organization",
-    name: "E-Motion Rennteam Aalen e.V.",
-    email: "info@emotion-rennteam.de",
-    telephone: "+49-7361-5762191",
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: "Beethovenstraße 1",
-      postalCode: "73430",
-      addressLocality: "Aalen",
-      addressCountry: "DE",
-    },
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
   },
 };
 

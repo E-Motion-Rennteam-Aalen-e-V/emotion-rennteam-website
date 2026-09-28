@@ -10,19 +10,12 @@ export const metadata: Metadata = {
   title: "Aktuelles & News",
   description:
     "Aktuelle Neuigkeiten vom E-Motion Rennteam Aalen: Rollouts, Wettbewerbsergebnisse und Team-Updates aus dem Formula-Student-Alltag.",
-  keywords: [
-    "Formula Student News",
-    "E-Motion Rennteam aktuell",
-    "FSG Ergebnisse aktuell",
-    "Rollout Rennwagen",
-    "Formula Student Wettbewerb aktuell",
-  ],
   alternates: { canonical: "/news" },
   openGraph: {
     title: "Aktuelles & News – E-Motion Rennteam Aalen",
     description: "Rollouts, Wettbewerbsergebnisse und Team-Updates aus dem Formula-Student-Alltag.",
     type: "website",
-    images: [{ url: "/uploads/ert-14-26-studio.jpg", alt: "Neuigkeiten vom E-Motion Rennteam Aalen", width: 1200, height: 630 }],
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
   },
 };
 

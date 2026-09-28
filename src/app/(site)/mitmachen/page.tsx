@@ -11,20 +11,12 @@ export const metadata: Metadata = {
   title: "Mitmachen – Jetzt bewerben & Teil des Teams werden",
   description:
     "Werde Teil des E-Motion Rennteams Aalen: offene Positionen in Konstruktion, Elektronik, Software und Marketing für Studierende der Hochschule Aalen.",
-  keywords: [
-    "Formula Student bewerben",
-    "Rennteam Aalen Mitglied werden",
-    "Hochschule Aalen Rennteam",
-    "FSE Team beitreten",
-    "Motorsport Praktikum Studenten",
-    "offene Stellen Formula Student",
-  ],
   alternates: { canonical: "/mitmachen" },
   openGraph: {
     title: "Mitmachen – E-Motion Rennteam Aalen",
     description: "Jetzt bewerben: offene Positionen in allen Fachbereichen für Studierende der Hochschule Aalen.",
     type: "website",
-    images: [{ url: "/uploads/ert-14-26-studio.jpg", alt: "Mitglieder des E-Motion Rennteams Aalen im Einsatz", width: 1200, height: 630 }],
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
   },
 };
 

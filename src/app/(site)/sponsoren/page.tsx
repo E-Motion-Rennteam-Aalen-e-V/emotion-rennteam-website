@@ -12,19 +12,12 @@ export const metadata: Metadata = {
   title: "Sponsoren & Partner – Jetzt Sponsor werden",
   description:
     "Unsere Sponsoren und Partner: Unternehmen, die das E-Motion Rennteam Aalen bei Formula Student unterstützen. Jetzt Sponsor werden und sichtbar sein.",
-  keywords: [
-    "Sponsor Formula Student Aalen",
-    "Sponsoring Hochschule Aalen",
-    "Partner E-Motion Rennteam",
-    "Formula Student Sponsoring",
-    "Motorsport Sponsoring Studenten",
-  ],
   alternates: { canonical: "/sponsoren" },
   openGraph: {
     title: "Sponsoren & Partner – E-Motion Rennteam Aalen",
     description: "Unternehmen, die das Formula-Student-Team der Hochschule Aalen unterstützen. Jetzt Sponsor werden.",
     type: "website",
-    images: [{ url: "/uploads/ert-14-26-studio.jpg", alt: "Sponsoren und Partner des E-Motion Rennteams Aalen", width: 1200, height: 630 }],
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
   },
 };
 

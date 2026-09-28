@@ -11,19 +11,12 @@ export const metadata: Metadata = {
   title: "Blog – Einblicke aus dem Teamalltag",
   description:
     "Einblicke aus dem Teamalltag des E-Motion Rennteams Aalen – Werkstatt, Onboarding und Geschichten hinter dem Formula-Student-Fahrzeug.",
-  keywords: [
-    "Formula Student Blog",
-    "Rennteam Werkstatt Einblicke",
-    "E-Motion Blog",
-    "Formula Student Alltag",
-    "Studenten Rennwagen Blog",
-  ],
   alternates: { canonical: "/blog" },
   openGraph: {
     title: "Blog – E-Motion Rennteam Aalen",
     description: "Einblicke aus dem Teamalltag: Werkstatt, Onboarding und Geschichten hinter dem Formula-Student-Fahrzeug.",
     type: "website",
-    images: [{ url: "/uploads/ert-14-26-studio.jpg", alt: "Blogbeiträge des E-Motion Rennteams Aalen", width: 1200, height: 630 }],
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
   },
 };
 

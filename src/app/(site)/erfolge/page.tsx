@@ -37,19 +37,12 @@ export const metadata: Metadata = {
   title: "Erfolge & Meilensteine",
   description:
     "Die Erfolgschronik des E-Motion Rennteams Aalen: Platzierungen, Wettbewerbsergebnisse und Meilensteine seit der Teamgründung 2009.",
-  keywords: [
-    "Formula Student Ergebnisse",
-    "E-Motion Rennteam Erfolge",
-    "FSG Platzierungen",
-    "Formula Student Wettbewerbsergebnisse",
-    "Formula Student Germany Rangliste",
-  ],
   alternates: { canonical: "/erfolge" },
   openGraph: {
     title: "Erfolge & Meilensteine – E-Motion Rennteam Aalen",
     description: "Platzierungen, Wettbewerbsergebnisse und Meilensteine des Formula-Student-Teams seit 2009.",
     type: "website",
-    images: [{ url: "/uploads/ert-14-26-studio.jpg", alt: "E-Motion Rennteam Aalen bei Formula Student Wettbewerben", width: 1200, height: 630 }],
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
   },
 };
 

@@ -28,8 +28,8 @@ export async function generateMetadata({
       description: `${album.images.length} Fotos aus dem Album "${album.name}".`,
       type: "website",
       images: album.images[0]
-        ? [{ url: album.images[0].image, alt: `${album.name} – Galerie des E-Motion Rennteams Aalen`, width: 1200, height: 630 }]
-        : [{ url: "/uploads/ert-14-26-studio.jpg", alt: "Galerie des E-Motion Rennteams Aalen", width: 1200, height: 630 }],
+        ? [{ url: album.images[0].image, width: 1200, height: 630 }]
+        : [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
     },
   };
 }

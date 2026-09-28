@@ -15,20 +15,12 @@ export const metadata: Metadata = {
   title: "Unser Team – Studierende & Fachbereiche",
   description:
     "Das Team des E-Motion Rennteams Aalen: über 50 Studierende aus allen Fachbereichen der Hochschule Aalen entwickeln gemeinsam einen Formula-Student-Electric-Rennwagen.",
-  keywords: [
-    "E-Motion Rennteam Team",
-    "Formula Student Team Aalen",
-    "Studierende Hochschule Aalen",
-    "FSE Team",
-    "Elektrotechnik Studium Aalen",
-    "Maschinenbau Studium Aalen",
-  ],
   alternates: { canonical: "/team" },
   openGraph: {
     title: "Unser Team – E-Motion Rennteam Aalen",
     description: "Über 50 Studierende aus allen Fachbereichen der Hochschule Aalen, die gemeinsam einen FSE-Rennwagen bauen.",
     type: "website",
-    images: [{ url: "/uploads/ert-14-26-studio.jpg", alt: "Das Team des E-Motion Rennteams Aalen", width: 1200, height: 630 }],
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
   },
 };
 

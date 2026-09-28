@@ -10,20 +10,12 @@ export const metadata: Metadata = {
   title: "Fahrzeuge – Formula Student Electric Rennwagen",
   description:
     "Die Rennwagen des E-Motion Rennteams Aalen: technische Daten, Baujahre und Entwicklungsgeschichte unserer selbst gebauten Formula-Student-Electric-Boliden.",
-  keywords: [
-    "Formula Student Electric Rennwagen",
-    "FSE Fahrzeug technische Daten",
-    "Elektro Rennwagen Hochschule Aalen",
-    "ERT Formula Student",
-    "Formula Student Monocoque",
-    "Elektroantrieb Rennwagen",
-  ],
   alternates: { canonical: "/fahrzeuge" },
   openGraph: {
     title: "Fahrzeuge – Formula Student Electric Rennwagen",
     description: "Technische Daten und Entwicklungsgeschichte unserer selbst gebauten FSE-Boliden.",
     type: "website",
-    images: [{ url: "/uploads/ert-14-26-studio.jpg", alt: "ERT 14-26 Formula Student Electric Rennwagen", width: 1200, height: 630 }],
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
   },
 };
 

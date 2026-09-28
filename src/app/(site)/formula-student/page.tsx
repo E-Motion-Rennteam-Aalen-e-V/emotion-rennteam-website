@@ -12,21 +12,12 @@ export const metadata: Metadata = {
   title: "Formula Student – Internationaler Konstruktionswettbewerb erklärt",
   description:
     "Was ist Formula Student? Der internationale Konstruktionswettbewerb, bei dem Studierendenteams eigene Rennwagen entwickeln, bauen und gegeneinander antreten lassen.",
-  keywords: [
-    "Formula Student erklärt",
-    "Was ist Formula Student",
-    "Formula Student Germany",
-    "FSG Wettbewerb Disziplinen",
-    "Formula Student Electric",
-    "Studenten Rennwagen Wettbewerb",
-    "Formula SAE",
-  ],
   alternates: { canonical: "/formula-student" },
   openGraph: {
     title: "Formula Student – E-Motion Rennteam Aalen",
     description: "Alles über den internationalen Formula-Student-Wettbewerb: Disziplinen, Regeln und warum wir mitmachen.",
     type: "website",
-    images: [{ url: "/uploads/ert-14-26-studio.jpg", alt: "Formula Student Electric Rennwagen des E-Motion Rennteams Aalen", width: 1200, height: 630 }],
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
   },
 };
 

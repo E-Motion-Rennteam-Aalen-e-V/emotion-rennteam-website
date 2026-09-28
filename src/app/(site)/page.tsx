@@ -13,18 +13,6 @@ export const metadata: Metadata = {
   title: "E-Motion Rennteam Aalen | Formula Student Electric",
   description:
     "Das Formula-Student-Electric-Team der Hochschule Aalen. Über 50 Studierende entwickeln und bauen eigenständig Elektro-Rennwagen für den internationalen Wettbewerb.",
-  keywords: [
-    "E-Motion Rennteam Aalen",
-    "Formula Student Electric",
-    "Formula Student Germany",
-    "Elektro Rennwagen",
-    "Hochschule Aalen",
-    "FSG",
-    "FSE",
-    "Studierenden Rennteam",
-    "Formula SAE Electric",
-    "Aalen Motorsport",
-  ],
   alternates: { canonical: "/" },
   openGraph: {
     title: "E-Motion Rennteam Aalen | Formula Student Electric",
@@ -42,14 +30,6 @@ export const metadata: Metadata = {
         height: 630,
       },
     ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    site: "@e_motion_rennteam",
-    title: "E-Motion Rennteam Aalen | Formula Student Electric",
-    description:
-      "Das Formula-Student-Electric-Team der Hochschule Aalen. Über 50 Studierende entwickeln und bauen eigenständig Elektro-Rennwagen für den internationalen Wettbewerb.",
-    images: ["/uploads/ert-14-26-studio.jpg"],
   },
 };
 
