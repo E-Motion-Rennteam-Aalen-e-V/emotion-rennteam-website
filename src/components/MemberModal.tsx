@@ -33,6 +33,10 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
   const [flipped, setFlipped] = useState(false);
 
+  const isExecutive = member ? ['ceo', 'cto', 'cfo'].includes(member.roleLevel || '') : false;
+  const isLeadership = member ? isExecutive || ['Teamleiter', 'Leitung'].includes((member.role || '').trim()) : false;
+  const showRealContact = isLeadership;
+
   useEffect(() => {
     if (!member) {
       setFlipped(false);
@@ -293,17 +297,19 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
 
                   {/* Contact rows */}
                   <div style={{ padding: '10px 18px', display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
-                    {member.phone && (
+                    {(member.phone || !showRealContact) && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                         <span style={{ color: '#0071b5', fontSize: 14 }}>
                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: 15, height: 15 }}>
                             <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.82A16 16 0 0 0 15.18 16.09l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
                           </svg>
                         </span>
-                        <span style={{ color: '#9aa0b4', fontSize: 13 }}>{maskPhone(member.phone)}</span>
+                        <span style={{ color: '#9aa0b4', fontSize: 13 }}>
+                          {showRealContact && member.phone ? maskPhone(member.phone) : '[Test Tel]'}
+                        </span>
                       </div>
                     )}
-                    {member.email && (
+                    {(member.email || !showRealContact) && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                         <span style={{ color: '#0071b5', fontSize: 14 }}>
                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: 15, height: 15 }}>
@@ -311,7 +317,9 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                             <polyline points="22,6 12,13 2,6" />
                           </svg>
                         </span>
-                        <span style={{ color: '#9aa0b4', fontSize: 13 }}>{maskEmail(member.email)}</span>
+                        <span style={{ color: '#9aa0b4', fontSize: 13 }}>
+                          {showRealContact && member.email ? maskEmail(member.email) : '[Test Mail]'}
+                        </span>
                       </div>
                     )}
                     {member.linkedin && (
@@ -360,7 +368,7 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                     </button>
 
                     <div style={{ display: 'flex', gap: 7 }}>
-                      {member.email && (
+                      {showRealContact && member.email && (
                         <a
                           href={getGoogleContactsLink()}
                           target="_blank"
@@ -380,7 +388,7 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                           Google
                         </a>
                       )}
-                      {member.phone && (
+                      {showRealContact && member.phone && (
                         <a
                           href={`tel:${member.phone}`}
                           onClick={(e) => e.stopPropagation()}
