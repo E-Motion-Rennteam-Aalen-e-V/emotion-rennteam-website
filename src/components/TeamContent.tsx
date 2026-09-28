@@ -42,7 +42,7 @@ export default function TeamContent({ members, teamDescriptions }: TeamContentPr
                 {/* Executive Badge */}
                 {isExecutive && (
                   <div className="relative z-10 -mt-1 mb-2 flex justify-end">
-                    <span className="rounded-full bg-accent/20 px-2.5 py-1 text-xs font-semibold text-accent">
+                    <span className="rounded-full bg-accent px-2.5 py-1 text-xs font-semibold text-white">
                       Executive
                     </span>
                   </div>
