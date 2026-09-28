@@ -1,23 +1,39 @@
 import type { Metadata } from "next";
 import Reveal from "@/components/motion/Reveal";
 import MediaKitRequestForm from "@/components/MediaKitRequestForm";
+import { getBreadcrumbJsonLd } from "@/lib/structuredData";
 
 export const metadata: Metadata = {
   title: "Mediakit – Pressefotos & Logos anfragen",
   description:
     "Presse- und Medienmaterial des E-Motion Rennteams Aalen: Fahrzeug- und Teamfotos, Logos und Videos für Presse, Partner und Sponsoren.",
+  keywords: [
+    "Formula Student Pressefotos",
+    "E-Motion Rennteam Logos",
+    "Mediakit Motorsport",
+    "Pressematerial Formula Student",
+  ],
   alternates: { canonical: "/mediakit" },
   openGraph: {
     title: "Mediakit – E-Motion Rennteam Aalen",
     description: "Pressefotos, Fahrzeugbilder und Logos des Formula-Student-Teams der Hochschule Aalen anfragen.",
     type: "website",
-    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", alt: "Mediakit des E-Motion Rennteams Aalen", width: 1200, height: 630 }],
   },
 };
 
 export default function MediaKitPage() {
+  const breadcrumbJsonLd = getBreadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Mediakit", path: "/mediakit" },
+  ]);
+
   return (
     <div className="container-page py-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <Reveal>
         <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Mediakit</p>
         <h1 className="mt-2 text-4xl font-extrabold leading-tight tracking-normal sm:text-5xl md:text-6xl">

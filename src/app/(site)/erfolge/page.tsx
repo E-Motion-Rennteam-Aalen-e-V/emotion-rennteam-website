@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { getResults } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
+import { getBreadcrumbJsonLd } from "@/lib/structuredData";
 
 type ParsedChip =
   | { kind: "placement"; rank: number; discipline: string }
@@ -36,20 +37,35 @@ export const metadata: Metadata = {
   title: "Erfolge & Meilensteine",
   description:
     "Die Erfolgschronik des E-Motion Rennteams Aalen: Platzierungen, Wettbewerbsergebnisse und Meilensteine seit der Teamgründung 2009.",
+  keywords: [
+    "Formula Student Ergebnisse",
+    "E-Motion Rennteam Erfolge",
+    "FSG Platzierungen",
+    "Formula Student Wettbewerbsergebnisse",
+    "Formula Student Germany Rangliste",
+  ],
   alternates: { canonical: "/erfolge" },
   openGraph: {
     title: "Erfolge & Meilensteine – E-Motion Rennteam Aalen",
     description: "Platzierungen, Wettbewerbsergebnisse und Meilensteine des Formula-Student-Teams seit 2009.",
     type: "website",
-    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", alt: "E-Motion Rennteam Aalen bei Formula Student Wettbewerben", width: 1200, height: 630 }],
   },
 };
 
 export default function ResultsPage() {
   const results = getResults();
+  const breadcrumbJsonLd = getBreadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Erfolge", path: "/erfolge" },
+  ]);
 
   return (
     <div className="container-page py-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <Reveal>
         <div className="flex flex-col gap-8 sm:flex-row sm:items-center sm:gap-12">
           <div className="flex-1">

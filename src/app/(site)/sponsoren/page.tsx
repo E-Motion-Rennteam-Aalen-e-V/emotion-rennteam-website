@@ -6,17 +6,25 @@ import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import SponsorForm from "@/components/SponsorForm";
 import SponsorCard from "@/components/SponsorCard";
 import ShareButtons from "@/components/ShareButtons";
+import { getBreadcrumbJsonLd } from "@/lib/structuredData";
 
 export const metadata: Metadata = {
   title: "Sponsoren & Partner – Jetzt Sponsor werden",
   description:
     "Unsere Sponsoren und Partner: Unternehmen, die das E-Motion Rennteam Aalen bei Formula Student unterstützen. Jetzt Sponsor werden und sichtbar sein.",
+  keywords: [
+    "Sponsor Formula Student Aalen",
+    "Sponsoring Hochschule Aalen",
+    "Partner E-Motion Rennteam",
+    "Formula Student Sponsoring",
+    "Motorsport Sponsoring Studenten",
+  ],
   alternates: { canonical: "/sponsoren" },
   openGraph: {
     title: "Sponsoren & Partner – E-Motion Rennteam Aalen",
     description: "Unternehmen, die das Formula-Student-Team der Hochschule Aalen unterstützen. Jetzt Sponsor werden.",
     type: "website",
-    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", alt: "Sponsoren und Partner des E-Motion Rennteams Aalen", width: 1200, height: 630 }],
   },
 };
 
@@ -24,9 +32,17 @@ const TIERS: Sponsor["tier"][] = ["Platin", "Gold", "Silber", "Bronze", "Partner
 
 export default function SponsorsPage() {
   const sponsors = getSponsors();
+  const breadcrumbJsonLd = getBreadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Sponsoren", path: "/sponsoren" },
+  ]);
 
   return (
     <div className="container-page py-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <Reveal>
         <div className="flex flex-col gap-8 sm:flex-row sm:items-center sm:gap-12">
           <div className="flex-1">

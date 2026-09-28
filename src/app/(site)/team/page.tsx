@@ -9,17 +9,26 @@ import {
 } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import TeamContent from "@/components/TeamContent";
+import { getBreadcrumbJsonLd } from "@/lib/structuredData";
 
 export const metadata: Metadata = {
   title: "Unser Team – Studierende & Fachbereiche",
   description:
     "Das Team des E-Motion Rennteams Aalen: über 50 Studierende aus allen Fachbereichen der Hochschule Aalen entwickeln gemeinsam einen Formula-Student-Electric-Rennwagen.",
+  keywords: [
+    "E-Motion Rennteam Team",
+    "Formula Student Team Aalen",
+    "Studierende Hochschule Aalen",
+    "FSE Team",
+    "Elektrotechnik Studium Aalen",
+    "Maschinenbau Studium Aalen",
+  ],
   alternates: { canonical: "/team" },
   openGraph: {
     title: "Unser Team – E-Motion Rennteam Aalen",
     description: "Über 50 Studierende aus allen Fachbereichen der Hochschule Aalen, die gemeinsam einen FSE-Rennwagen bauen.",
     type: "website",
-    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", alt: "Das Team des E-Motion Rennteams Aalen", width: 1200, height: 630 }],
   },
 };
 
@@ -71,8 +80,17 @@ export default async function TeamPage({
 
   const heading = season.startsWith("ERT-") ? `Die Köpfe hinter dem ${season}` : season;
 
+  const breadcrumbJsonLd = getBreadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Team", path: "/team" },
+  ]);
+
   return (
     <div className="container-page py-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <Reveal>
         <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Team</p>
         <h1 className="mt-2 text-4xl font-extrabold leading-tight tracking-normal sm:text-5xl md:text-6xl xl:text-7xl">{heading}</h1>

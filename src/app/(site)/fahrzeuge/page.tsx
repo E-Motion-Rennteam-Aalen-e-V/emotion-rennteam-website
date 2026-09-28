@@ -3,25 +3,54 @@ import Image from "next/image";
 import { getVehicles } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import VehicleSpecs from "@/components/VehicleSpecs";
+import { getBreadcrumbJsonLd, getItemListJsonLd } from "@/lib/structuredData";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Fahrzeuge – Formula Student Electric Rennwagen",
   description:
     "Die Rennwagen des E-Motion Rennteams Aalen: technische Daten, Baujahre und Entwicklungsgeschichte unserer selbst gebauten Formula-Student-Electric-Boliden.",
+  keywords: [
+    "Formula Student Electric Rennwagen",
+    "FSE Fahrzeug technische Daten",
+    "Elektro Rennwagen Hochschule Aalen",
+    "ERT Formula Student",
+    "Formula Student Monocoque",
+    "Elektroantrieb Rennwagen",
+  ],
   alternates: { canonical: "/fahrzeuge" },
   openGraph: {
     title: "Fahrzeuge – Formula Student Electric Rennwagen",
     description: "Technische Daten und Entwicklungsgeschichte unserer selbst gebauten FSE-Boliden.",
     type: "website",
-    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", alt: "ERT 14-26 Formula Student Electric Rennwagen", width: 1200, height: 630 }],
   },
 };
 
 export default function VehiclesPage() {
   const vehicles = getVehicles();
+  const breadcrumbJsonLd = getBreadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Fahrzeuge", path: "/fahrzeuge" },
+  ]);
+  const vehicleListJsonLd = getItemListJsonLd(
+    vehicles.map((v, i) => ({
+      name: v.name,
+      url: `${SITE_URL}/fahrzeuge#${v.slug}`,
+      position: i + 1,
+    }))
+  );
 
   return (
     <div className="container-page py-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(vehicleListJsonLd) }}
+      />
       <Reveal className="text-center">
         <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Fahrzeuge</p>
         <h1 className="mx-auto mt-2 max-w-2xl text-4xl font-extrabold leading-tight tracking-normal sm:text-5xl md:text-6xl xl:text-7xl">

@@ -5,25 +5,41 @@ import { getBlogPosts } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import NewsletterForm from "@/components/NewsletterForm";
+import { getBreadcrumbJsonLd } from "@/lib/structuredData";
 
 export const metadata: Metadata = {
   title: "Blog – Einblicke aus dem Teamalltag",
   description:
     "Einblicke aus dem Teamalltag des E-Motion Rennteams Aalen – Werkstatt, Onboarding und Geschichten hinter dem Formula-Student-Fahrzeug.",
+  keywords: [
+    "Formula Student Blog",
+    "Rennteam Werkstatt Einblicke",
+    "E-Motion Blog",
+    "Formula Student Alltag",
+    "Studenten Rennwagen Blog",
+  ],
   alternates: { canonical: "/blog" },
   openGraph: {
     title: "Blog – E-Motion Rennteam Aalen",
     description: "Einblicke aus dem Teamalltag: Werkstatt, Onboarding und Geschichten hinter dem Formula-Student-Fahrzeug.",
     type: "website",
-    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", alt: "Blogbeiträge des E-Motion Rennteams Aalen", width: 1200, height: 630 }],
   },
 };
 
 export default function BlogPage() {
   const posts = getBlogPosts();
+  const breadcrumbJsonLd = getBreadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Blog", path: "/blog" },
+  ]);
 
   return (
     <div className="container-page py-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <Reveal>
         <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Blog</p>
         <h1 className="mt-2 text-4xl font-extrabold leading-tight tracking-normal sm:text-5xl md:text-6xl xl:text-7xl">

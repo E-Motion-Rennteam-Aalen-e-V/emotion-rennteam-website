@@ -6,22 +6,42 @@ import DisciplinesChart from "@/components/DisciplinesChart";
 import FSTimeline from "@/components/FormulaStudent/FSTimeline";
 import FSPillars from "@/components/FormulaStudent/FSPillars";
 import FSStats from "@/components/FormulaStudent/FSStats";
+import { getBreadcrumbJsonLd } from "@/lib/structuredData";
+
 export const metadata: Metadata = {
   title: "Formula Student – Internationaler Konstruktionswettbewerb erklärt",
   description:
     "Was ist Formula Student? Der internationale Konstruktionswettbewerb, bei dem Studierendenteams eigene Rennwagen entwickeln, bauen und gegeneinander antreten lassen.",
+  keywords: [
+    "Formula Student erklärt",
+    "Was ist Formula Student",
+    "Formula Student Germany",
+    "FSG Wettbewerb Disziplinen",
+    "Formula Student Electric",
+    "Studenten Rennwagen Wettbewerb",
+    "Formula SAE",
+  ],
   alternates: { canonical: "/formula-student" },
   openGraph: {
     title: "Formula Student – E-Motion Rennteam Aalen",
     description: "Alles über den internationalen Formula-Student-Wettbewerb: Disziplinen, Regeln und warum wir mitmachen.",
     type: "website",
-    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", alt: "Formula Student Electric Rennwagen des E-Motion Rennteams Aalen", width: 1200, height: 630 }],
   },
 };
 
 export default function FormulaStudentPage() {
+  const breadcrumbJsonLd = getBreadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Formula Student", path: "/formula-student" },
+  ]);
+
   return (
     <div className="container-page space-y-20 py-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {/* Hero */}
       <Reveal>
         <div className="space-y-6">

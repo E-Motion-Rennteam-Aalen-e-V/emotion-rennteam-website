@@ -5,25 +5,65 @@ import ContactForm from "@/components/ContactForm";
 import ImageCarousel from "@/components/ImageCarousel";
 import ContactMap from "@/components/ContactMap";
 import Reveal from "@/components/motion/Reveal";
+import { getBreadcrumbJsonLd } from "@/lib/structuredData";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Kontakt – Schreib uns eine Nachricht",
   description:
     "Kontaktiere das E-Motion Rennteam Aalen: Fragen, Kooperationen oder Sponsoring-Anfragen – wir freuen uns auf deine Nachricht.",
+  keywords: [
+    "E-Motion Rennteam Kontakt",
+    "Formula Student Aalen Kontakt",
+    "Hochschule Aalen Rennteam Adresse",
+    "Sponsoring Anfrage",
+  ],
   alternates: { canonical: "/kontakt" },
   openGraph: {
     title: "Kontakt – E-Motion Rennteam Aalen",
     description: "Fragen, Kooperationen oder Sponsoring-Anfragen an das Formula-Student-Team der Hochschule Aalen.",
     type: "website",
-    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", alt: "E-Motion Rennteam Aalen – Kontakt aufnehmen", width: 1200, height: 630 }],
+  },
+};
+
+const contactPageJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ContactPage",
+  name: "Kontakt – E-Motion Rennteam Aalen",
+  url: `${SITE_URL}/kontakt`,
+  mainEntity: {
+    "@type": "Organization",
+    name: "E-Motion Rennteam Aalen e.V.",
+    email: "info@emotion-rennteam.de",
+    telephone: "+49-7361-5762191",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "Beethovenstraße 1",
+      postalCode: "73430",
+      addressLocality: "Aalen",
+      addressCountry: "DE",
+    },
   },
 };
 
 export default function ContactPage() {
   const page = getPage("contact");
+  const breadcrumbJsonLd = getBreadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Kontakt", path: "/kontakt" },
+  ]);
 
   return (
     <div className="container-page py-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(contactPageJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <Reveal>
         <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Kontakt</p>
         <h1 className="mt-2 text-4xl font-extrabold leading-tight tracking-normal sm:text-5xl md:text-6xl xl:text-7xl">
