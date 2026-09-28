@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import {
   getTeam,
@@ -9,7 +8,8 @@ import {
   DEFAULT_TEAM_SEASON,
 } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
-import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
+import TeamContent from "@/components/TeamContent";
+import { getBreadcrumbJsonLd } from "@/lib/structuredData";
 
 export const metadata: Metadata = {
   title: "Unser Team – Studierende & Fachbereiche",
@@ -72,8 +72,17 @@ export default async function TeamPage({
 
   const heading = season.startsWith("ERT-") ? `Die Köpfe hinter dem ${season}` : season;
 
+  const breadcrumbJsonLd = getBreadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Team", path: "/team" },
+  ]);
+
   return (
     <div className="container-page py-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <Reveal>
         <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Team</p>
         <h1 className="mt-2 text-4xl font-extrabold leading-tight tracking-normal sm:text-5xl md:text-6xl xl:text-7xl">{heading}</h1>
@@ -150,61 +159,9 @@ export default async function TeamPage({
                           .
                         </p>
                       ) : (
-                      <StaggerGroup className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        {members.map((member) => (
-                          <StaggerItem key={member.slug}>
-                            <div className="group h-full rounded-xl border border-border bg-surface p-5 transition-all duration-300 hover:-translate-y-1 hover:border-accent/60 hover:shadow-[0_0_30px_-10px_rgba(0,113,181,0.35)]">
-                              <div className="aspect-square overflow-hidden rounded-lg bg-surface-2">
-                                {member.photo ? (
-                                  <Image
-                                    src={member.photo}
-                                    alt={member.name}
-                                    width={300}
-                                    height={300}
-                                    className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
-                                  />
-                                ) : (
-                                  <div className="flex h-full w-full flex-col items-center justify-center gap-1 text-muted">
-                                    <svg
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      stroke="currentColor"
-                                      strokeWidth="1.5"
-                                      className="h-9 w-9 opacity-50"
-                                    >
-                                      <circle cx="12" cy="8" r="4" />
-                                      <path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8" />
-                                    </svg>
-                                    <span className="text-xs font-medium uppercase tracking-wide">
-                                      Bild folgt
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
-                              <div className="mt-4 flex items-center justify-between">
-                                <h4 className="font-sans font-semibold leading-normal">{member.name}</h4>
-                                {member.linkedin && /^https:\/\/(www\.)?linkedin\.com\//.test(member.linkedin) && (
-                                  <a
-                                    href={member.linkedin}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    aria-label={`${member.name} auf LinkedIn (öffnet in neuem Tab)`}
-                                    className="text-accent transition-colors hover:text-accent-text"
-                                  >
-                                    <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
-                                      <path d="M4.98 3.5C4.98 4.881 3.87 6 2.5 6S0 4.881 0 3.5 1.12 1 2.5 1s2.48 1.119 2.48 2.5zM.24 8.25h4.52V23H.24V8.25zM8.5 8.25h4.33v2.02h.06c.6-1.14 2.07-2.34 4.26-2.34 4.55 0 5.39 3 5.39 6.9V23h-4.52v-6.7c0-1.6-.03-3.66-2.23-3.66-2.24 0-2.58 1.75-2.58 3.55V23H8.5V8.25z" />
-                                    </svg>
-                                  </a>
-                                )}
-                              </div>
-                              <p className="text-sm text-accent-text">{member.role}</p>
-                              {member.body && (
-                                <p className="mt-2 text-sm text-muted">{member.body}</p>
-                              )}
-                            </div>
-                          </StaggerItem>
-                        ))}
-                      </StaggerGroup>
+                      <div className="mt-6">
+                        <TeamContent members={members} teamDescriptions={TEAM_DESCRIPTIONS} />
+                      </div>
                       )}
                       </div>
                     </div>

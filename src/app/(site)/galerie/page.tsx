@@ -4,6 +4,7 @@ import { getGalleryAlbums } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import ImageWithFallback from "@/components/ImageWithFallback";
+import { getBreadcrumbJsonLd } from "@/lib/structuredData";
 
 export const metadata: Metadata = {
   title: "Galerie – Fotos & Impressionen",
@@ -21,9 +22,17 @@ export const metadata: Metadata = {
 export default function GalleryPage() {
   const albums = getGalleryAlbums();
   const hasAlbums = albums.length > 0;
+  const breadcrumbJsonLd = getBreadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Galerie", path: "/galerie" },
+  ]);
 
   return (
     <div className="container-page py-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <Reveal>
         <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Galerie</p>
         <h1 className="mt-2 text-4xl font-extrabold leading-tight tracking-normal sm:text-5xl md:text-6xl xl:text-7xl">Impressionen</h1>

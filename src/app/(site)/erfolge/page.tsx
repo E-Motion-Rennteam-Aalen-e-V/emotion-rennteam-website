@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { getResults } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
+import { getBreadcrumbJsonLd } from "@/lib/structuredData";
 
 type ParsedChip =
   | { kind: "placement"; rank: number; discipline: string }
@@ -47,9 +48,17 @@ export const metadata: Metadata = {
 
 export default function ResultsPage() {
   const results = getResults();
+  const breadcrumbJsonLd = getBreadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Erfolge", path: "/erfolge" },
+  ]);
 
   return (
     <div className="container-page py-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <Reveal>
         <div className="flex flex-col gap-8 sm:flex-row sm:items-center sm:gap-12">
           <div className="flex-1">

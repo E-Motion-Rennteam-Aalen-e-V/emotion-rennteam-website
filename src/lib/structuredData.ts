@@ -79,6 +79,19 @@ export function getWebSiteJsonLd() {
   };
 }
 
+export function getItemListJsonLd(items: { name: string; url: string; position: number }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    itemListElement: items.map((item) => ({
+      "@type": "ListItem",
+      position: item.position,
+      name: item.name,
+      url: item.url,
+    })),
+  };
+}
+
 /**
  * Serialized once here (not just built) so next.config.ts can hash the exact
  * same string for the CSP script-src allowlist — the inline <script> in

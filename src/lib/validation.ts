@@ -72,6 +72,11 @@ export function isValidEmail(value: string): boolean {
   return value.length > 0 && value.length <= LIMITS.email && EMAIL_RE.test(value);
 }
 
+export function isValidPhone(value: string): boolean {
+  const cleaned = value.replace(/[\s\-().+]/g, "");
+  return /^\d{7,15}$/.test(cleaned);
+}
+
 function readField(data: Record<string, unknown>, key: string): string {
   return sanitizeText(data[key]);
 }
@@ -213,7 +218,10 @@ export function validateMemberApplicationForm(
   else if (!isValidEmail(email)) errors.email = "Bitte gib eine gültige E-Mail-Adresse an.";
   else if (isDisposableEmail(email)) errors.email = "Bitte nutze eine reguläre, dauerhafte E-Mail-Adresse.";
 
-  if (phone && phone.length > LIMITS.phone) errors.phone = "Telefonnummer ist zu lang.";
+  if (phone) {
+    if (phone.length > LIMITS.phone) errors.phone = "Telefonnummer ist zu lang.";
+    else if (!isValidPhone(phone)) errors.phone = "Bitte gib eine gültige Telefonnummer an.";
+  }
 
   if (!(MEMBER_DEPARTMENTS as readonly string[]).includes(department)) {
     errors.department = "Ungültiger Fachbereich.";
@@ -263,7 +271,10 @@ export function validateSponsorForm(body: unknown): ValidationResult<SponsorForm
   else if (!isValidEmail(email)) errors.email = "Bitte gib eine gültige E-Mail-Adresse an.";
   else if (isDisposableEmail(email)) errors.email = "Bitte nutze eine reguläre, dauerhafte E-Mail-Adresse.";
 
-  if (phone && phone.length > LIMITS.phone) errors.phone = "Telefonnummer ist zu lang.";
+  if (phone) {
+    if (phone.length > LIMITS.phone) errors.phone = "Telefonnummer ist zu lang.";
+    else if (!isValidPhone(phone)) errors.phone = "Bitte gib eine gültige Telefonnummer an.";
+  }
 
   if (!(SPONSOR_TIERS as readonly string[]).includes(tier)) {
     errors.tier = "Ungültige Sponsoring-Stufe.";

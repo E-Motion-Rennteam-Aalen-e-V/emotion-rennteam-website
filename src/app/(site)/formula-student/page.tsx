@@ -6,6 +6,8 @@ import DisciplinesChart from "@/components/DisciplinesChart";
 import FSTimeline from "@/components/FormulaStudent/FSTimeline";
 import FSPillars from "@/components/FormulaStudent/FSPillars";
 import FSStats from "@/components/FormulaStudent/FSStats";
+import { getBreadcrumbJsonLd } from "@/lib/structuredData";
+
 export const metadata: Metadata = {
   title: "Formula Student – Internationaler Konstruktionswettbewerb erklärt",
   description:
@@ -20,8 +22,17 @@ export const metadata: Metadata = {
 };
 
 export default function FormulaStudentPage() {
+  const breadcrumbJsonLd = getBreadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Formula Student", path: "/formula-student" },
+  ]);
+
   return (
     <div className="container-page space-y-20 py-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {/* Hero */}
       <Reveal>
         <div className="space-y-6">

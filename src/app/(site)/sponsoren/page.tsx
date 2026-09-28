@@ -6,6 +6,7 @@ import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import SponsorForm from "@/components/SponsorForm";
 import SponsorCard from "@/components/SponsorCard";
 import ShareButtons from "@/components/ShareButtons";
+import { getBreadcrumbJsonLd } from "@/lib/structuredData";
 
 export const metadata: Metadata = {
   title: "Sponsoren & Partner – Jetzt Sponsor werden",
@@ -24,9 +25,17 @@ const TIERS: Sponsor["tier"][] = ["Platin", "Gold", "Silber", "Bronze", "Partner
 
 export default function SponsorsPage() {
   const sponsors = getSponsors();
+  const breadcrumbJsonLd = getBreadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Sponsoren", path: "/sponsoren" },
+  ]);
 
   return (
     <div className="container-page py-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <Reveal>
         <div className="flex flex-col gap-8 sm:flex-row sm:items-center sm:gap-12">
           <div className="flex-1">

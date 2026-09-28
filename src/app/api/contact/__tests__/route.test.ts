@@ -57,7 +57,7 @@ describe("POST /api/contact", () => {
     expect(response.status).toBe(400);
   });
 
-  it("silently accepts but does not deliver honeypot-tripped submissions", async () => {
+  it("rejects honeypot-tripped submissions with 400", async () => {
     const deliverSpy = vi
       .spyOn(formDelivery, "deliverFormSubmission")
       .mockResolvedValue(undefined);
@@ -65,8 +65,8 @@ describe("POST /api/contact", () => {
     const response = await POST(postRequest({ ...validPayload, website: "http://spam.example" }));
     const json = await response.json();
 
-    expect(response.status).toBe(200);
-    expect(json.ok).toBe(true);
+    expect(response.status).toBe(400);
+    expect(json.ok).toBe(false);
     expect(deliverSpy).not.toHaveBeenCalled();
   });
 
@@ -130,7 +130,7 @@ describe("POST /api/contact", () => {
     expect(json.errors.email).toBeDefined();
   });
 
-  it("silently accepts but does not deliver submissions completed implausibly fast", async () => {
+  it("rejects submissions completed implausibly fast with 400", async () => {
     const deliverSpy = vi
       .spyOn(formDelivery, "deliverFormSubmission")
       .mockResolvedValue(undefined);
@@ -143,8 +143,8 @@ describe("POST /api/contact", () => {
     );
     const json = await response.json();
 
-    expect(response.status).toBe(200);
-    expect(json.ok).toBe(true);
+    expect(response.status).toBe(400);
+    expect(json.ok).toBe(false);
     expect(deliverSpy).not.toHaveBeenCalled();
   });
 });

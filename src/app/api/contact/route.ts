@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
   if (!checkRateLimit(`contact:${ip}`, 5, 10 * 60 * 1000)) {
     return NextResponse.json(
       { ok: false, error: "Zu viele Anfragen. Bitte versuche es später erneut." },
-      { status: 429, headers: { "Retry-After": "600" } }
+      { status: 429, headers: { "Retry-After": "3600" } }
     );
   }
 
@@ -44,13 +44,18 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (!result.isBot) {
-    try {
-      await deliverFormSubmission("contact", result.data);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Interner Fehler.";
-      return NextResponse.json({ ok: false, error: message }, { status: 503 });
-    }
+  if (result.isBot) {
+    return NextResponse.json(
+      { ok: false, error: "Bitte versuche es erneut." },
+      { status: 400 }
+    );
+  }
+
+  try {
+    await deliverFormSubmission("contact", result.data);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Interner Fehler.";
+    return NextResponse.json({ ok: false, error: message }, { status: 503 });
   }
 
   return NextResponse.json({ ok: true });

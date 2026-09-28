@@ -73,6 +73,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
+    site: "@e_motion_rennteam",
     title: "E-Motion Rennteam Aalen | Formula Student Electric",
     description: SITE_DESCRIPTION,
     images: ["/uploads/ert-14-26-studio.jpg"],

@@ -5,6 +5,7 @@ import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import MemberApplicationForm from "@/components/MemberApplicationForm";
 import AlumniShowcase from "@/components/AlumniShowcase";
+import { getBreadcrumbJsonLd } from "@/lib/structuredData";
 
 export const metadata: Metadata = {
   title: "Mitmachen – Jetzt bewerben & Teil des Teams werden",
@@ -22,6 +23,10 @@ export const metadata: Metadata = {
 export default function JoinPage() {
   const positions = getPositions();
   const memberCount = getTeam().length;
+  const breadcrumbJsonLd = getBreadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Mitmachen", path: "/mitmachen" },
+  ]);
   const stats = [
     { value: "2009", label: "Dabei seit" },
     { value: String(memberCount), label: "Aktive Mitglieder" },
@@ -30,6 +35,10 @@ export default function JoinPage() {
 
   return (
     <div className="container-page py-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <Reveal>
         <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Mitmachen</p>
         <h1 className="mt-2 text-4xl font-extrabold leading-tight tracking-normal sm:text-5xl md:text-6xl xl:text-7xl">Werde Teil des Teams</h1>
