@@ -41,9 +41,14 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (!result.isBot) {
-    await deliverFormSubmission("newsletter", result.data);
+  if (result.isBot) {
+    return NextResponse.json(
+      { ok: false, error: "Bitte versuche es erneut." },
+      { status: 400 }
+    );
   }
+
+  await deliverFormSubmission("newsletter", result.data);
 
   return NextResponse.json({ ok: true });
 }

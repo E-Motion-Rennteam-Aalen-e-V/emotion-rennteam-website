@@ -5,6 +5,11 @@ import { hasJsonContentType, isTrustedOrigin } from "@/lib/apiSecurity";
 import { createConfirmToken } from "@/lib/newsletterToken";
 import { Resend } from "resend";
 
+function normalizeEmailForRateLimit(email: string): string {
+  const [local, domain] = email.toLowerCase().split("@");
+  return `${local.split("+")[0]}@${domain}`;
+}
+
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
@@ -35,10 +40,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, errors: result.errors }, { status: 400 });
   }
 
-  if (!checkRateLimit(`newsletter_sub:${result.data.email.toLowerCase()}`, 1, 30 * 24 * 60 * 60 * 1000)) {
+  const normalizedEmail = normalizeEmailForRateLimit(result.data.email);
+  if (!checkRateLimit(`newsletter_sub:${normalizedEmail}`, 1, 30 * 24 * 60 * 60 * 1000)) {
     return NextResponse.json(
-      { ok: false, error: "Diese E-Mail-Adresse wurde bereits angemeldet. Bitte prüfe dein Postfach." },
-      { status: 429, headers: { "Retry-After": "2592000" } }
+      { ok: true },
+      { status: 200 }
     );
   }
 
