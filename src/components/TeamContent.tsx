@@ -19,8 +19,8 @@ export default function TeamContent({ members, teamDescriptions }: TeamContentPr
       <StaggerGroup className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {members.map((member) => {
           const isExecutive = ['ceo', 'cto', 'cfo'].includes(member.roleLevel || '');
-          const hasCard = isExecutive || ['Teamleiter', 'Leitung'].includes((member.role || '').trim());
           const hasLinkedin = !!member.linkedin && /^https:\/\/(www\.)?linkedin\.com\//.test(member.linkedin);
+          const hasCard = (isExecutive || ['Teamleiter', 'Leitung'].includes((member.role || '').trim())) && hasLinkedin;
 
           return (
             <StaggerItem key={member.slug}>
