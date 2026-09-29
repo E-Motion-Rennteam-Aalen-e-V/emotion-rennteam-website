@@ -79,16 +79,17 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
         onClick={onClose}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+        className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm sm:items-center"
       >
         {/* Modal Panel */}
         <motion.div
-          initial={{ x: '100%', opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          exit={{ x: '100%', opacity: 0 }}
-          transition={{ type: 'spring', damping: 32, stiffness: 320 }}
+          initial={{ y: '100%', opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: '100%', opacity: 0 }}
+          transition={{ type: 'spring', damping: 35, stiffness: 350 }}
           onClick={(e) => e.stopPropagation()}
-          className="relative w-full max-w-sm rounded-2xl border border-border bg-surface shadow-2xl sm:max-w-md"
+          className="relative w-full max-w-sm overflow-y-auto rounded-t-2xl border border-border bg-surface shadow-2xl sm:max-w-md sm:rounded-2xl"
+          style={{ maxHeight: '90svh' }}
         >
           {/* Close Button */}
           <button
@@ -217,10 +218,10 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                   <img
                     src={qrCodeDataUrl}
                     alt="QR Code für Kontaktdaten"
-                    className="h-[200px] w-[200px]"
+                    className="h-[160px] w-[160px] sm:h-[200px] sm:w-[200px]"
                   />
                 ) : (
-                  <div className="flex h-[200px] w-[200px] items-center justify-center text-xs text-muted">
+                  <div className="flex h-[160px] w-[160px] items-center justify-center text-xs text-muted sm:h-[200px] sm:w-[200px]">
                     QR wird generiert...
                   </div>
                 )}
