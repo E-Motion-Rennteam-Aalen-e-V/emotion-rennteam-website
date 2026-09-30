@@ -11,13 +11,13 @@ import { getOrganizationJsonLdScript, getWebSiteJsonLd } from "@/lib/structuredD
 import { DEVICE_BOOTSTRAP_SCRIPT } from "@/lib/device";
 
 const airstrike = localFont({
-  src: "../fonts/airstrike.ttf",
+  src: "../fonts/airstrike.woff2",
   variable: "--font-heading",
   display: "swap",
 });
 
 const lato = localFont({
-  src: "../fonts/LatoSemibold.ttf",
+  src: "../fonts/LatoSemibold.woff2",
   variable: "--font-body",
   display: "swap",
 });
@@ -25,6 +25,7 @@ const lato = localFont({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const viewport: Viewport = {

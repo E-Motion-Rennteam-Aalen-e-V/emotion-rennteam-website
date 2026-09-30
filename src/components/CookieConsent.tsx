@@ -33,8 +33,8 @@ export default function CookieConsent() {
       aria-label="Cookie-Hinweis"
       className="fixed inset-x-0 bottom-0 z-[90] border-t border-border bg-surface/95 backdrop-blur-sm"
     >
-      <div className="container-page flex flex-col items-center gap-4 py-5 text-sm text-muted sm:flex-row sm:justify-between">
-        <p className="max-w-2xl">
+      <div className="container-page flex flex-col items-center gap-2 py-3 text-xs text-muted sm:flex-row sm:justify-between sm:gap-4 sm:py-5 sm:text-sm">
+        <p className="line-clamp-2 max-w-2xl sm:line-clamp-none">
           Wir setzen ein technisch notwendiges Cookie, um deine Auswahl zu diesem Hinweis zu
           speichern. Mit deiner Einwilligung nutzen wir zusätzlich Meta Pixel, um die Wirksamkeit
           unserer Social-Media-Inhalte zu messen. Mehr dazu in unserer{" "}
@@ -43,18 +43,18 @@ export default function CookieConsent() {
           </Link>
           .
         </p>
-        <div className="flex shrink-0 gap-3">
+        <div className="flex w-full shrink-0 gap-2 sm:w-auto sm:gap-3">
           <button
             type="button"
             onClick={() => writeConsentCookie("necessary")}
-            className="rounded-md border border-border px-4 py-2 text-sm font-semibold transition-colors hover:border-accent/60"
+            className="flex-1 rounded-md border border-border px-3 py-1.5 text-xs font-semibold transition-colors hover:border-accent/60 sm:flex-none sm:px-4 sm:py-2 sm:text-sm"
           >
             Nur notwendige
           </button>
           <button
             type="button"
             onClick={() => writeConsentCookie("all")}
-            className="rounded-md bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground transition-transform hover:scale-105"
+            className="flex-1 rounded-md bg-accent px-3 py-1.5 text-xs font-semibold text-accent-foreground transition-transform hover:scale-105 sm:flex-none sm:px-4 sm:py-2 sm:text-sm"
           >
             Alle akzeptieren
           </button>
