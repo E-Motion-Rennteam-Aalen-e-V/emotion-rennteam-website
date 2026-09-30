@@ -319,6 +319,7 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                             color: '#f2f4f8', fontSize: 21, fontWeight: 900,
                             lineHeight: 1.15, margin: 0, letterSpacing: '-0.025em',
                             textShadow: '0 2px 12px rgba(0,0,0,0.8)',
+                            fontStyle: 'normal', fontFamily: 'var(--font-sans, system-ui, sans-serif)',
                           }}
                         >
                           {member.name}
@@ -417,7 +418,7 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                     </div>
 
                     {/* Contact rows */}
-                    <div style={{ flexShrink: 0, padding: '12px 18px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <div style={{ flexShrink: 0, padding: '10px 16px', display: 'flex', flexDirection: 'column', gap: 7 }}>
                       {(member.phone || !showRealContact) && (
                         <ContactRow icon={<PhoneIcon />} label={showRealContact && member.phone ? maskPhone(member.phone) : '[Test Tel]'} dim={!showRealContact || !member.phone} />
                       )}
@@ -430,30 +431,30 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                     </div>
 
                     {/* Divider */}
-                    <div style={{ margin: '0 18px', height: 1, background: 'rgba(255,255,255,0.05)', flexShrink: 0 }} />
+                    <div style={{ margin: '0 16px', height: 1, background: 'rgba(255,255,255,0.05)', flexShrink: 0 }} />
 
                     {/* QR */}
-                    <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '12px 18px 8px' }}>
+                    <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '10px 16px 6px' }}>
                       <div style={{
-                        background: 'white', borderRadius: 12, padding: 9,
+                        background: 'white', borderRadius: 10, padding: 7,
                         boxShadow: '0 4px 24px rgba(0,0,0,0.6)',
                         display: 'inline-block',
                       }}>
                         {qrCodeDataUrl ? (
-                          <img src={qrCodeDataUrl} alt="QR Code" style={{ width: 96, height: 96, display: 'block' }} />
+                          <img src={qrCodeDataUrl} alt="QR Code" style={{ width: 82, height: 82, display: 'block' }} />
                         ) : (
-                          <div style={{ width: 96, height: 96, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#aaa', fontSize: 10 }}>
+                          <div style={{ width: 82, height: 82, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#aaa', fontSize: 10 }}>
                             Lädt…
                           </div>
                         )}
                       </div>
-                      <p style={{ color: 'rgba(100,120,145,0.5)', fontSize: 9, marginTop: 5, textTransform: 'uppercase', letterSpacing: '0.14em', fontWeight: 700 }}>
+                      <p style={{ color: 'rgba(100,120,145,0.5)', fontSize: 9, marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.14em', fontWeight: 700 }}>
                         QR scannen · Kontakt speichern
                       </p>
                     </div>
 
                     {/* Actions */}
-                    <div style={{ flexGrow: 1, padding: '4px 18px 14px', display: 'flex', flexDirection: 'column', gap: 7, justifyContent: 'flex-end' }}>
+                    <div style={{ flexGrow: 1, padding: '4px 16px 12px', display: 'flex', flexDirection: 'column', gap: 6, justifyContent: 'flex-end' }}>
                       <ActionButton onClick={(e) => { e.stopPropagation(); downloadVCard(member); }}>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: 13, height: 13 }}>
                           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -487,8 +488,8 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                     {/* Footer */}
                     <div style={{
                       flexShrink: 0,
-                      borderTop: '1px solid rgba(255,255,255,0.04)',
-                      padding: '7px 18px',
+                      borderTop: '1px solid rgba(255,255,255,0.06)',
+                      padding: '6px 16px',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                     }}>
                       <div style={{
@@ -531,9 +532,9 @@ function ContactRow({ icon, label, dim }: { icon: React.ReactNode; label: string
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
       <div style={{
-        width: 28, height: 28, borderRadius: 7, flexShrink: 0,
-        background: 'rgba(0,113,181,0.1)',
-        border: '1px solid rgba(0,113,181,0.18)',
+        width: 26, height: 26, borderRadius: 6, flexShrink: 0,
+        background: 'rgba(0,113,181,0.12)',
+        border: '1px solid rgba(0,113,181,0.2)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
         {icon}
