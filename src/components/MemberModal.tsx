@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import type { TeamMember } from '@/lib/content';
-import { downloadVCard, generateVCard, generateMECard } from '@/lib/vcard-generator';
-import { generateQRCodeValue, generateQRCodeDataUrl, QR_CONFIG } from '@/lib/qrcode-generator';
+import { downloadVCard } from '@/lib/vcard-generator';
+import { generateQRCodeValue, generateQRCodeDataUrl } from '@/lib/qrcode-generator';
 
 interface MemberModalProps {
   member: TeamMember | null;
@@ -50,8 +50,6 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
   }, [member]);
 
   if (!member) return null;
-
-  const vcard = generateVCard(member);
 
   // Wallet links
   const getAppleWalletLink = () => {
@@ -215,9 +213,11 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
               <p className="text-xs text-muted">QR Code scannen</p>
               <div className="rounded bg-white p-2">
                 {qrCodeDataUrl ? (
-                  <img
+                  <Image
                     src={qrCodeDataUrl}
                     alt="QR Code für Kontaktdaten"
+                    width={200}
+                    height={200}
                     className="h-[160px] w-[160px] sm:h-[200px] sm:w-[200px]"
                   />
                 ) : (

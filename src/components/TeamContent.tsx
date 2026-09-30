@@ -11,7 +11,7 @@ interface TeamContentProps {
   teamDescriptions: Record<string, string>;
 }
 
-export default function TeamContent({ members, teamDescriptions }: TeamContentProps) {
+export default function TeamContent({ members }: TeamContentProps) {
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
 
   return (
