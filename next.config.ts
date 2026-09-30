@@ -86,7 +86,7 @@ const nextConfig: NextConfig = {
   // instead of the whole package, shrinking the client JS bundle shipped
   // for pages that only use a couple of its features (Reveal, Stagger, ...).
   experimental: {
-    optimizePackageImports: ["framer-motion"],
+    optimizePackageImports: ["framer-motion", "lucide-react"],
   },
   async headers() {
     return [

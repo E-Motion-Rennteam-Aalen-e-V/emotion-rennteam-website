@@ -7,7 +7,7 @@ import HeroContent from "@/components/motion/HeroContent";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import Counter from "@/components/motion/Counter";
-import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import { SITE_NAME, SITE_URL } from "@/lib/site";
 import { TEAM_STRUCTURE } from "@/lib/team-departments";
 
 export const metadata: Metadata = {
