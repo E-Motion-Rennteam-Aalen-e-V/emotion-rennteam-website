@@ -258,49 +258,59 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                   }}>
                     {/* Racing stripe — animated shimmer */}
                     <div style={{
-                      height: 3, flexShrink: 0, position: 'relative', overflow: 'hidden',
-                      background: 'linear-gradient(90deg, #003eb5 0%, #0081e0 45%, #003eb5 100%)',
+                      height: 4, flexShrink: 0, position: 'relative', overflow: 'hidden',
+                      background: 'linear-gradient(90deg, #0040c0 0%, #0088f0 50%, #0040c0 100%)',
+                      boxShadow: '0 2px 12px rgba(0,100,220,0.4)',
                     }}>
                       <motion.div
                         animate={{ x: ['-100%', '200%'] }}
-                        transition={{ repeat: Infinity, duration: 2.8, ease: 'linear', repeatDelay: 2 }}
+                        transition={{ repeat: Infinity, duration: 2.6, ease: 'easeInOut', repeatDelay: 1.8 }}
                         style={{
                           position: 'absolute', inset: 0,
-                          background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent)',
-                          width: '40%',
+                          background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)',
+                          width: '35%',
+                          filter: 'blur(1px)',
                         }}
                       />
                     </div>
 
                     {/* Logo bar — frosted glass */}
-                    <div style={{
-                      flexShrink: 0,
-                      padding: '11px 16px 9px',
-                      display: 'flex', alignItems: 'center', gap: 9,
-                      background: 'rgba(7,8,15,0.55)',
-                      backdropFilter: 'blur(12px)',
-                      borderBottom: '1px solid rgba(255,255,255,0.04)',
-                    }}>
-                      <div style={{
-                        width: 28, height: 28, borderRadius: 7,
-                        background: 'linear-gradient(135deg, #0071b5 0%, #0048cc 100%)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    <motion.div
+                      animate={{ background: ['rgba(7,8,15,0.55)', 'rgba(10,20,40,0.6)', 'rgba(7,8,15,0.55)'] }}
+                      transition={{ duration: 4, repeat: Infinity }}
+                      style={{
                         flexShrink: 0,
-                        boxShadow: '0 2px 12px rgba(0,113,181,0.5), inset 0 1px 0 rgba(255,255,255,0.2)',
+                        padding: '12px 16px 10px',
+                        display: 'flex', alignItems: 'center', gap: 10,
+                        backdropFilter: 'blur(14px)',
+                        borderBottom: '1px solid rgba(0,120,220,0.15)',
+                        boxShadow: 'inset 0 1px 0 rgba(0,150,255,0.08)',
                       }}>
+                      <motion.div
+                        whileHover={{ scale: 1.08 }}
+                        style={{
+                          width: 28, height: 28, borderRadius: 8,
+                          background: 'linear-gradient(135deg, #0080c0 0%, #0050e0 100%)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          flexShrink: 0,
+                          boxShadow: '0 0 16px rgba(0,130,220,0.5), inset 0 1px 0 rgba(255,255,255,0.25)',
+                        }}>
                         <svg width="18" height="18" viewBox="0 0 40 40" fill="none">
                           <path d="M8 28L14 12H20L16 22H22L18 32H8Z" fill="white" />
                           <path d="M20 12H32L28 22H24L28 12" fill="white" opacity="0.55" />
                         </svg>
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ color: '#c8d2e4', fontSize: 10.5, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', lineHeight: 1 }}>
+                      </motion.div>
+                      <motion.div
+                        animate={{ color: ['#d0dae8', '#e8f0ff', '#d0dae8'] }}
+                        transition={{ duration: 3, repeat: Infinity }}
+                        style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 11, fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase', lineHeight: 1 }}>
                           E-Motion Rennteam
                         </div>
-                        <div style={{ color: '#3a4560', fontSize: 8.5, fontWeight: 600, letterSpacing: '0.12em', marginTop: 2, textTransform: 'uppercase' }}>
+                        <div style={{ color: '#4a6080', fontSize: 8.5, fontWeight: 700, letterSpacing: '0.12em', marginTop: 2, textTransform: 'uppercase' }}>
                           Hochschule Aalen
                         </div>
-                      </div>
+                      </motion.div>
                       {isExecutive && (
                         <motion.span
                           initial={{ scale: 0.8, opacity: 0 }}
@@ -318,7 +328,7 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                           Executive
                         </motion.span>
                       )}
-                    </div>
+                    </motion.div>
 
                     {/* Photo — full bleed */}
                     <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
@@ -368,45 +378,60 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                       )}
 
                       {/* Name / role overlay */}
-                      <div style={{
-                        position: 'absolute', bottom: 0, left: 0, right: 0,
-                        padding: '12px 18px 14px',
-                        textAlign: 'center',
-                      }}>
-                        <h2
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.5, duration: 0.5 }}
+                        style={{
+                          position: 'absolute', bottom: 0, left: 0, right: 0,
+                          padding: '16px 18px 18px',
+                          textAlign: 'center',
+                          background: 'linear-gradient(to top, rgba(5,7,18,0.95) 0%, rgba(5,7,18,0.7) 70%, transparent 100%)',
+                        }}>
+                        <motion.h2
                           id={`modal-title-${member.slug}`}
+                          animate={{ letterSpacing: '-0.01em' }}
                           style={{
-                            color: '#ffffff', fontSize: 22, fontWeight: 900,
-                            lineHeight: 1.15, margin: 0, letterSpacing: '-0.02em',
+                            color: '#f8f9fb', fontSize: 24, fontWeight: 950,
+                            lineHeight: 1.1, margin: 0, letterSpacing: '-0.02em',
                             fontStyle: 'normal', fontFamily: 'var(--font-sans, system-ui, sans-serif)',
-                            textShadow: '0 0 32px rgba(60,150,255,0.35), 0 2px 18px rgba(0,0,0,0.95)',
+                            textShadow: '0 0 40px rgba(100,180,255,0.4), 0 4px 20px rgba(0,0,0,0.95)',
                           }}
                         >
                           {member.name}
-                        </h2>
+                        </motion.h2>
                         {member.role && (
-                          <div style={{ marginTop: 6, display: 'flex', justifyContent: 'center' }}>
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.7, duration: 0.4 }}
+                            style={{ marginTop: 8, display: 'flex', justifyContent: 'center' }}>
                             <span style={{
-                              color: '#60c4ff', fontSize: 10, fontWeight: 700,
-                              letterSpacing: '0.1em', textTransform: 'uppercase',
-                              background: 'rgba(0,100,200,0.2)',
-                              border: '1px solid rgba(0,140,255,0.25)',
-                              borderRadius: 20, padding: '3px 10px',
-                              backdropFilter: 'blur(4px)',
+                              color: '#5dd9ff', fontSize: 11, fontWeight: 800,
+                              letterSpacing: '0.12em', textTransform: 'uppercase',
+                              background: 'linear-gradient(135deg, rgba(0,140,220,0.3) 0%, rgba(0,100,180,0.2) 100%)',
+                              border: '1px solid rgba(100,180,255,0.35)',
+                              borderRadius: 22, padding: '4px 12px',
+                              backdropFilter: 'blur(6px)',
+                              boxShadow: '0 0 12px rgba(0,120,220,0.2)',
                             }}>
                               {member.role}
                             </span>
-                          </div>
+                          </motion.div>
                         )}
                         {member.department && (
-                          <p style={{
-                            color: 'rgba(180,200,225,0.45)', fontSize: 9.5, marginTop: 4,
-                            fontWeight: 500, letterSpacing: '0.05em',
-                          }}>
+                          <motion.p
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.85, duration: 0.4 }}
+                            style={{
+                              color: 'rgba(180,210,255,0.55)', fontSize: 10, marginTop: 5,
+                              fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase',
+                            }}>
                             {member.department}
-                          </p>
+                          </motion.p>
                         )}
-                      </div>
+                      </motion.div>
                     </div>
 
                     {/* Flip hint */}
@@ -440,31 +465,39 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                   }}>
                     {/* Top stripe */}
                     <div style={{
-                      height: 3, flexShrink: 0, position: 'relative', overflow: 'hidden',
-                      background: 'linear-gradient(90deg, #003eb5 0%, #0090e0 50%, #003eb5 100%)',
+                      height: 4, flexShrink: 0, position: 'relative', overflow: 'hidden',
+                      background: 'linear-gradient(90deg, #0040c0 0%, #0090f0 50%, #0040c0 100%)',
+                      boxShadow: '0 2px 12px rgba(0,100,220,0.35)',
                     }}>
                       <motion.div
                         animate={{ x: ['-100%', '200%'] }}
-                        transition={{ repeat: Infinity, duration: 2.8, ease: 'linear', repeatDelay: 3, delay: 1 }}
+                        transition={{ repeat: Infinity, duration: 2.6, ease: 'easeInOut', repeatDelay: 1.8, delay: 0.8 }}
                         style={{
                           position: 'absolute', inset: 0,
-                          background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent)',
-                          width: '40%',
+                          background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent)',
+                          width: '35%',
+                          filter: 'blur(1px)',
                         }}
                       />
                     </div>
 
-                    {/* Decorative bg glow */}
-                    <div style={{
-                      position: 'absolute', top: 3, right: -20, width: 200, height: 200,
-                      background: 'radial-gradient(circle, rgba(0,100,200,0.12) 0%, transparent 70%)',
-                      pointerEvents: 'none',
-                    }} />
-                    <div style={{
-                      position: 'absolute', bottom: 40, left: -30, width: 150, height: 150,
-                      background: 'radial-gradient(circle, rgba(0,60,140,0.08) 0%, transparent 70%)',
-                      pointerEvents: 'none',
-                    }} />
+                    {/* Decorative bg glow — animated */}
+                    <motion.div
+                      animate={{ opacity: [0.08, 0.15, 0.08] }}
+                      transition={{ duration: 5, repeat: Infinity }}
+                      style={{
+                        position: 'absolute', top: 3, right: -20, width: 200, height: 200,
+                        background: 'radial-gradient(circle, rgba(0,130,220,0.15) 0%, transparent 70%)',
+                        pointerEvents: 'none',
+                      }} />
+                    <motion.div
+                      animate={{ opacity: [0.06, 0.12, 0.06] }}
+                      transition={{ duration: 5.5, repeat: Infinity, delay: 0.3 }}
+                      style={{
+                        position: 'absolute', bottom: 40, left: -30, width: 150, height: 150,
+                        background: 'radial-gradient(circle, rgba(0,80,180,0.12) 0%, transparent 70%)',
+                        pointerEvents: 'none',
+                      }} />
 
                     {/* Animated back content */}
                     <motion.div
@@ -544,22 +577,29 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
 
                       {/* QR */}
                       <motion.div variants={backItem} style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '10px 16px 6px' }}>
-                        <div style={{
-                          background: 'white', borderRadius: 10, padding: 7,
-                          boxShadow: '0 0 0 1px rgba(0,120,220,0.25), 0 6px 28px rgba(0,0,0,0.7), 0 0 20px rgba(0,100,200,0.12)',
-                          display: 'inline-block',
-                        }}>
+                        <motion.div
+                          whileHover={{ scale: 1.08 }}
+                          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                          style={{
+                            background: 'white', borderRadius: 12, padding: 8,
+                            boxShadow: '0 0 0 2px rgba(0,120,220,0.3), 0 8px 32px rgba(0,80,180,0.25), 0 0 28px rgba(0,120,220,0.15)',
+                            display: 'inline-block',
+                            cursor: 'pointer',
+                          }}>
                           {qrCodeDataUrl ? (
-                            <img src={qrCodeDataUrl} alt="QR Code" style={{ width: 82, height: 82, display: 'block' }} />
+                            <img src={qrCodeDataUrl} alt="QR Code" style={{ width: 82, height: 82, display: 'block', borderRadius: 4 }} />
                           ) : (
-                            <div style={{ width: 82, height: 82, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#bbb', fontSize: 10 }}>
+                            <div style={{ width: 82, height: 82, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#aaa', fontSize: 11, fontWeight: 600 }}>
                               Lädt…
                             </div>
                           )}
-                        </div>
-                        <p style={{ color: 'rgba(100,125,155,0.5)', fontSize: 8.5, marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 700 }}>
+                        </motion.div>
+                        <motion.p
+                          animate={{ opacity: [0.4, 0.6, 0.4] }}
+                          transition={{ duration: 3, repeat: Infinity }}
+                          style={{ color: 'rgba(100,125,155,0.55)', fontSize: 8.5, marginTop: 6, textTransform: 'uppercase', letterSpacing: '0.16em', fontWeight: 800 }}>
                           QR scannen · Kontakt speichern
-                        </p>
+                        </motion.p>
                       </motion.div>
 
                       {/* Actions */}
@@ -643,44 +683,66 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
 
 /* ─── Helper components ─── */
 function ContactRow({ icon, label, dim }: { icon: React.ReactNode; label: string; dim?: boolean }) {
+  const [hovering, setHovering] = useState(false);
   return (
-    <div style={{
-      display: 'flex', alignItems: 'center', gap: 9,
-      padding: '6px 8px 6px 6px', borderRadius: 8,
-      background: 'rgba(255,255,255,0.02)',
-      border: '1px solid rgba(255,255,255,0.04)',
-      borderLeft: '2px solid rgba(0,100,200,0.25)',
-    }}>
-      <div style={{
-        width: 24, height: 24, borderRadius: 6, flexShrink: 0,
-        background: 'rgba(0,100,200,0.14)',
-        border: '1px solid rgba(0,120,220,0.2)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
+    <motion.div
+      onMouseEnter={() => setHovering(true)}
+      onMouseLeave={() => setHovering(false)}
+      animate={hovering ? { x: 4, backgroundColor: 'rgba(0,100,220,0.12)' } : { x: 0, backgroundColor: 'rgba(255,255,255,0.02)' }}
+      transition={{ duration: 0.2 }}
+      style={{
+        display: 'flex', alignItems: 'center', gap: 9,
+        padding: '6px 8px 6px 6px', borderRadius: 8,
+        border: '1px solid rgba(0,120,220,0.25)',
+        borderLeft: hovering ? '2px solid rgba(0,180,255,0.5)' : '2px solid rgba(0,100,200,0.25)',
+        cursor: 'pointer',
+        transition: 'border-color 0.2s',
       }}>
+      <motion.div
+        animate={hovering ? { scale: 1.1, boxShadow: '0 0 14px rgba(0,130,220,0.4)' } : { scale: 1, boxShadow: '0 0 6px rgba(0,100,200,0.15)' }}
+        transition={{ duration: 0.2 }}
+        style={{
+          width: 24, height: 24, borderRadius: 6, flexShrink: 0,
+          background: 'linear-gradient(135deg, rgba(0,100,200,0.2) 0%, rgba(0,60,140,0.14) 100%)',
+          border: '1px solid rgba(0,120,220,0.3)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
         {icon}
-      </div>
-      <span style={{ color: dim ? 'rgba(100,120,148,0.5)' : '#8fb8d4', fontSize: 11.5, fontWeight: 500, letterSpacing: '0.01em' }}>
+      </motion.div>
+      <motion.span
+        animate={hovering ? { color: '#5dd9ff' } : { color: dim ? 'rgba(100,120,148,0.5)' : '#8fb8d4' }}
+        transition={{ duration: 0.2 }}
+        style={{ fontSize: 11.5, fontWeight: 500, letterSpacing: '0.01em' }}>
         {label}
-      </span>
-    </div>
+      </motion.span>
+    </motion.div>
   );
 }
 
 function ActionButton({ onClick, children }: { onClick: (e: React.MouseEvent) => void; children: React.ReactNode }) {
+  const [hovering, setHovering] = useState(false);
   return (
     <motion.button
       onClick={onClick}
-      whileHover={{ scale: 1.015, borderColor: 'rgba(0,140,255,0.6)' }}
-      whileTap={{ scale: 0.97 }}
+      onMouseEnter={() => setHovering(true)}
+      onMouseLeave={() => setHovering(false)}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.96 }}
+      animate={hovering ? {
+        background: 'linear-gradient(135deg, rgba(0,120,200,0.35) 0%, rgba(0,80,160,0.28) 100%)',
+        boxShadow: '0 0 24px rgba(0,130,220,0.3), inset 0 1px 0 rgba(255,255,255,0.08)'
+      } : {
+        background: 'linear-gradient(135deg, rgba(0,90,180,0.28) 0%, rgba(0,60,140,0.22) 100%)',
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05), 0 2px 12px rgba(0,80,180,0.15)'
+      }}
+      transition={{ duration: 0.25 }}
       style={{
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
-        background: 'linear-gradient(135deg, rgba(0,90,180,0.28) 0%, rgba(0,60,140,0.22) 100%)',
-        border: '1px solid rgba(0,120,220,0.4)',
-        borderRadius: 10, padding: '10px 14px',
-        color: '#4dc4ff', fontSize: 11.5, fontWeight: 700,
+        border: '1px solid rgba(0,140,220,0.45)',
+        borderRadius: 11, padding: '11px 16px',
+        color: hovering ? '#5dd9ff' : '#4dc4ff', fontSize: 12, fontWeight: 800,
         cursor: 'pointer', letterSpacing: '0.04em', width: '100%',
-        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05), 0 2px 12px rgba(0,80,180,0.15)',
-        transition: 'border-color 0.2s',
+        transition: 'color 0.25s',
       }}
     >
       {children}
@@ -689,22 +751,34 @@ function ActionButton({ onClick, children }: { onClick: (e: React.MouseEvent) =>
 }
 
 function GhostButton({ href, children }: { href: string; children: React.ReactNode }) {
+  const [hovering, setHovering] = useState(false);
   return (
     <motion.a
       href={href}
       target={href.startsWith('tel:') ? undefined : '_blank'}
       rel="noopener noreferrer"
       onClick={(e) => e.stopPropagation()}
-      whileHover={{ scale: 1.02, borderColor: 'rgba(255,255,255,0.14)' }}
-      whileTap={{ scale: 0.97 }}
+      onMouseEnter={() => setHovering(true)}
+      onMouseLeave={() => setHovering(false)}
+      whileHover={{ scale: 1.03 }}
+      whileTap={{ scale: 0.94 }}
+      animate={hovering ? {
+        background: 'rgba(100,180,255,0.12)',
+        borderColor: 'rgba(100,150,220,0.35)',
+        boxShadow: '0 0 16px rgba(100,150,220,0.2), inset 0 1px 0 rgba(255,255,255,0.06)'
+      } : {
+        background: 'rgba(255,255,255,0.03)',
+        borderColor: 'rgba(255,255,255,0.08)',
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.03)'
+      }}
+      transition={{ duration: 0.25 }}
       style={{
         flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-        background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)',
-        borderRadius: 9, padding: '8px 8px',
-        color: '#4a5a70', fontSize: 11, fontWeight: 600,
+        border: '1px solid rgba(255,255,255,0.08)',
+        borderRadius: 10, padding: '9px 8px',
+        color: hovering ? '#5dd9ff' : '#5a7a95', fontSize: 11.5, fontWeight: 700,
         textDecoration: 'none',
-        transition: 'border-color 0.2s, color 0.2s',
-        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.03)',
+        transition: 'color 0.25s',
       }}
     >
       {children}
