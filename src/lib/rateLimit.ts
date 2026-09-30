@@ -1,26 +1,27 @@
+// ⚠️ This file was built with AI assistance – the flood-detection edge cases
+// and IP-spoofing details are the kind of thing that's really easy to get
+// wrong without knowing the attack vectors beforehand.
+// (Dieser Teil wurde mit KI-Hilfe gebaut – die Angriffs-Szenarien sind
+// tricky und man tritt leicht in eine Falle wenn man sie nicht kennt.)
+
 import type { NextRequest } from "next/server";
 
-/**
- * Minimal in-memory fixed-window rate limiter. Good enough to blunt naive
- * form-spam bots on a single long-lived Node.js server process. It does
- * *not* work across multiple serverless instances/regions since each
- * process has its own memory — if the site moves to a multi-instance
- * deployment, swap this for a shared store (Redis/Upstash, etc.).
- */
+// We track request counts per "route + IP" in memory to stop spam bots.
+// One bucket per key, resets after the time window expires.
+// Heads up: this only works on a single Node.js process. If the site ever
+// runs on multiple Vercel instances in parallel, each has its own memory and
+// won't know what the others have seen – you'd need Redis for that.
+// (Für uns reicht das erstmal, weil wir keinen riesigen Traffic haben.)
 
 type Bucket = { count: number; resetAt: number };
 
 const buckets = new Map<string, Bucket>();
 
-/**
- * Upper bound on how many distinct keys (route + IP) we track at once.
- * Expired buckets are never actively evicted on a timer — Vercel/Node
- * serverless functions don't get to run background work between
- * invocations — so without a cap, a long-lived process fielding traffic
- * from many distinct IPs (or a flood of spoofed `x-forwarded-for` values)
- * would grow this map forever. Once the map hits the cap we sweep expired
- * entries before inserting a new one, keeping steady-state memory bounded.
- */
+// Hard limit on how many IPs we track at once.
+// Without this, a bot flooding us with thousands of fake IPs would grow this
+// Map forever and crash the server – not ideal.
+// Bei 5000 Einträgen räumen wir auf: erst alte löschen, wenn immer noch
+// voll → ältesten rauswerfen (JavaScript Maps merken sich die Reihenfolge).
 const MAX_TRACKED_BUCKETS = 5000;
 
 function sweepExpiredBuckets(now: number): void {
@@ -36,15 +37,11 @@ export function checkRateLimit(key: string, limit: number, windowMs: number): bo
   if (!bucket || bucket.resetAt <= now) {
     if (buckets.size >= MAX_TRACKED_BUCKETS) {
       sweepExpiredBuckets(now);
-      // A sustained flood of distinct keys inside a single window (e.g.
-      // spoofed `x-forwarded-for` values arriving faster than any of
-      // them expire) leaves nothing for the sweep above to reclaim — all
-      // buckets are still legitimately "active". Without a fallback the
-      // map would keep growing past MAX_TRACKED_BUCKETS for as long as
-      // the flood lasts, silently defeating the cap. Evict the oldest
-      // entry (first in Map insertion order) so the cap is a true bound
-      // even under that load, not just when traffic happens to be idle
-      // enough for buckets to expire on their own.
+      // Tricky edge case: during an active flood, ALL buckets are still valid
+      // (none have expired yet), so sweeping does nothing. Without a fallback
+      // the map would just keep growing past the cap.
+      // Lösung: ältesten Eintrag rauswerfen – das ist der erste in der Map,
+      // weil JS Maps die Insertionsreihenfolge beibehalten.
       if (buckets.size >= MAX_TRACKED_BUCKETS) {
         const oldestKey = buckets.keys().next().value;
         if (oldestKey !== undefined) buckets.delete(oldestKey);
@@ -62,21 +59,21 @@ export function checkRateLimit(key: string, limit: number, windowMs: number): bo
   return true;
 }
 
-/** Test-only escape hatch to observe the internal map size. */
+// Only used in tests to check that the cleanup logic actually works
 export function _getTrackedBucketCountForTesting(): number {
   return buckets.size;
 }
 
-/**
- * Best-effort client IP extraction behind a single trusted reverse proxy
- * (e.g. Vercel's edge network). `x-forwarded-for` is a comma-separated list
- * that each hop *appends* to rather than replaces, so a client can freely
- * set their own value before the request reaches the proxy — only the
- * *last* entry is the one the trusted proxy itself added and is safe to
- * key rate limits on. Taking the first (leftmost, client-controlled) entry
- * would let anyone bypass rate limiting simply by sending a different
- * `x-forwarded-for` value on every request.
- */
+// Extracts the real client IP from the request.
+// Liest die echte Client-IP aus den Request-Headern.
+//
+// This one is subtle / Hier steckt eine Falle:
+// x-forwarded-for looks like "clientIP, proxy1, proxy2" – each hop appends
+// its own address. The LAST entry is what our trusted Vercel proxy added,
+// so that's the only one we can believe.
+// If we'd take the FIRST entry instead, any attacker could just set their
+// own x-forwarded-for header and bypass rate limiting completely.
+// (Den ersten nehmen = Angreifer kann sich eine beliebige IP ausdenken.)
 export function getClientIp(request: NextRequest): string {
   const forwardedFor = request.headers.get("x-forwarded-for");
   if (forwardedFor) {
