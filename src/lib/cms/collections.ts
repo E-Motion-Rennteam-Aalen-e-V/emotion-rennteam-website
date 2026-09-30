@@ -220,6 +220,34 @@ export const collections: CollectionDef[] = [
     ],
   },
   {
+    name: "businessCardDraft",
+    label: "Visitenkarten (Entwürfe aus App)",
+    path: "content/business-card-drafts",
+    fields: [
+      { name: "name", label: "Name", type: "string", isTitle: true, required: true },
+      { name: "title", label: "Position", type: "string" },
+      { name: "email", label: "E-Mail", type: "string" },
+      { name: "phone", label: "Telefon", type: "string" },
+      { name: "address", label: "Adresse", type: "text" },
+      { name: "linkedin", label: "LinkedIn-URL", type: "string" },
+      { name: "photo", label: "Foto", type: "image" },
+      { name: "templateId", label: "Design-Vorlage (1-5)", type: "number" },
+      {
+        name: "status",
+        label: "Status",
+        type: "select",
+        // "draft" kommt automatisch aus der E-Motion-Cards-PWA (Auto-Sync bei
+        // jeder Änderung). Erst nach manueller Pruefung hier auf "published"
+        // setzen und die Felder in den passenden Team-Mitglied-Eintrag
+        // (content/team/*.md) uebernehmen - dieser Entwurf erscheint nie von
+        // selbst auf der oeffentlichen Team-Seite.
+        options: ["draft", "published"],
+      },
+      { name: "sourceMemberSlug", label: "Verknüpftes Team-Mitglied (Slug, falls bekannt)", type: "string" },
+      { name: "syncedAt", label: "Zuletzt aus der App synchronisiert", type: "datetime" },
+    ],
+  },
+  {
     name: "position",
     label: "Offene Positionen",
     path: "content/positions",
