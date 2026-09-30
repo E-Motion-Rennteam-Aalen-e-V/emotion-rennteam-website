@@ -8,6 +8,7 @@ import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import Counter from "@/components/motion/Counter";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import { TEAM_STRUCTURE } from "@/lib/team-departments";
 
 export const metadata: Metadata = {
   title: "E-Motion Rennteam Aalen | Formula Student Electric",
@@ -76,9 +77,11 @@ export default function Home() {
           />
         </div>
 
-        <div aria-hidden="true" className="absolute bottom-8 left-1/2 hidden -translate-x-1/2 animate-bounce flex-col items-center gap-1.5 sm:flex">
-          <span className="text-[0.6rem] font-semibold uppercase tracking-[0.35em] text-white/60 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">Scrollen</span>
-          <span className="text-base leading-none text-white/60 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">&darr;</span>
+        <div aria-hidden="true" className="absolute bottom-8 left-1/2 flex -translate-x-1/2 animate-bounce flex-col items-center gap-1.5">
+          <span className="hidden text-[0.6rem] font-semibold uppercase tracking-[0.35em] text-white/60 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)] sm:block">Scrollen</span>
+          <svg className="h-5 w-5 text-white/60 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
         </div>
       </section>
 
@@ -88,14 +91,14 @@ export default function Home() {
             {stats.map((stat, i) => (
               <StaggerItem
                 key={stat.label}
-                className={`flex flex-col items-center justify-center px-6 py-9 text-center sm:px-10 sm:py-11 ${
+                className={`group flex flex-col items-center justify-center px-6 py-9 text-center sm:px-10 sm:py-11 ${
                   i < stats.length - 1 ? "border-r border-border" : ""
                 } [&:nth-child(2)]:border-r-0 sm:[&:nth-child(2)]:border-r [&:nth-child(1)]:border-b [&:nth-child(2)]:border-b sm:[&:nth-child(1)]:border-b-0 sm:[&:nth-child(2)]:border-b-0`}
               >
-                <div className="text-3xl font-extrabold tabular-nums text-foreground lg:text-4xl">
+                <div className="font-mono text-3xl font-bold tabular-nums text-gradient-accent lg:text-4xl xl:text-5xl">
                   <Counter value={stat.value} suffix={stat.suffix} />
                 </div>
-                <div className="mt-2 text-xs font-medium uppercase tracking-widest text-muted">
+                <div className="mt-2 text-xs font-medium uppercase tracking-[0.18em] text-muted transition-colors group-hover:text-accent-text">
                   {stat.label}
                 </div>
               </StaggerItem>
@@ -107,8 +110,11 @@ export default function Home() {
       <section className="container-page py-16 sm:py-20">
         <StaggerGroup className="grid gap-5 sm:grid-cols-2">
           <StaggerItem className="h-full">
-            <div className="flex h-full flex-col gap-6 rounded-2xl border border-border bg-surface p-8 transition-colors hover:border-accent/50 sm:p-10">
-              <div className="h-0.5 w-10 rounded-full bg-accent" />
+            <div className="card-gradient-border flex h-full flex-col gap-6 rounded-xl bg-surface p-8 sm:p-10">
+              <div className="flex items-center gap-3">
+                <div className="h-px w-8 bg-accent" />
+                <span className="text-xs font-semibold uppercase tracking-[0.2em] text-accent-text">Partner</span>
+              </div>
               <div className="flex-1">
                 <h2 className="text-2xl font-extrabold tracking-normal sm:text-3xl">
                   Unsere Sponsoren
@@ -119,15 +125,18 @@ export default function Home() {
               </div>
               <Link
                 href="/sponsoren"
-                className="inline-flex w-fit items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold tracking-wide text-accent-foreground shadow-[0_8px_30px_-8px_rgba(0,113,181,0.5)] transition-all hover:scale-[1.03] hover:gap-3 hover:shadow-[0_8px_30px_-8px_rgba(0,113,181,0.8)]"
+                className="group inline-flex w-fit items-center gap-2 rounded-sm bg-accent px-6 py-3 text-xs font-bold uppercase tracking-wider text-accent-foreground transition-all hover:bg-accent/90 hover:gap-3"
               >
-                Zu unseren Sponsoren <span aria-hidden="true">&rarr;</span>
+                Zu unseren Sponsoren <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">&rarr;</span>
               </Link>
             </div>
           </StaggerItem>
           <StaggerItem className="h-full">
-            <div className="flex h-full flex-col gap-6 rounded-2xl border border-border bg-surface p-8 transition-colors hover:border-accent/50 sm:p-10">
-              <div className="h-0.5 w-10 rounded-full bg-accent" />
+            <div className="card-gradient-border flex h-full flex-col gap-6 rounded-xl bg-surface p-8 sm:p-10">
+              <div className="flex items-center gap-3">
+                <div className="h-px w-8 bg-accent" />
+                <span className="text-xs font-semibold uppercase tracking-[0.2em] text-accent-text">Bewerbung</span>
+              </div>
               <div className="flex-1">
                 <h2 className="text-2xl font-extrabold tracking-normal sm:text-3xl">
                   Werde Teil des Teams
@@ -138,9 +147,9 @@ export default function Home() {
               </div>
               <Link
                 href="/mitmachen"
-                className="inline-flex w-fit items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold tracking-wide text-accent-foreground shadow-[0_8px_30px_-8px_rgba(0,113,181,0.5)] transition-all hover:scale-[1.03] hover:gap-3 hover:shadow-[0_8px_30px_-8px_rgba(0,113,181,0.8)]"
+                className="group inline-flex w-fit items-center gap-2 rounded-sm bg-accent px-6 py-3 text-xs font-bold uppercase tracking-wider text-accent-foreground transition-all hover:bg-accent/90 hover:gap-3"
               >
-                Offene Positionen ansehen <span aria-hidden="true">&rarr;</span>
+                Offene Positionen <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">&rarr;</span>
               </Link>
             </div>
           </StaggerItem>
@@ -150,67 +159,117 @@ export default function Home() {
       {aboutSentence && (
         <section className="container-page py-20">
           <Reveal>
-            <div className="mx-auto max-w-2xl space-y-3 text-center">
-              <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">
-                Über uns
-              </p>
-              <p className="text-xl font-medium text-foreground">{aboutSentence}</p>
+            <div className="mx-auto max-w-3xl">
+              <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-12">
+                <div className="shrink-0">
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-accent-text">Über uns</p>
+                  <div className="speed-line-divider mt-3 w-24" />
+                </div>
+                <div>
+                  <p className="text-xl font-medium leading-relaxed text-foreground sm:text-2xl">{aboutSentence}</p>
+                  <Link
+                    href="/formula-student"
+                    className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-accent-text transition-colors hover:text-foreground"
+                  >
+                    Mehr über Formula Student <span aria-hidden="true">&rarr;</span>
+                  </Link>
+                </div>
+              </div>
             </div>
           </Reveal>
         </section>
       )}
 
       {vehicle && (
-        <section className="container-page py-28 text-center">
+        <section className="container-page py-20">
+          <div className="grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-16">
+            {vehicle.coverImage && (
+              <Reveal direction="left" className="relative">
+                <div className="relative aspect-[3/2] w-full overflow-hidden rounded-md border border-border/60">
+                  <Image
+                    src={vehicle.coverImage}
+                    alt={vehicle.name}
+                    fill
+                    sizes="(min-width: 1024px) 50vw, 100vw"
+                    className="object-cover transition-transform duration-700 hover:scale-105"
+                  />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent" />
+                  <div className="absolute bottom-4 left-4">
+                    <span className="rounded-sm bg-accent px-3 py-1 font-mono text-xs font-bold uppercase tracking-wider text-accent-foreground">
+                      {vehicle.year} · Aktuell
+                    </span>
+                  </div>
+                </div>
+              </Reveal>
+            )}
+            <Reveal direction={vehicle.coverImage ? "right" : "up"}>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-accent-text">
+                {vehicle.year} · Aktuelles Fahrzeug
+              </p>
+              <h2 className="mt-3 text-4xl font-extrabold tracking-normal text-balance sm:text-5xl xl:text-6xl">
+                {vehicle.name}
+              </h2>
+              {vehicle.tagline && (
+                <p className="mt-4 text-lg text-muted">{vehicle.tagline}</p>
+              )}
+              <div className="mt-8 grid grid-cols-2 gap-3">
+                {vehicle.specs?.slice(0, 4).map((spec) => (
+                  <div key={spec.label} className="rounded-md border border-border/60 bg-surface p-4 transition-all hover:border-accent/50 hover:-translate-y-0.5">
+                    <div className="text-[0.65rem] uppercase tracking-[0.18em] text-muted">{spec.label}</div>
+                    <div className="mt-1.5 font-mono text-xl font-bold text-foreground">{spec.value}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-8">
+                <Link
+                  href="/fahrzeuge"
+                  className="group inline-flex items-center gap-2 rounded-sm bg-accent px-6 py-3 text-xs font-bold uppercase tracking-wider text-accent-foreground transition-all hover:bg-accent/90 hover:gap-3"
+                >
+                  Alle technischen Daten <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">&rarr;</span>
+                </Link>
+              </div>
+            </Reveal>
+          </div>
+        </section>
+      )}
+
+      <section className="border-t border-border/60 bg-surface/30 py-20">
+        <div className="container-page">
           <Reveal>
-            <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">
-              {vehicle.year} · Aktuelles Fahrzeug
-            </p>
-            <h2 className="mx-auto mt-3 max-w-4xl text-4xl font-extrabold tracking-normal text-balance sm:text-5xl xl:text-6xl">
-              {vehicle.name}
-            </h2>
-            <p className="mx-auto mt-4 max-w-xl text-lg text-muted">{vehicle.tagline}</p>
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-accent-text">
+                  Fachbereiche
+                </p>
+                <h2 className="mt-2 text-3xl font-extrabold tracking-normal sm:text-4xl">
+                  {TEAM_STRUCTURE.filter(s => s.category !== "Board").reduce((n, s) => n + s.departments.length, 0)}+ Spezialisierungen
+                </h2>
+              </div>
+              <p className="max-w-sm text-muted sm:text-right">
+                Von der Simulation bis zum Renntrack — jedes Fachteam trägt seinen Teil bei.
+              </p>
+            </div>
           </Reveal>
-          <StaggerGroup className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-4 items-stretch xl:grid-cols-4 xl:gap-6">
-            {vehicle.specs?.slice(0, 4).map((spec) => (
-              <StaggerItem key={spec.label} className="h-full">
-                <div className="flex h-full flex-col justify-center rounded-2xl border border-border bg-surface p-5 transition-colors hover:border-accent/60">
-                  <div className="text-xs uppercase tracking-wide text-muted">{spec.label}</div>
-                  <div className="mt-1.5 text-lg font-semibold">{spec.value}</div>
+
+          <StaggerGroup className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            {TEAM_STRUCTURE.filter(s => s.category !== "Board").flatMap(s => s.departments).map((dept) => (
+              <StaggerItem key={dept}>
+                <div className="group rounded-md border border-border/50 bg-surface px-4 py-3 text-left transition-all hover:border-accent/50 hover:bg-surface/80">
+                  <div className="h-0.5 w-6 rounded-full bg-accent/50 transition-all group-hover:w-8 group-hover:bg-accent" />
+                  <div className="mt-2 text-sm font-medium leading-snug text-foreground/80 transition-colors group-hover:text-foreground">
+                    {dept}
+                  </div>
                 </div>
               </StaggerItem>
             ))}
           </StaggerGroup>
+
           <Reveal delay={0.1} className="mt-10">
             <Link
-              href="/fahrzeuge"
-              className="inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition-all hover:gap-3"
-            >
-              Alle technischen Daten ansehen <span aria-hidden="true">&rarr;</span>
-            </Link>
-          </Reveal>
-        </section>
-      )}
-
-      <section className="border-t border-border/60 bg-background/40 py-28">
-        <div className="container-page">
-          <Reveal>
-            <div className="mx-auto max-w-2xl text-center">
-              <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">
-                Fachbereiche
-              </p>
-              <p className="mt-4 text-lg text-muted">
-                Von der Konstruktion bis zum Marketing – jedes Fachteam trägt seinen Teil zum
-                fertigen Rennwagen bei.
-              </p>
-            </div>
-          </Reveal>
-          <Reveal delay={0.1} className="mt-10 text-center">
-            <Link
               href="/team"
-              className="inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition-all hover:gap-3"
+              className="group inline-flex items-center gap-2 rounded-sm bg-accent px-6 py-3 text-xs font-bold uppercase tracking-wider text-accent-foreground transition-all hover:bg-accent/90 hover:gap-3"
             >
-              Das ganze Team kennenlernen <span aria-hidden="true">&rarr;</span>
+              Das ganze Team kennenlernen <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">&rarr;</span>
             </Link>
           </Reveal>
         </div>
@@ -218,43 +277,48 @@ export default function Home() {
 
       <section className="overflow-hidden py-16">
         <Reveal>
-          <div className="container-page mb-8">
-            <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">
-              Wettbewerbe & Momente
-            </p>
-            <h2 className="mt-1 text-2xl font-extrabold tracking-normal text-balance sm:text-3xl">
-              Auf der Strecke zuhause
-            </h2>
+          <div className="container-page mb-8 flex items-end justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-accent-text">
+                Wettbewerbe & Momente
+              </p>
+              <h2 className="mt-1 text-2xl font-extrabold tracking-normal text-balance sm:text-3xl">
+                Auf der Strecke zuhause
+              </h2>
+            </div>
+            <Link
+              href="/galerie"
+              className="hidden items-center gap-1.5 text-sm font-semibold text-muted transition-colors hover:text-accent-text sm:flex"
+            >
+              Alle Fotos <span aria-hidden="true">&rarr;</span>
+            </Link>
           </div>
         </Reveal>
         <div className="flex gap-3 overflow-x-auto px-4 pb-4 sm:px-8 lg:px-0 lg:container-page lg:grid lg:grid-cols-3 lg:overflow-visible lg:pb-0">
-          <div className="relative aspect-[4/3] w-72 flex-none overflow-hidden rounded-2xl lg:w-auto">
-            <Image
-              src="/uploads/ert-14-26-rollout-buehne.png"
-              alt="ERT 14-26 Rollout Bühne"
-              fill
-              sizes="(min-width: 1024px) 33vw, 288px"
-              className="object-cover transition-transform duration-700 hover:scale-105"
-            />
-          </div>
-          <div className="relative aspect-[4/3] w-72 flex-none overflow-hidden rounded-2xl lg:w-auto">
-            <Image
-              src="/uploads/rollout-2026/rollout-2026-buehne-enthuellung.webp"
-              alt="Rollout 2026 Enthüllung"
-              fill
-              sizes="(min-width: 1024px) 33vw, 288px"
-              className="object-cover transition-transform duration-700 hover:scale-105"
-            />
-          </div>
-          <div className="relative aspect-[4/3] w-72 flex-none overflow-hidden rounded-2xl lg:w-auto">
-            <Image
-              src="/uploads/ert-14-26-sunset.webp"
-              alt="ERT 14-26 im Sonnenuntergang"
-              fill
-              sizes="(min-width: 1024px) 33vw, 288px"
-              className="object-cover transition-transform duration-700 hover:scale-105"
-            />
-          </div>
+          {[
+            { src: "/uploads/ert-14-26-rollout-buehne.png", alt: "ERT 14-26 Rollout Bühne", caption: "Rollout 2024" },
+            { src: "/uploads/rollout-2026/rollout-2026-buehne-enthuellung.webp", alt: "Rollout 2026 Enthüllung", caption: "Rollout 2026" },
+            { src: "/uploads/ert-14-26-sunset.webp", alt: "ERT 14-26 im Sonnenuntergang", caption: "Rennstrecke" },
+          ].map((photo, i) => (
+            <div key={i} className="group relative aspect-[4/3] w-72 flex-none overflow-hidden rounded-md lg:w-auto">
+              <Image
+                src={photo.src}
+                alt={photo.alt}
+                fill
+                sizes="(min-width: 1024px) 33vw, 288px"
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+              <div className="absolute bottom-3 left-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                <span className="text-xs font-semibold uppercase tracking-wider text-white">{photo.caption}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="container-page mt-6 sm:hidden">
+          <Link href="/galerie" className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted hover:text-accent-text">
+            Alle Fotos ansehen <span aria-hidden="true">&rarr;</span>
+          </Link>
         </div>
       </section>
 
