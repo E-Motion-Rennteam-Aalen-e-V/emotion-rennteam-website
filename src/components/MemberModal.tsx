@@ -197,8 +197,8 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
               <motion.div
                 style={{
                   rotateX: flipped ? 0 : springX,
-                  rotateY: flipped ? 180 : springY,
-                  perspective: 1200,
+                  rotateY: flipped ? 0 : springY,
+                  transformPerspective: 1200,
                   cursor: 'pointer',
                 }}
                 onMouseMove={!flipped ? handleMouseMove : undefined}
