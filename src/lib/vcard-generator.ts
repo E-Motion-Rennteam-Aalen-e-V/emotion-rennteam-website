@@ -1,8 +1,19 @@
 import type { TeamMember } from './content';
 
 /**
- * Generates RFC 5545 compliant vCard (virtual contact) format
- * Compatible with all major contact apps (Outlook, Apple Contacts, Google Contacts, etc)
+ * Erzeugt eine vCard nach RFC 6350 (Version 3.0) — das universelle Format
+ * für digitale Visitenkarten, das von Outlook, Apple Contacts, Google
+ * Contacts und praktisch jeder anderen Kontakt-App verstanden wird.
+ * Generates an RFC 6350-compliant vCard (version 3.0) — the universal
+ * digital business-card format understood by Outlook, Apple Contacts,
+ * Google Contacts, and virtually every other contacts app.
+ *
+ * Trennzeichen ist \r\n (CRLF), nicht nur \n — das schreibt die Spec vor.
+ * Einige Apps (v. a. ältere Outlook-Versionen) lehnen vCards mit reinem LF
+ * ab oder importieren sie fehlerhaft.
+ * The line separator is \r\n (CRLF), not just \n — the spec requires it.
+ * Some apps (especially older Outlook versions) reject or mangle vCards
+ * with bare LF line endings.
  */
 export function generateVCard(member: TeamMember): string {
   const lines: string[] = [
@@ -43,8 +54,15 @@ export function generateVCard(member: TeamMember): string {
 }
 
 /**
- * Escapes special characters in vCard field values
- * vCard spec requires escaping of: comma, semicolon, backslash, newline
+ * Maskiert Sonderzeichen in vCard-Feldwerten.
+ * Escapes special characters in vCard field values.
+ *
+ * Die vCard-Spec (RFC 6350 §3.4) verlangt Escaping für: Komma, Semikolon,
+ * Backslash und Zeilenumbruch. Ohne das würde ein Name wie "Müller, Hans"
+ * als zwei getrennte Namensteile interpretiert.
+ * The vCard spec (RFC 6350 §3.4) requires escaping of: comma, semicolon,
+ * backslash, and newline. Without it, a name like "Müller, Hans" would be
+ * parsed as two separate name components.
  */
 function escapeVCardValue(value: string): string {
   if (!value) return '';
@@ -56,8 +74,19 @@ function escapeVCardValue(value: string): string {
 }
 
 /**
- * Generates MECARD format (mobile-friendly QR code content)
- * Used for scanning with phone camera to add contact
+ * Erzeugt das MECARD-Format — kompakter als vCard und ideal für QR-Codes.
+ * Generates MECARD format — more compact than vCard and ideal for QR codes.
+ *
+ * MECARD wurde von NTT DoCoMo entwickelt und ist auf praktisch jedem
+ * modernen Smartphone nativ lesbar (iOS Kamera-App, Android-Kamera etc.).
+ * Wichtig: Der Name wird umgekehrt gespeichert (Nachname, Vorname), weil
+ * das der MECARD-Standard so vorschreibt — beim Import dreht die App es
+ * wieder um.
+ *
+ * MECARD was developed by NTT DoCoMo and is natively readable by virtually
+ * every modern smartphone (iOS Camera app, Android camera, etc.). Note: the
+ * name is stored in reverse order (last name, first name) as the MECARD
+ * standard requires — contact apps flip it back on import.
  */
 export function generateMECard(member: TeamMember): string {
   const parts: string[] = [];
@@ -84,7 +113,17 @@ export function generateMECard(member: TeamMember): string {
 }
 
 /**
- * Triggers download of vCard file
+ * Löst den Download der vCard-Datei im Browser aus.
+ * Triggers a vCard file download in the browser.
+ *
+ * Wir erstellen einen temporären <a>-Link mit einer Blob-URL, klicken ihn
+ * programmatisch und räumen danach auf. revokeObjectURL ist wichtig: Ohne
+ * es hält der Browser den Speicher des Blobs so lange, bis der Tab
+ * geschlossen wird.
+ *
+ * We create a temporary <a> link with a Blob URL, click it programmatically,
+ * then clean up. revokeObjectURL matters: without it the browser keeps the
+ * blob's memory allocated until the tab is closed.
  */
 export function downloadVCard(member: TeamMember): void {
   const vcard = generateVCard(member);

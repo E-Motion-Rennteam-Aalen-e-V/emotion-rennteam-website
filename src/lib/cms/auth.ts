@@ -1,18 +1,22 @@
-// ⚠️ AI-assisted – session tokens, cryptographic signing, and timing-safe
-// comparison are genuinely hard to get right. Built with AI help.
-// (Session-Kryptographie ist fehleranfällig – mit KI-Hilfe umgesetzt.)
-
-// Session management for the CMS admin login.
-// Verwaltet die Login-Sessions für das CMS-Backend.
-//
-// Instead of using a library, we roll our own signed cookie:
-// - The session data (username, expiry) is JSON-encoded and base64-URL-encoded
-// - Then signed with HMAC-SHA256 so nobody can tamper with it
-// - On every request the signature is verified before trusting the payload
-//
-// Wir nutzen keine fertige Bibliothek, sondern bauen das selbst mit Web Crypto –
-// das funktioniert auch in Vercel's Edge Runtime (Middleware), die kein
-// vollständiges Node.js hat.
+/**
+ * Session-Verwaltung für das CMS-Admin-Panel.
+ * Session management for the custom CMS admin panel.
+ *
+ * Statt einer fertigen Auth-Bibliothek nutzen wir selbst gebaute, signierte
+ * Cookies (HMAC-SHA256 über einen JSON-Payload). Der Grund: die Middleware
+ * läuft auf Vercels Edge Runtime, die kein Node.js hat — nur Web Crypto API.
+ * Deshalb muss alles mit `crypto.subtle` funktionieren.
+ *
+ * Instead of a ready-made auth library, we use hand-rolled signed cookies
+ * (HMAC-SHA256 over a JSON payload). The reason: Next.js middleware runs on
+ * Vercel's Edge Runtime (no Node.js, only Web Crypto API), so everything
+ * here must work with `crypto.subtle` — no `require('crypto')` allowed there.
+ *
+ * Token-Aufbau / token structure:
+ *   base64url(JSON-Payload) + "." + base64url(HMAC-Signatur)
+ *   — wie ein minimales JWT, nur ohne Header.
+ *   — like a minimal JWT, just without the header.
+ */
 
 export const SESSION_COOKIE = "cms_session";
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7; // 7 Tage / 7 days
@@ -20,17 +24,25 @@ const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7; // 7 Tage / 7 days
 // What we store in the cookie (short field names to keep the cookie small)
 // Was im Cookie steht (kurze Feldnamen um Platz zu sparen)
 interface SessionPayload {
-  u: string;  // username / Benutzername
-  exp: number; // expiry timestamp (Unix seconds) / Ablaufzeitpunkt
-  iat: number; // issued-at timestamp / Ausstellungszeitpunkt (für Widerruf)
-  /** Must set own password before using the CMS / Muss erst Passwort vergeben */
+  u: string;   // username
+  exp: number; // Unix-Timestamp: Ablauf / expiry
+  iat: number; // Unix-Timestamp: ausgestellt / issued at — für Revocation gebraucht / used for revocation
+  /**
+   * "must change password" — wird gesetzt, wenn ein Admin-Account
+   * zum ersten Mal angelegt wird. / Set when an admin account is first created.
+   * Der Nutzer kommt nach dem Login auf eine Passwort-Änderungsseite,
+   * bis er das erledigt hat. / User is redirected to a change-password page until done.
+   */
   p?: boolean;
 }
 
-// Standard base64 doesn't work well in URLs (uses +, /, =).
-// Base64URL is the URL-safe variant that swaps those characters.
-// (Standard Base64 hat Zeichen die in URLs nicht gut funktionieren –
-// Base64URL tauscht sie aus.)
+/**
+ * Base64url = normales Base64, aber URL-sicher: + wird -, / wird _, = am Ende fällt weg.
+ * Base64url = regular Base64 but URL-safe: + → -, / → _, trailing = stripped.
+ * Warum nicht btoa direkt? / Why not btoa directly?
+ * btoa gibt + und / aus, die in URLs und Cookie-Werten Sonderzeichen sind.
+ * btoa outputs + and /, which are special characters in URLs and cookie values.
+ */
 function base64UrlEncode(bytes: Uint8Array): string {
   let binary = "";
   for (const b of bytes) binary += String.fromCharCode(b);
@@ -38,6 +50,8 @@ function base64UrlEncode(bytes: Uint8Array): string {
 }
 
 function base64UrlDecode(str: string): Uint8Array {
+  // Rückwärts: - → +, _ → /, fehlende = auffüllen bis durch 4 teilbar.
+  // Reverse: - → +, _ → /, re-add padding = until length is divisible by 4.
   const padded = str.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(str.length / 4) * 4, "=");
   const binary = atob(padded);
   const bytes = new Uint8Array(binary.length);
@@ -114,6 +128,14 @@ export async function verifySessionToken(
   // an welcher Stelle genau die Signatur abweicht (Timing-Angriff).
   const expected = new Uint8Array(expectedSig);
   if (expected.length !== providedSig.length) return null;
+  // Timing-sichere Signatur-Prüfung / timing-safe signature comparison:
+  // Ein normales `===` würde bei der ersten Abweichung abbrechen — das verrät
+  // einem Angreifer durch Messung der Antwortzeit, wie viele Bytes schon stimmen.
+  // XOR aller Bytes und am Ende prüfen ist immer gleich schnell, egal wo der
+  // Unterschied liegt. / A simple `===` would short-circuit on the first mismatch
+  // — an attacker can measure response time to learn how many bytes are correct.
+  // XOR-ing all bytes and checking at the end is constant-time regardless of
+  // where the difference is.
   let diff = 0;
   for (let i = 0; i < expected.length; i++) diff |= expected[i] ^ providedSig[i];
   if (diff !== 0) return null;

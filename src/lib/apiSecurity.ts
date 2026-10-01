@@ -5,20 +5,26 @@
 import type { NextRequest } from "next/server";
 import { SITE_URL } from "@/lib/site";
 
-// Checks if a request comes from our own website and not from some random
-// external page trying to abuse our forms.
-// Prüft ob ein Request wirklich von unserer eigenen Seite kommt.
-//
-// How it works / Wie es funktioniert:
-// Browsers automatically attach an "Origin" header to cross-site requests,
-// and that header can't be spoofed by JavaScript on a foreign page (that's
-// the whole point of the browser's Same-Origin Policy).
-// So if Origin is set and doesn't match our domain → blocked.
-// If Origin is missing (e.g. curl, server-to-server) → we let it through,
-// because there's nothing to check – the rate limiter covers those anyway.
-//
-// (Wenn kein Origin-Header da ist, z.B. bei curl-Requests, lassen wir
-// durch – da können wir eh nichts prüfen, und der Rate-Limiter greift noch.)
+/**
+ * Leichtgewichtige CSRF-Abwehr für die cookielosen JSON-Formular-Endpunkte
+ * (OWASP "Verifying Origin with Standard Headers").
+ * Lightweight CSRF defense for the site's cookie-less JSON form endpoints
+ * (OWASP "Verifying Origin with Standard Headers").
+ *
+ * Eine fremde Seite kann zwar einen POST an diese Routes auslösen, aber
+ * Browser hängen an same-site Fetches den `Origin`-Header an — und den
+ * kann eine cross-origin Anfrage nicht fälschen. Anfragen mit falschem
+ * Origin werden direkt abgelehnt; Anfragen *ohne* Origin (z. B. curl,
+ * Postman) kommen durch, da es nichts zu prüfen gibt — Rate Limiter und
+ * Validierung greifen dort trotzdem.
+ *
+ * A cross-site page can still trigger a POST to these routes, but browsers
+ * attach `Origin` to same-site fetches, which a forged cross-origin request
+ * cannot spoof. Requests with a wrong Origin are rejected outright; requests
+ * with no Origin at all (some non-browser clients) are allowed through since
+ * there's nothing to check — the rate limiter and validation layer still
+ * apply to those.
+ */
 export function isTrustedOrigin(request: NextRequest): boolean {
   const origin = request.headers.get("origin");
   if (!origin) return true;
