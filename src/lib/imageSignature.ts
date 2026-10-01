@@ -1,10 +1,21 @@
 /**
+ * Prüft, ob der tatsächliche Byte-Inhalt einer Datei zu ihrem deklarierten
+ * MIME-Typ passt — anhand von Magic Numbers statt blindem Vertrauen in den
+ * vom Client gesendeten `Content-Type`.
  * Verifies that a file's actual byte content matches its declared MIME
  * type, using magic-number signatures instead of trusting the
- * client-supplied `Content-Type`. A browser or attacker can set any
- * `file.type` value they like on a multipart upload, so the MIME check
- * alone (see api/admin/upload/route.ts) only rejects obviously-wrong
+ * client-supplied `Content-Type`.
+ *
+ * Warum das wichtig ist: Ein Browser oder Angreifer kann beim Upload
+ * beliebig `file.type` setzen. Die MIME-Prüfung allein (siehe
+ * api/admin/upload/route.ts) fängt nur offensichtlich falsche Uploads —
+ * nicht eine bösartige Datei, die sich mit gefälschtem MIME als Bild tarnt.
+ *
+ * Why this matters: a browser or attacker can set any `file.type` value on
+ * a multipart upload, so the MIME check alone only rejects obviously-wrong
  * uploads, not a malicious file dressed up with a spoofed image MIME type.
+ * Magic numbers are the first bytes every format mandates — they can't be
+ * faked without breaking the file.
  */
 
 function matchesSignature(bytes: Uint8Array, signature: number[], offset = 0): boolean {
