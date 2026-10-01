@@ -21,6 +21,8 @@
 export const SESSION_COOKIE = "cms_session";
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7; // 7 Tage / 7 days
 
+// What we store in the cookie (short field names to keep the cookie small)
+// Was im Cookie steht (kurze Feldnamen um Platz zu sparen)
 interface SessionPayload {
   u: string;   // username
   exp: number; // Unix-Timestamp: Ablauf / expiry
@@ -57,6 +59,8 @@ function base64UrlDecode(str: string): Uint8Array {
   return bytes;
 }
 
+// Loads the secret as a Web Crypto key so we can use it for HMAC signing.
+// (Web Crypto API erwartet ein CryptoKey-Objekt, nicht einfach einen String.)
 async function hmacKey(secret: string): Promise<CryptoKey> {
   return crypto.subtle.importKey(
     "raw",
@@ -77,6 +81,8 @@ function getSecret(): string {
   return secret;
 }
 
+// Creates a signed session token: payload.signature
+// Erstellt ein signiertes Session-Token: Nutzdaten.Signatur
 export async function createSessionToken(username: string, mustChangePassword = false): Promise<string> {
   const now = Math.floor(Date.now() / 1000);
   const payload: SessionPayload = {
@@ -116,6 +122,10 @@ export async function verifySessionToken(
   } catch {
     return null;
   }
+  // Timing-safe comparison – compare every byte even if we find a mismatch early.
+  // Timing-sicherer Vergleich: Wir prüfen alle Bytes auch wenn wir schon wissen
+  // dass die Signatur falsch ist. Sonst könnte man aus der Antwortzeit ablesen
+  // an welcher Stelle genau die Signatur abweicht (Timing-Angriff).
   const expected = new Uint8Array(expectedSig);
   if (expected.length !== providedSig.length) return null;
   // Timing-sichere Signatur-Prüfung / timing-safe signature comparison:
@@ -143,7 +153,8 @@ export async function verifySessionToken(
 
 export const SESSION_MAX_AGE = SESSION_TTL_SECONDS;
 
-/** Reads and verifies the session cookie from an incoming request. */
+// Reads the session cookie from the request and verifies it.
+// Liest und prüft den Session-Cookie aus dem Request.
 export async function getSessionUser(
   request: Request
 ): Promise<{ username: string; mustChangePassword: boolean } | null> {
@@ -156,16 +167,18 @@ export async function getSessionUser(
   const token = decodeURIComponent(match.slice(SESSION_COOKIE.length + 1));
   const session = await verifySessionToken(token);
   if (!session) return null;
-  // In Node.js runtime (API routes), also check against the file-based
-  // revocation store. Sessions issued before a password change are rejected.
-  // This import is intentionally dynamic so this file remains importable from
-  // the edge runtime (middleware), where `users.ts` (which uses `fs`) cannot
-  // be imported synchronously.
+  // In Node.js (API routes) we also check the revocation list – sessions
+  // created before a password change get invalidated this way.
+  // We use a dynamic import here on purpose: this file must stay importable
+  // from Edge Runtime (middleware), which can't use Node's `fs` module.
+  // (Dynamischer Import damit diese Datei auch in der Edge Runtime lädt –
+  // users.ts nutzt fs, das die Edge Runtime nicht kennt.)
   try {
     const { isSessionValid } = await import("./users");
     if (!isSessionValid(session.username, session.iat)) return null;
   } catch {
-    // Edge runtime or unavailable — skip revocation check.
+    // Edge runtime – skip revocation check, signature is still verified above.
+    // Edge Runtime – Widerruf-Check überspringen, Signaturprüfung gilt noch.
   }
   return session;
 }

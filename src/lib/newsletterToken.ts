@@ -26,7 +26,7 @@
  */
 import { createHmac, timingSafeEqual } from "node:crypto";
 
-const TOKEN_TTL_MS = 24 * 60 * 60 * 1000; // 24 h
+const TOKEN_TTL_MS = 24 * 60 * 60 * 1000; // 24 Stunden / 24 hours
 
 function getSecret(): string {
   const s = process.env.NEWSLETTER_CONFIRM_SECRET;
@@ -34,6 +34,8 @@ function getSecret(): string {
   return s;
 }
 
+// Builds the confirmation token and encodes it as base64url (URL-safe).
+// Erstellt den Bestätigungstoken und kodiert ihn als URL-sicheres base64url.
 export function createConfirmToken(email: string): string {
   const expiresAt = Date.now() + TOKEN_TTL_MS;
   const payload = `${email}|${expiresAt}`;
@@ -55,6 +57,13 @@ export function verifyConfirmToken(token: string): VerifyResult {
     const expected = createHmac("sha256", getSecret()).update(payload).digest("hex");
     const sigBuf = Buffer.from(sig, "hex");
     const expBuf = Buffer.from(expected, "hex");
+    // timingSafeEqual compares all bytes even if the first one already differs.
+    // timingSafeEqual prüft immer alle Bytes, auch wenn schon der erste falsch ist.
+    // Why? / Warum? A normal === or early-exit comparison leaks information
+    // through response timing – an attacker could guess the correct signature
+    // one byte at a time by measuring how long the check takes.
+    // (Normaler Vergleich: je mehr Bytes stimmen, desto länger dauert es –
+    // das verrät wie "nah dran" ein Angriffversuch war.)
     if (sigBuf.length !== expBuf.length || !timingSafeEqual(sigBuf, expBuf)) {
       return { valid: false, reason: "invalid" };
     }

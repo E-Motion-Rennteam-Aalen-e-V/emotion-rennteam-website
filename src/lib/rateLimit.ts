@@ -1,3 +1,9 @@
+// ⚠️ This file was built with AI assistance – the flood-detection edge cases
+// and IP-spoofing details are the kind of thing that's really easy to get
+// wrong without knowing the attack vectors beforehand.
+// (Dieser Teil wurde mit KI-Hilfe gebaut – die Angriffs-Szenarien sind
+// tricky und man tritt leicht in eine Falle wenn man sie nicht kennt.)
+
 import type { NextRequest } from "next/server";
 
 /**
@@ -53,15 +59,11 @@ export function checkRateLimit(key: string, limit: number, windowMs: number): bo
   if (!bucket || bucket.resetAt <= now) {
     if (buckets.size >= MAX_TRACKED_BUCKETS) {
       sweepExpiredBuckets(now);
-      // A sustained flood of distinct keys inside a single window (e.g.
-      // spoofed `x-forwarded-for` values arriving faster than any of
-      // them expire) leaves nothing for the sweep above to reclaim — all
-      // buckets are still legitimately "active". Without a fallback the
-      // map would keep growing past MAX_TRACKED_BUCKETS for as long as
-      // the flood lasts, silently defeating the cap. Evict the oldest
-      // entry (first in Map insertion order) so the cap is a true bound
-      // even under that load, not just when traffic happens to be idle
-      // enough for buckets to expire on their own.
+      // Tricky edge case: during an active flood, ALL buckets are still valid
+      // (none have expired yet), so sweeping does nothing. Without a fallback
+      // the map would just keep growing past the cap.
+      // Lösung: ältesten Eintrag rauswerfen – das ist der erste in der Map,
+      // weil JS Maps die Insertionsreihenfolge beibehalten.
       if (buckets.size >= MAX_TRACKED_BUCKETS) {
         const oldestKey = buckets.keys().next().value;
         if (oldestKey !== undefined) buckets.delete(oldestKey);
@@ -79,7 +81,7 @@ export function checkRateLimit(key: string, limit: number, windowMs: number): bo
   return true;
 }
 
-/** Test-only escape hatch to observe the internal map size. */
+// Only used in tests to check that the cleanup logic actually works
 export function _getTrackedBucketCountForTesting(): number {
   return buckets.size;
 }

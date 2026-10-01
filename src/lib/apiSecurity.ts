@@ -1,3 +1,7 @@
+// ⚠️ AI-assisted – CSRF and Origin validation are security-critical and
+// surprisingly easy to implement wrong. This was built with AI help.
+// (CSRF-Schutz ist knifflig – mit KI-Hilfe gebaut.)
+
 import type { NextRequest } from "next/server";
 import { SITE_URL } from "@/lib/site";
 
@@ -27,18 +31,22 @@ export function isTrustedOrigin(request: NextRequest): boolean {
 
   try {
     const originHostname = new URL(origin).hostname;
-    // Allow requests where origin matches the actual host serving the request
-    // (covers all Vercel deployment URLs without needing NEXT_PUBLIC_SITE_URL)
+    // Compare against the "host" header too, not just SITE_URL – this way
+    // all Vercel preview deployments work without extra config.
+    // (Vercel gibt jeder Preview-URL einen anderen Hostnamen, deshalb
+    // schauen wir auf den aktuellen Host statt nur auf SITE_URL.)
     const host = request.headers.get("host");
     if (host && originHostname === host.split(":")[0]) return true;
-    // Also allow the configured SITE_URL (production custom domain)
+    // Fallback for the configured production domain
     return new URL(origin).origin === new URL(SITE_URL).origin;
   } catch {
     return false;
   }
 }
 
-/** Rejects anything that isn't declaring a JSON body, before it's parsed. */
+// Sanity check before we even try to parse the body.
+// Kurzer Check: Requests die kein JSON ankündigen sofort ablehnen –
+// spart uns unnötiges Parsen und fängt kaputte Requests früh ab.
 export function hasJsonContentType(request: NextRequest): boolean {
   const contentType = request.headers.get("content-type") ?? "";
   return contentType.toLowerCase().includes("application/json");
