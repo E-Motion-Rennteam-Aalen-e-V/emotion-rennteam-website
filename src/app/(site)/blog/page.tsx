@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { getBlogPosts } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
+import RainCanvas from "@/components/motion/RainCanvas";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import NewsletterForm from "@/components/NewsletterForm";
 
@@ -17,18 +18,24 @@ export default function BlogPage() {
   const posts = getBlogPosts();
 
   return (
-    <div className="container-page py-20">
-      <Reveal>
-        <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Blog</p>
-        <h1 className="mt-2 text-4xl font-extrabold leading-tight tracking-normal sm:text-5xl md:text-6xl xl:text-7xl">
-          Einblicke ins Team
-        </h1>
-        <p className="mt-4 max-w-2xl text-muted">
-          Geschichten aus der Werkstatt, dem Onboarding neuer Mitglieder und dem Alltag hinter
-          unserem Rennwagen.
-        </p>
-      </Reveal>
+    <>
+      <section className="relative bg-surface/50 py-20">
+        <RainCanvas className="absolute inset-0 h-full w-full pointer-events-none opacity-50 mix-blend-screen" />
+        <div className="container-page relative z-10">
+        <Reveal>
+          <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Blog</p>
+          <h1 className="mt-2 text-4xl font-extrabold leading-tight tracking-normal sm:text-5xl md:text-6xl xl:text-7xl">
+            Einblicke ins Team
+          </h1>
+          <p className="mt-4 max-w-2xl text-muted">
+            Geschichten aus der Werkstatt, dem Onboarding neuer Mitglieder und dem Alltag hinter
+            unserem Rennwagen.
+          </p>
+        </Reveal>
+        </div>
+      </section>
 
+      <div className="container-page py-20">
       {posts.length === 0 ? (
         <p className="mt-14 text-sm text-muted">Aktuell sind keine Blogbeiträge verfügbar.</p>
       ) : (
@@ -86,6 +93,7 @@ export default function BlogPage() {
           </div>
         </div>
       </Reveal>
-    </div>
+      </div>
+    </>
   );
 }
