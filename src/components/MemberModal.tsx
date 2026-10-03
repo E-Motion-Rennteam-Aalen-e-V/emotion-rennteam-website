@@ -464,7 +464,6 @@ function MemberDialog({ member, onClose }: { member: TeamMember; onClose: () => 
                     cursor: 'grab',
                     touchAction: 'none',
                     userSelect: 'none',
-                    filter: 'drop-shadow(0 30px 36px rgba(0,0,0,0.65))',
                   }}
                 >
                   <div
@@ -490,6 +489,9 @@ function MemberDialog({ member, onClose }: { member: TeamMember; onClose: () => 
                         background: '#06070d',
                         backfaceVisibility: 'hidden',
                         WebkitBackfaceVisibility: 'hidden',
+                        visibility: flipped ? 'hidden' : 'visible',
+                        transition: 'visibility 0s linear 0.4s',
+                        boxShadow: '0 30px 60px -10px rgba(0,0,0,0.7)',
                       }}
                     >
                       {member.photo ? (
@@ -665,6 +667,9 @@ function MemberDialog({ member, onClose }: { member: TeamMember; onClose: () => 
                         background: '#06070d',
                         backfaceVisibility: 'hidden',
                         WebkitBackfaceVisibility: 'hidden',
+                        visibility: flipped ? 'visible' : 'hidden',
+                        transition: 'visibility 0s linear 0.4s',
+                        boxShadow: '0 30px 60px -10px rgba(0,0,0,0.7)',
                         transform: 'rotateY(180deg)',
                         display: 'flex',
                         flexDirection: 'column',
