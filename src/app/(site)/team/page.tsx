@@ -8,6 +8,7 @@ import {
   DEFAULT_TEAM_SEASON,
 } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
+import RainCanvas from "@/components/motion/RainCanvas";
 import TeamContent from "@/components/TeamContent";
 import { getBreadcrumbJsonLd } from "@/lib/structuredData";
 
@@ -78,38 +79,45 @@ export default async function TeamPage({
   ]);
 
   return (
-    <div className="container-page py-20">
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <Reveal>
-        <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Team</p>
-        <h1 className="mt-2 text-4xl font-extrabold leading-tight tracking-normal sm:text-5xl md:text-6xl xl:text-7xl">{heading}</h1>
-        <p className="mt-4 max-w-2xl text-muted">
-          Über 50 Studierende verschiedener Fachrichtungen entwickeln, fertigen und testen
-          gemeinsam unseren elektrischen Rennwagen – organisiert in {TEAM_DEPARTMENTS.length} Fachteams.
-        </p>
+      <section className="relative bg-surface/50 py-20">
+        <RainCanvas className="absolute inset-0 h-full w-full pointer-events-none opacity-50 mix-blend-screen" />
+        <div className="container-page relative z-10">
+          <Reveal>
+            <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Team</p>
+            <h1 className="mt-2 text-4xl font-extrabold leading-tight tracking-normal sm:text-5xl md:text-6xl xl:text-7xl">{heading}</h1>
+            <p className="mt-4 max-w-2xl text-muted">
+              Über 50 Studierende verschiedener Fachrichtungen entwickeln, fertigen und testen
+              gemeinsam unseren elektrischen Rennwagen – organisiert in {TEAM_DEPARTMENTS.length} Fachteams.
+            </p>
 
-        <div className="mt-8 flex flex-wrap gap-2">
-          {TEAM_SEASONS.map((s) => {
-            const active = s === season;
-            return (
-              <Link
-                key={s}
-                href={s === DEFAULT_TEAM_SEASON ? "/team" : `/team?season=${encodeURIComponent(s)}`}
-                className={`rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
-                  active
-                    ? "border-accent bg-accent text-accent-foreground"
-                    : "border-border text-foreground hover:border-accent hover:bg-surface"
-                }`}
-              >
-                {s}
-              </Link>
-            );
-          })}
+            <div className="mt-8 flex flex-wrap gap-2">
+              {TEAM_SEASONS.map((s) => {
+                const active = s === season;
+                return (
+                  <Link
+                    key={s}
+                    href={s === DEFAULT_TEAM_SEASON ? "/team" : `/team?season=${encodeURIComponent(s)}`}
+                    className={`rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
+                      active
+                        ? "border-accent bg-accent text-accent-foreground"
+                        : "border-border text-foreground hover:border-accent hover:bg-surface"
+                    }`}
+                  >
+                    {s}
+                  </Link>
+                );
+              })}
+            </div>
+          </Reveal>
         </div>
-      </Reveal>
+      </section>
+
+      <div className="container-page py-20">
 
       {team.length === 0 ? (
         <Reveal delay={0.05}>
@@ -173,6 +181,7 @@ export default async function TeamPage({
         ))}
       </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

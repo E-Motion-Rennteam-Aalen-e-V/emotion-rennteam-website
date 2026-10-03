@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { getSponsors, type Sponsor } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
+import RainCanvas from "@/components/motion/RainCanvas";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import SponsorForm from "@/components/SponsorForm";
 import SponsorCard from "@/components/SponsorCard";
@@ -79,6 +81,25 @@ export default function SponsorsPage() {
           </div>
         );
       })}
+
+      <section className="relative -mx-container-page bg-gradient-to-r from-accent/15 via-accent/5 to-accent/10 py-20 mt-24">
+        <RainCanvas className="absolute inset-0 h-full w-full pointer-events-none opacity-40 mix-blend-screen" />
+        <div className="container-page relative z-10">
+          <Reveal className="text-center">
+            <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Sponsoring</p>
+            <h2 className="mt-2 text-3xl font-extrabold tracking-normal sm:text-4xl md:text-5xl">Werde unser Partner</h2>
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-muted">
+              Unterstütze das E-Motion Rennteam Aalen und sei Teil einer innovativen Community rund um Formula Student Electric.
+            </p>
+            <Link
+              href="#werden"
+              className="mt-6 inline-flex items-center gap-2 rounded-sm bg-accent px-8 py-3 text-sm font-bold uppercase tracking-wider text-accent-foreground transition-all hover:bg-accent/90 hover:gap-3"
+            >
+              Jetzt Kontakt aufnehmen <span aria-hidden="true" className="transition-transform">→</span>
+            </Link>
+          </Reveal>
+        </div>
+      </section>
 
       <Reveal id="werden" className="mt-24 scroll-mt-24 rounded-2xl border border-accent/40 bg-surface p-8 sm:p-10" delay={0.1}>
         <div className="text-center">
