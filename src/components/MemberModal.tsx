@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
 import type { TeamMember } from '@/lib/content';
 import { downloadVCard } from '@/lib/vcard-generator';
@@ -11,6 +11,19 @@ interface MemberModalProps {
   member: TeamMember | null;
   onClose: () => void;
 }
+
+const CARD_W = 340;
+const CARD_H = 540;
+const CARD_TOP = 190;
+const STAGE_W = 340;
+const STAGE_H = CARD_TOP + CARD_H;
+const RAIL_Y = 44;
+const MAX_ANGLE = 0.9;
+const SITE_HOST = 'emotion-rennteam.de';
+const ADDRESS = 'Beethovenstraße 1 · 73430 Aalen';
+
+const HEADING_FONT = "var(--font-heading), var(--font-body), Arial, sans-serif";
+const BODY_FONT = "var(--font-body), Arial, Helvetica, sans-serif";
 
 function maskPhone(phone: string): string {
   const prefix = phone.slice(0, Math.min(10, Math.ceil(phone.length * 0.45)));
@@ -23,112 +36,255 @@ function maskEmail(email: string): string {
   return `${local.slice(0, 2)}•••@${domain}`;
 }
 
-/* ─── Lanyard ─── */
-function Lanyard() {
+function nameFontSize(name: string, base: number): number {
+  const len = name.length;
+  if (len <= 14) return base;
+  if (len <= 20) return Math.round(base * 0.83);
+  if (len <= 26) return Math.round(base * 0.7);
+  return Math.round(base * 0.6);
+}
+
+/* ─── Icons ─── */
+const iconProps = {
+  width: 18,
+  height: 18,
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  stroke: '#5aa6d6',
+  strokeWidth: 2,
+  strokeLinecap: 'round' as const,
+  strokeLinejoin: 'round' as const,
+  'aria-hidden': true,
+};
+
+function PhoneIcon() {
   return (
-    <svg width="56" height="92" viewBox="0 0 56 92" fill="none" style={{ display: 'block', margin: '0 auto' }}>
-      <defs>
-        <linearGradient id="rope" x1="0" y1="0" x2="0" y2="92" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#9ba8bb" />
-          <stop offset="60%" stopColor="#4d5868" />
-          <stop offset="100%" stopColor="#2a303d" />
-        </linearGradient>
-        <linearGradient id="clip" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#d4dce8" />
-          <stop offset="40%" stopColor="#8e9cb2" />
-          <stop offset="100%" stopColor="#576070" />
-        </linearGradient>
-        <linearGradient id="clipShine" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="rgba(255,255,255,0)" />
-          <stop offset="50%" stopColor="rgba(255,255,255,0.28)" />
-          <stop offset="100%" stopColor="rgba(255,255,255,0)" />
-        </linearGradient>
-      </defs>
-      {/* Rope with subtle taper */}
-      <path d="M28 0 C28 28, 28 56, 28 74" stroke="url(#rope)" strokeWidth="3" strokeLinecap="round" />
-      {/* Clip body */}
-      <rect x="17" y="72" width="22" height="14" rx="3.5" fill="url(#clip)" />
-      {/* Clip shine */}
-      <rect x="17" y="72" width="22" height="14" rx="3.5" fill="url(#clipShine)" />
-      {/* Clip rivet highlight */}
-      <rect x="19" y="74" width="18" height="3.5" rx="1.5" fill="rgba(255,255,255,0.25)" />
-      {/* Hole with inner shadow */}
-      <circle cx="28" cy="70" r="5.5" fill="#0e111e" stroke="#4a5468" strokeWidth="1.8" />
-      <circle cx="28" cy="70" r="2.5" fill="#080a14" />
-      <circle cx="26.5" cy="68.5" r="1" fill="rgba(255,255,255,0.1)" />
+    <svg {...iconProps}>
+      <path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z" />
+    </svg>
+  );
+}
+function MailIcon() {
+  return (
+    <svg {...iconProps}>
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="M3 7l9 6 9-6" />
+    </svg>
+  );
+}
+function GlobeIcon() {
+  return (
+    <svg {...iconProps}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18M12 3a14 14 0 010 18M12 3a14 14 0 000 18" />
+    </svg>
+  );
+}
+function PinIcon() {
+  return (
+    <svg {...iconProps}>
+      <path d="M12 21s7-6.2 7-11a7 7 0 10-14 0c0 4.8 7 11 7 11z" />
+      <circle cx="12" cy="10" r="2.5" />
+    </svg>
+  );
+}
+function PersonIcon({ size, stroke }: { size: number; stroke: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.3" aria-hidden="true">
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8" />
     </svg>
   );
 }
 
-/* ─── Stagger variants ─── */
-const backContainer = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.07, delayChildren: 0.08 } },
-};
-const backItem = {
-  hidden: { opacity: 0, y: 10 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.38, ease: [0.22, 1, 0.36, 1] as [number,number,number,number] } },
+function ContactRow({ icon, text }: { icon: React.ReactNode; text: string }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        minHeight: 40,
+        boxSizing: 'border-box',
+        padding: '0 14px',
+        borderRadius: 14,
+        background: 'rgba(255,255,255,0.05)',
+        border: '1px solid rgba(255,255,255,0.1)',
+        fontSize: 13,
+        color: '#f5f6f8',
+      }}
+    >
+      <span style={{ flex: 'none', display: 'flex' }}>{icon}</span>
+      <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={text}>
+        {text}
+      </span>
+    </div>
+  );
+}
+
+const pillButton: React.CSSProperties = {
+  minHeight: 44,
+  padding: '0 18px',
+  borderRadius: 999,
+  border: '1px solid #232635',
+  background: 'rgba(16,18,27,0.9)',
+  color: '#f5f6f8',
+  fontSize: 14,
+  cursor: 'pointer',
+  fontFamily: BODY_FONT,
 };
 
-export default function MemberModal({ member, onClose }: MemberModalProps) {
+function MemberDialog({ member, onClose }: { member: TeamMember; onClose: () => void }) {
+  const reduceMotion = useReducedMotion();
   const dialogRef = useRef<HTMLDivElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
+  const anchorRef = useRef<HTMLDivElement>(null);
+  const swingRef = useRef<HTMLDivElement>(null);
+  const sheenRef = useRef<HTMLDivElement>(null);
+  const parallaxRef = useRef<HTMLDivElement>(null);
+  const physics = useRef({ th: 0, om: 0, drag: false, t: 0, sway: !reduceMotion });
+
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
   const [flipped, setFlipped] = useState(false);
-  const [backShowing, setBackShowing] = useState(false);
-  const [hovering, setHovering] = useState(false);
+  const [swayOn, setSwayOn] = useState(!reduceMotion);
+  const [scale, setScale] = useState(1);
 
-  const isExecutive = member ? ['ceo', 'cto', 'cfo'].includes(member.roleLevel || '') : false;
-  const isLeadership = member
-    ? isExecutive || ['Teamleiter', 'Leitung'].includes((member.role || '').trim())
-    : false;
-  const showRealContact = isLeadership;
+  const isExecutive = ['ceo', 'cto', 'cfo'].includes(member.roleLevel || '');
+  const isLeadership = isExecutive || ['Teamleiter', 'Leitung'].includes((member.role || '').trim());
 
-  const tiltX = useMotionValue(0);
-  const tiltY = useMotionValue(0);
-  const springX = useSpring(tiltX, { stiffness: 200, damping: 24 });
-  const springY = useSpring(tiltY, { stiffness: 200, damping: 24 });
-
+  /* Dialog: Escape, focus trap, focus return, scroll lock */
   useEffect(() => {
-    if (!member) { setFlipped(false); setBackShowing(false); return; }
     previousActiveElement.current = document.activeElement as HTMLElement;
-    const handleKeyDown = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+      if (e.key !== 'Tab' || !dialogRef.current) return;
+      const focusable = Array.from(
+        dialogRef.current.querySelectorAll<HTMLElement>('button, a[href], [tabindex]:not([tabindex="-1"])'),
+      ).filter((el) => !el.hasAttribute('disabled'));
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
     document.addEventListener('keydown', handleKeyDown);
     dialogRef.current?.focus();
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = previousOverflow;
       previousActiveElement.current?.focus();
     };
   }, [member, onClose]);
 
+  /* QR code */
   useEffect(() => {
-    if (!member) return;
     generateQRCodeDataUrl(generateQRCodeValue(member))
       .then(setQrCodeDataUrl)
       .catch(() => setQrCodeDataUrl(''));
   }, [member]);
 
-  /* Trigger back stagger after flip starts */
+  /* Fit the fixed-size stage into the viewport */
   useEffect(() => {
-    if (flipped) {
-      const t = setTimeout(() => setBackShowing(true), 420);
-      return () => clearTimeout(t);
-    } else {
-      setBackShowing(false);
-    }
-  }, [flipped]);
+    const fit = () => {
+      const byWidth = (window.innerWidth - 24) / STAGE_W;
+      const byHeight = (window.innerHeight - RAIL_Y - 12 - 132) / STAGE_H;
+      setScale(Math.max(0.4, Math.min(1, byWidth, byHeight)));
+    };
+    fit();
+    window.addEventListener('resize', fit);
+    return () => window.removeEventListener('resize', fit);
+  }, [member]);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (flipped) return;
-    const r = e.currentTarget.getBoundingClientRect();
-    tiltX.set(((e.clientY - r.top) / r.height - 0.5) * -16);
-    tiltY.set(((e.clientX - r.left) / r.width - 0.5) * 16);
+  /* Pendulum */
+  useEffect(() => {
+    const p = physics.current;
+    p.th = reduceMotion ? 0 : 0.32;
+    p.om = 0;
+    p.drag = false;
+    let last = performance.now();
+    let raf = 0;
+    const tick = (now: number) => {
+      const dt = Math.min(0.032, (now - last) / 1000);
+      last = now;
+      p.t += dt;
+      if (!p.drag) {
+        const drive = p.sway ? 1.2 * Math.sin(1.5 * p.t) : 0;
+        const acc = -14 * Math.sin(p.th) - 0.9 * p.om + drive;
+        p.om += acc * dt;
+        p.th += p.om * dt;
+        if (p.th > MAX_ANGLE) {
+          p.th = MAX_ANGLE;
+          p.om = -Math.abs(p.om) * 0.4;
+        }
+        if (p.th < -MAX_ANGLE) {
+          p.th = -MAX_ANGLE;
+          p.om = Math.abs(p.om) * 0.4;
+        }
+      }
+      const deg = (p.th * 180) / Math.PI;
+      if (swingRef.current) swingRef.current.style.transform = `rotate(${deg.toFixed(2)}deg)`;
+      if (sheenRef.current) sheenRef.current.style.backgroundPosition = `${(50 + deg * 2.2).toFixed(1)}% 0`;
+      if (parallaxRef.current) parallaxRef.current.style.transform = `translateX(${(-deg * 0.35).toFixed(1)}px)`;
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [reduceMotion]);
+
+  const toggleSway = () => {
+    physics.current.sway = !physics.current.sway;
+    setSwayOn(physics.current.sway);
   };
 
-  const resetTilt = () => { tiltX.set(0); tiltY.set(0); setHovering(false); };
+  const onCardPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    const p = physics.current;
+    const startX = e.clientX;
+    const startY = e.clientY;
+    let moved = false;
+    p.om = 0;
+    let lastMove = performance.now();
+
+    const onMove = (ev: PointerEvent) => {
+      if (!moved && Math.hypot(ev.clientX - startX, ev.clientY - startY) > 6) {
+        moved = true;
+        p.drag = true;
+      }
+      if (!p.drag || !anchorRef.current) return;
+      const r = anchorRef.current.getBoundingClientRect();
+      const dx = ev.clientX - (r.left + r.width / 2);
+      const dy = ev.clientY - r.top;
+      let th = Math.atan2(dx, Math.max(dy, 40));
+      th = Math.max(-MAX_ANGLE, Math.min(MAX_ANGLE, th));
+      const now = performance.now();
+      const dt = Math.max(0.008, Math.min(0.05, (now - lastMove) / 1000));
+      lastMove = now;
+      const v = (th - p.th) / dt;
+      p.om = Math.max(-8, Math.min(8, 0.5 * p.om + 0.5 * v));
+      p.th = th;
+    };
+    const onUp = () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+      p.drag = false;
+      if (!moved) setFlipped((f) => !f);
+    };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
+  }, []);
 
   const getGoogleContactsLink = () => {
-    if (!member) return '#';
     const p = new URLSearchParams();
     if (member.name) p.append('name', member.name);
     if (member.phone) p.append('tel', member.phone);
@@ -136,12 +292,10 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
     return `https://contacts.google.com/?add&contact=${p.toString()}`;
   };
 
-  const CARD_W = 'min(308px, 86vw)';
-  const CARD_H = 'min(462px, calc(86vw * 1.497))';
+  const showPhone = isLeadership && !!member.phone;
+  const showEmail = isLeadership && !!member.email;
 
   return (
-    <AnimatePresence>
-      {member && (
         <motion.div
           key="overlay"
           role="dialog"
@@ -155,658 +309,591 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
           transition={{ duration: 0.3 }}
           onClick={onClose}
           style={{
-            position: 'fixed', inset: 0, zIndex: 50,
-            display: 'flex', flexDirection: 'column', alignItems: 'center',
-            justifyContent: 'flex-start',
-            overflowY: 'auto',
-            paddingTop: 'clamp(32px, 5vh, 64px)',
-            paddingBottom: 48,
-            background: 'radial-gradient(ellipse 90% 65% at 50% 0%, rgba(0,80,180,0.28) 0%, rgba(0,0,0,0.9) 62%)',
-            backdropFilter: 'blur(20px) saturate(1.5)',
+            position: 'fixed',
+            inset: 0,
+            zIndex: 100,
+            overflow: 'hidden',
+            outline: 'none',
+            background:
+              'radial-gradient(ellipse 70% 50% at 50% 48%, #12203f 0%, #0a0d18 45%, #06070d 78%)',
+            fontFamily: BODY_FONT,
+            color: '#f5f6f8',
           }}
         >
-          {/* Close button */}
-          <motion.button
-            onClick={onClose}
-            aria-label="Schließen"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.4, type: 'spring', stiffness: 300 }}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+          {/* Rail */}
+          <div
+            aria-hidden="true"
             style={{
-              position: 'fixed', right: 18, top: 18, zIndex: 60,
-              width: 40, height: 40, borderRadius: '50%',
-              border: '1px solid rgba(255,255,255,0.15)',
-              background: 'rgba(10,12,20,0.7)',
-              color: 'rgba(255,255,255,0.6)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', backdropFilter: 'blur(10px)',
-              boxShadow: '0 2px 16px rgba(0,0,0,0.4)',
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: RAIL_Y - 14,
+              height: 14,
+              background: 'linear-gradient(180deg, #5a6075 0%, #232635 55%, #10121b 100%)',
+            }}
+          />
+
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
+            aria-label="Schließen"
+            style={{
+              position: 'absolute',
+              right: 16,
+              top: 16,
+              zIndex: 60,
+              width: 44,
+              height: 44,
+              borderRadius: '50%',
+              border: '1px solid rgba(255,255,255,0.18)',
+              background: 'rgba(16,18,27,0.85)',
+              color: '#f5f6f8',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
             }}
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: 15, height: 15 }}>
-              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
-          </motion.button>
+          </button>
 
-          {/* Card wrapper */}
+          {/* Stage */}
           <motion.div
             onClick={(e) => e.stopPropagation()}
-            initial={{ y: -100, opacity: 0, scale: 0.85 }}
-            animate={{ y: 0, opacity: 1, scale: 1 }}
-            exit={{ y: -60, opacity: 0, scale: 0.9 }}
-            transition={{ type: 'spring', damping: 18, stiffness: 160, mass: 1.0 }}
+            initial={{ y: -140, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -80, opacity: 0 }}
+            transition={{ type: 'spring', damping: 20, stiffness: 140 }}
             style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center',
-              filter: 'drop-shadow(0 56px 120px rgba(0,0,0,0.95)) drop-shadow(0 0 60px rgba(0,80,180,0.15))',
+              position: 'absolute',
+              top: RAIL_Y,
+              left: '50%',
+              width: STAGE_W,
+              height: STAGE_H,
+              marginLeft: -STAGE_W / 2,
+              transformOrigin: 'top center',
             }}
           >
-            {/* Lanyard */}
-            <motion.div
-              style={{ pointerEvents: 'none', marginBottom: -2 }}
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-            >
-              <Lanyard />
-            </motion.div>
+            <div style={{ width: STAGE_W, height: STAGE_H, transform: `scale(${scale})`, transformOrigin: 'top center' }}>
+              <div ref={anchorRef} style={{ position: 'absolute', left: STAGE_W / 2, top: 0, width: 0, height: 0 }} />
 
-            {/* Swing wrapper */}
-            <motion.div
-              animate={hovering ? { rotate: 0 } : { rotate: [-1, 1, -0.5, 0.5, -1] }}
-              transition={hovering
-                ? { duration: 0.5, ease: 'easeOut' }
-                : { repeat: Infinity, duration: 7, ease: 'easeInOut', times: [0, 0.25, 0.5, 0.75, 1] }
-              }
-              style={{ transformOrigin: 'top center' }}
-            >
-              {/* Tilt wrapper */}
-              <motion.div
+              <div
+                ref={swingRef}
                 style={{
-                  rotateX: flipped ? 0 : springX,
-                  rotateY: flipped ? 0 : springY,
-                  transformPerspective: 1200,
-                  cursor: 'pointer',
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  width: STAGE_W,
+                  height: STAGE_H,
+                  transformOrigin: `${STAGE_W / 2}px 0px`,
                 }}
-                onMouseMove={!flipped ? handleMouseMove : undefined}
-                onMouseEnter={() => setHovering(true)}
-                onMouseLeave={resetTilt}
-                onClick={() => setFlipped((f) => !f)}
               >
-                {/* 3-D flip container */}
+                {/* Lanyard */}
                 <div
+                  aria-hidden="true"
                   style={{
-                    width: CARD_W,
-                    height: CARD_H,
-                    position: 'relative',
-                    transformStyle: 'preserve-3d',
-                    transition: 'transform 0.75s cubic-bezier(0.28, 0, 0.1, 1)',
-                    transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+                    position: 'absolute',
+                    left: 148,
+                    top: 0,
+                    width: 44,
+                    height: 150,
+                    background: '#0071b5',
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    justifyContent: 'center',
+                    paddingTop: 12,
+                    boxSizing: 'border-box',
+                    overflow: 'hidden',
                   }}
                 >
+                  <div
+                    style={{
+                      writingMode: 'vertical-rl',
+                      fontFamily: HEADING_FONT,
+                      fontSize: 11,
+                      letterSpacing: '0.08em',
+                      color: '#ffffff',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    E-MOTION RENNTEAM
+                  </div>
+                </div>
+                <div
+                  aria-hidden="true"
+                  style={{
+                    position: 'absolute',
+                    left: 150,
+                    top: 146,
+                    width: 40,
+                    height: 46,
+                    borderRadius: 6,
+                    background: 'linear-gradient(180deg, #b9bfd1 0%, #4a4f63 100%)',
+                  }}
+                />
+                <div
+                  aria-hidden="true"
+                  style={{
+                    position: 'absolute',
+                    left: 158,
+                    top: 170,
+                    width: 24,
+                    height: 24,
+                    boxSizing: 'border-box',
+                    borderRadius: '50%',
+                    border: '3px solid #b9bfd1',
+                  }}
+                />
 
-                  {/* ════════ FRONT ════════ */}
-                  <div style={{
-                    position: 'absolute', inset: 0,
-                    backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden',
-                    borderRadius: 22, overflow: 'hidden',
-                    background: '#07080f',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
-                    display: 'flex', flexDirection: 'column',
-                  }}>
-                    {/* Racing stripe — animated shimmer */}
-                    <div style={{
-                      height: 4, flexShrink: 0, position: 'relative', overflow: 'hidden',
-                      background: 'linear-gradient(90deg, #0040c0 0%, #0088f0 50%, #0040c0 100%)',
-                      boxShadow: '0 2px 12px rgba(0,100,220,0.4)',
-                    }}>
-                      <motion.div
-                        animate={{ x: ['-100%', '200%'] }}
-                        transition={{ repeat: Infinity, duration: 2.6, ease: 'easeInOut', repeatDelay: 1.8 }}
-                        style={{
-                          position: 'absolute', inset: 0,
-                          background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)',
-                          width: '35%',
-                          filter: 'blur(1px)',
-                        }}
-                      />
-                    </div>
-
-                    {/* Logo bar — frosted glass */}
-                    <motion.div
-                      animate={{ background: ['rgba(7,8,15,0.55)', 'rgba(10,20,40,0.6)', 'rgba(7,8,15,0.55)'] }}
-                      transition={{ duration: 4, repeat: Infinity }}
+                {/* Card */}
+                <div
+                  onPointerDown={onCardPointerDown}
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    top: CARD_TOP,
+                    width: CARD_W,
+                    height: CARD_H,
+                    perspective: 1600,
+                    cursor: 'grab',
+                    touchAction: 'none',
+                    userSelect: 'none',
+                    filter: 'drop-shadow(0 30px 36px rgba(0,0,0,0.65))',
+                  }}
+                >
+                  <div
+                    style={{
+                      position: 'relative',
+                      width: CARD_W,
+                      height: CARD_H,
+                      transformStyle: 'preserve-3d',
+                      transition: 'transform 0.8s cubic-bezier(.25,.8,.2,1)',
+                      transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+                    }}
+                  >
+                    {/* ════════ FRONT ════════ */}
+                    <div
+                      aria-hidden={flipped}
                       style={{
-                        flexShrink: 0,
-                        padding: '12px 16px 10px',
-                        display: 'flex', alignItems: 'center', gap: 10,
-                        backdropFilter: 'blur(14px)',
-                        borderBottom: '1px solid rgba(0,120,220,0.15)',
-                        boxShadow: 'inset 0 1px 0 rgba(0,150,255,0.08)',
-                      }}>
-                      <motion.div
-                        whileHover={{ scale: 1.08 }}
-                        style={{
-                          width: 28, height: 28, borderRadius: 8,
-                          background: 'linear-gradient(135deg, #0080c0 0%, #0050e0 100%)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          flexShrink: 0,
-                          boxShadow: '0 0 16px rgba(0,130,220,0.5), inset 0 1px 0 rgba(255,255,255,0.25)',
-                        }}>
-                        <svg width="18" height="18" viewBox="0 0 40 40" fill="none">
-                          <path d="M8 28L14 12H20L16 22H22L18 32H8Z" fill="white" />
-                          <path d="M20 12H32L28 22H24L28 12" fill="white" opacity="0.55" />
-                        </svg>
-                      </motion.div>
-                      <motion.div
-                        animate={{ color: ['#d0dae8', '#e8f0ff', '#d0dae8'] }}
-                        transition={{ duration: 3, repeat: Infinity }}
-                        style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 11, fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase', lineHeight: 1 }}>
-                          E-Motion Rennteam
-                        </div>
-                        <div style={{ color: '#4a6080', fontSize: 8.5, fontWeight: 700, letterSpacing: '0.12em', marginTop: 2, textTransform: 'uppercase' }}>
-                          Hochschule Aalen
-                        </div>
-                      </motion.div>
-                      {isExecutive && (
-                        <motion.span
-                          initial={{ scale: 0.8, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          transition={{ delay: 0.3, type: 'spring' }}
-                          style={{
-                            background: 'linear-gradient(135deg, #0058cc, #0090e0)',
-                            color: '#e8f4ff', fontSize: 8.5, fontWeight: 800,
-                            padding: '3px 8px', borderRadius: 20,
-                            letterSpacing: '0.1em', textTransform: 'uppercase',
-                            flexShrink: 0,
-                            boxShadow: '0 2px 10px rgba(0,113,181,0.55), inset 0 1px 0 rgba(255,255,255,0.2)',
-                          }}
-                        >
-                          Executive
-                        </motion.span>
-                      )}
-                    </motion.div>
-
-                    {/* Photo — full bleed */}
-                    <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+                        position: 'absolute',
+                        inset: 0,
+                        boxSizing: 'border-box',
+                        overflow: 'hidden',
+                        borderRadius: 26,
+                        border: '1px solid rgba(255,255,255,0.16)',
+                        background: '#06070d',
+                        backfaceVisibility: 'hidden',
+                        WebkitBackfaceVisibility: 'hidden',
+                      }}
+                    >
                       {member.photo ? (
-                        <>
+                        <div ref={parallaxRef} style={{ position: 'absolute', inset: '-10px -24px', willChange: 'transform' }}>
                           <Image
                             src={member.photo}
-                            alt={member.name}
+                            alt=""
                             fill
-                            style={{ objectFit: 'cover', objectPosition: 'top' }}
+                            sizes="400px"
+                            priority
+                            draggable={false}
+                            style={{ objectFit: 'cover', objectPosition: 'top', pointerEvents: 'none' }}
                           />
-                          {/* Vignette + bottom gradient */}
-                          <div style={{
-                            position: 'absolute', inset: 0,
-                            background: [
-                              'radial-gradient(ellipse at 50% 0%, transparent 60%, rgba(5,7,18,0.4) 100%)',
-                              'linear-gradient(to bottom, transparent 38%, rgba(5,7,18,0.5) 65%, rgba(5,7,18,0.97) 100%)',
-                            ].join(', '),
-                          }} />
-                          {/* Subtle side vignette */}
-                          <div style={{
-                            position: 'absolute', inset: 0,
-                            background: 'linear-gradient(to right, rgba(5,7,18,0.3) 0%, transparent 20%, transparent 80%, rgba(5,7,18,0.3) 100%)',
-                          }} />
-                        </>
+                        </div>
                       ) : (
-                        <div style={{
-                          width: '100%', height: '100%',
-                          display: 'flex', flexDirection: 'column',
-                          alignItems: 'center', justifyContent: 'center', gap: 10,
-                          background: 'linear-gradient(135deg, #0a1628 0%, #060810 100%)',
-                        }}>
-                          <div style={{
-                            width: 68, height: 68, borderRadius: '50%',
-                            background: 'radial-gradient(circle, rgba(0,113,181,0.14) 0%, rgba(0,0,0,0) 100%)',
-                            border: '1px solid rgba(0,113,181,0.22)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          }}>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="#0071b5" strokeWidth="1.3" style={{ width: 34, height: 34, opacity: 0.45 }}>
-                              <circle cx="12" cy="8" r="4" /><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8" />
-                            </svg>
-                          </div>
-                          <span style={{ color: '#1e2840', fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em' }}>
-                            Foto folgt
-                          </span>
+                        <div
+                          style={{
+                            position: 'absolute',
+                            inset: 0,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: 10,
+                            paddingBottom: 150,
+                            background: 'linear-gradient(180deg, #171a26, #06070d)',
+                          }}
+                        >
+                          <PersonIcon size={130} stroke="#2a3040" />
+                          <span style={{ color: '#9aa0b4', fontSize: 12, letterSpacing: '0.2em' }}>FOTO FOLGT</span>
+                        </div>
+                      )}
+                      <div
+                        style={{
+                          position: 'absolute',
+                          inset: 0,
+                          background:
+                            'linear-gradient(180deg, rgba(6,7,13,0.6) 0%, rgba(6,7,13,0) 22%, rgba(6,7,13,0) 40%, rgba(6,7,13,0.9) 68%, #06070d 100%)',
+                        }}
+                      />
+
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src="/uploads/logo.png"
+                        alt=""
+                        draggable={false}
+                        style={{ position: 'absolute', left: 12, top: 0, width: 190, height: 'auto', pointerEvents: 'none' }}
+                      />
+                      {member.season && (
+                        <div
+                          style={{
+                            position: 'absolute',
+                            right: 20,
+                            top: 22,
+                            padding: '6px 12px',
+                            borderRadius: 999,
+                            background: 'rgba(16,18,27,0.55)',
+                            border: '1px solid rgba(255,255,255,0.18)',
+                            fontSize: 11,
+                            letterSpacing: '0.16em',
+                            color: '#f5f6f8',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {member.season}
                         </div>
                       )}
 
-                      {/* Name / role overlay */}
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.5, duration: 0.5 }}
+                      {/* Glass panel */}
+                      <div
                         style={{
-                          position: 'absolute', bottom: 0, left: 0, right: 0,
-                          padding: '16px 18px 18px',
-                          textAlign: 'center',
-                          background: 'linear-gradient(to top, rgba(5,7,18,0.95) 0%, rgba(5,7,18,0.7) 70%, transparent 100%)',
-                        }}>
-                        <motion.h2
+                          position: 'absolute',
+                          left: 16,
+                          right: 16,
+                          bottom: 16,
+                          boxSizing: 'border-box',
+                          padding: '16px 18px 14px',
+                          borderRadius: 20,
+                          background: 'rgba(16,18,27,0.5)',
+                          border: '1px solid rgba(255,255,255,0.16)',
+                          backdropFilter: 'blur(18px)',
+                          WebkitBackdropFilter: 'blur(18px)',
+                        }}
+                      >
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                          {member.role && (
+                            <span
+                              style={{
+                                padding: '4px 10px',
+                                borderRadius: 999,
+                                background: '#0071b5',
+                                color: '#ffffff',
+                                fontSize: 11,
+                                letterSpacing: '0.14em',
+                                textTransform: 'uppercase',
+                                lineHeight: 1.3,
+                              }}
+                            >
+                              {member.role}
+                            </span>
+                          )}
+                        </div>
+                        <h2
                           id={`modal-title-${member.slug}`}
-                          animate={{ letterSpacing: '-0.01em' }}
                           style={{
-                            color: '#f8f9fb', fontSize: 24, fontWeight: 950,
-                            lineHeight: 1.1, margin: 0, letterSpacing: '-0.02em',
-                            fontStyle: 'normal', fontFamily: 'var(--font-sans, system-ui, sans-serif)',
-                            textShadow: '0 0 40px rgba(100,180,255,0.4), 0 4px 20px rgba(0,0,0,0.95)',
+                            margin: '10px 0 0',
+                            fontFamily: HEADING_FONT,
+                            fontSize: nameFontSize(member.name, 36),
+                            lineHeight: 1.05,
+                            letterSpacing: '0.02em',
+                            fontWeight: 400,
+                            color: '#f5f6f8',
+                            overflowWrap: 'anywhere',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
                           }}
                         >
                           {member.name}
-                        </motion.h2>
-                        {member.role && (
-                          <motion.div
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: 0.7, duration: 0.4 }}
-                            style={{ marginTop: 8, display: 'flex', justifyContent: 'center' }}>
-                            <span style={{
-                              color: '#5dd9ff', fontSize: 11, fontWeight: 800,
-                              letterSpacing: '0.12em', textTransform: 'uppercase',
-                              background: 'linear-gradient(135deg, rgba(0,140,220,0.3) 0%, rgba(0,100,180,0.2) 100%)',
-                              border: '1px solid rgba(100,180,255,0.35)',
-                              borderRadius: 22, padding: '4px 12px',
-                              backdropFilter: 'blur(6px)',
-                              boxShadow: '0 0 12px rgba(0,120,220,0.2)',
-                            }}>
-                              {member.role}
-                            </span>
-                          </motion.div>
-                        )}
+                        </h2>
                         {member.department && (
-                          <motion.p
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.85, duration: 0.4 }}
-                            style={{
-                              color: 'rgba(180,210,255,0.55)', fontSize: 10, marginTop: 5,
-                              fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase',
-                            }}>
+                          <div style={{ marginTop: 8, fontSize: 13, letterSpacing: '0.08em', color: '#5aa6d6', lineHeight: 1.35 }}>
                             {member.department}
-                          </motion.p>
+                          </div>
                         )}
-                      </motion.div>
-                    </div>
+                        <div
+                          style={{
+                            marginTop: 12,
+                            paddingTop: 10,
+                            borderTop: '1px solid rgba(255,255,255,0.14)',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            fontSize: 11,
+                            letterSpacing: '0.16em',
+                            color: '#9aa0b4',
+                          }}
+                        >
+                          <span>{SITE_HOST.toUpperCase()}</span>
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5aa6d6" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                            <path d="M6 8a6 6 0 010 8M10 5a10 10 0 010 14M14 2a14 14 0 010 20" />
+                          </svg>
+                        </div>
+                      </div>
 
-                    {/* Flip hint */}
-                    <div style={{
-                      flexShrink: 0,
-                      borderTop: '1px solid rgba(255,255,255,0.035)',
-                      padding: '7px',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-                      background: 'rgba(7,8,15,0.6)',
-                    }}>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"
-                        style={{ width: 9, height: 9, color: 'rgba(100,120,145,0.4)' }}>
-                        <path d="M1 4v6h6M23 20v-6h-6" />
-                        <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15" />
-                      </svg>
-                      <span style={{ color: 'rgba(100,120,145,0.4)', fontSize: 8.5, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase' }}>
-                        Umdrehen
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* ════════ BACK ════════ */}
-                  <div style={{
-                    position: 'absolute', inset: 0,
-                    backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden',
-                    transform: 'rotateY(180deg)',
-                    borderRadius: 22, overflow: 'hidden',
-                    background: 'linear-gradient(158deg, #0d1d35 0%, #07080f 55%)',
-                    border: '1px solid rgba(255,255,255,0.07)',
-                    display: 'flex', flexDirection: 'column',
-                  }}>
-                    {/* Top stripe */}
-                    <div style={{
-                      height: 4, flexShrink: 0, position: 'relative', overflow: 'hidden',
-                      background: 'linear-gradient(90deg, #0040c0 0%, #0090f0 50%, #0040c0 100%)',
-                      boxShadow: '0 2px 12px rgba(0,100,220,0.35)',
-                    }}>
-                      <motion.div
-                        animate={{ x: ['-100%', '200%'] }}
-                        transition={{ repeat: Infinity, duration: 2.6, ease: 'easeInOut', repeatDelay: 1.8, delay: 0.8 }}
+                      <div
+                        ref={sheenRef}
+                        aria-hidden="true"
                         style={{
-                          position: 'absolute', inset: 0,
-                          background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent)',
-                          width: '35%',
-                          filter: 'blur(1px)',
+                          position: 'absolute',
+                          inset: 0,
+                          pointerEvents: 'none',
+                          mixBlendMode: 'screen',
+                          backgroundImage:
+                            'linear-gradient(112deg, rgba(0,0,0,0) 34%, rgba(0,113,181,0.35) 42%, rgba(255,255,255,0.3) 50%, rgba(90,166,214,0.35) 58%, rgba(0,0,0,0) 66%)',
+                          backgroundSize: '260% 100%',
+                          backgroundPosition: '50% 0',
                         }}
                       />
                     </div>
 
-                    {/* Decorative bg glow — animated */}
-                    <motion.div
-                      animate={{ opacity: [0.08, 0.15, 0.08] }}
-                      transition={{ duration: 5, repeat: Infinity }}
+                    {/* ════════ BACK ════════ */}
+                    <div
+                      aria-hidden={!flipped}
                       style={{
-                        position: 'absolute', top: 3, right: -20, width: 200, height: 200,
-                        background: 'radial-gradient(circle, rgba(0,130,220,0.15) 0%, transparent 70%)',
-                        pointerEvents: 'none',
-                      }} />
-                    <motion.div
-                      animate={{ opacity: [0.06, 0.12, 0.06] }}
-                      transition={{ duration: 5.5, repeat: Infinity, delay: 0.3 }}
-                      style={{
-                        position: 'absolute', bottom: 40, left: -30, width: 150, height: 150,
-                        background: 'radial-gradient(circle, rgba(0,80,180,0.12) 0%, transparent 70%)',
-                        pointerEvents: 'none',
-                      }} />
-
-                    {/* Animated back content */}
-                    <motion.div
-                      variants={backContainer}
-                      initial="hidden"
-                      animate={backShowing ? 'visible' : 'hidden'}
-                      style={{ display: 'flex', flexDirection: 'column', flex: 1 }}
+                        position: 'absolute',
+                        inset: 0,
+                        boxSizing: 'border-box',
+                        overflow: 'hidden',
+                        borderRadius: 26,
+                        border: '1px solid rgba(255,255,255,0.16)',
+                        background: '#06070d',
+                        backfaceVisibility: 'hidden',
+                        WebkitBackfaceVisibility: 'hidden',
+                        transform: 'rotateY(180deg)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                      }}
                     >
-                      {/* Header */}
-                      <motion.div variants={backItem} style={{
-                        flexShrink: 0, padding: '13px 16px 11px',
-                        display: 'flex', alignItems: 'center', gap: 10,
-                        borderBottom: '1px solid rgba(255,255,255,0.05)',
-                        background: 'linear-gradient(to right, rgba(0,60,140,0.12) 0%, transparent 100%)',
-                      }}>
-                        <div style={{
-                          width: 40, height: 40, borderRadius: '50%', overflow: 'hidden',
-                          flexShrink: 0, background: '#0a1020',
-                          boxShadow: '0 0 0 2px rgba(0,130,220,0.4), 0 0 12px rgba(0,130,220,0.2)',
-                        }}>
-                          {member.photo ? (
-                            <Image src={member.photo} alt={member.name} width={40} height={40}
-                              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
-                          ) : (
-                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                              <svg viewBox="0 0 24 24" fill="none" stroke="#2a3d55" strokeWidth="1.5" style={{ width: 18, height: 18 }}>
-                                <circle cx="12" cy="8" r="4" /><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8" />
-                              </svg>
-                            </div>
-                          )}
+                      <div style={{ position: 'relative', height: 170, flex: 'none' }}>
+                        <Image
+                          src="/uploads/ert-14-26-studio.jpg"
+                          alt=""
+                          fill
+                          sizes="340px"
+                          draggable={false}
+                          style={{ objectFit: 'cover', objectPosition: '60% 55%', pointerEvents: 'none' }}
+                        />
+                        <div
+                          style={{
+                            position: 'absolute',
+                            inset: 0,
+                            background: 'linear-gradient(180deg, rgba(6,7,13,0.35) 0%, rgba(6,7,13,0.1) 45%, #06070d 100%)',
+                          }}
+                        />
+                        <div
+                          style={{
+                            position: 'absolute',
+                            left: 20,
+                            top: 20,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 10,
+                            fontSize: 11,
+                            letterSpacing: '0.2em',
+                            color: '#f5f6f8',
+                          }}
+                        >
+                          <span style={{ display: 'block', width: 24, height: 3, background: '#0071b5' }} />
+                          <span>E-MOTION RENNTEAM AALEN</span>
                         </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{
-                            color: '#e8eef8', fontSize: 15, fontWeight: 800, margin: 0,
-                            letterSpacing: '-0.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                            fontFamily: 'var(--font-sans, system-ui, sans-serif)',
-                          }}>
-                            {member.name}
-                          </p>
-                          {member.role && (
-                            <p style={{ color: '#3eaaee', fontSize: 9.5, fontWeight: 700, margin: '3px 0 0', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                              {member.role}
-                            </p>
-                          )}
-                        </div>
-                      </motion.div>
-
-                      {/* Contact rows */}
-                      <div style={{ flexShrink: 0, padding: '10px 16px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-                        {(member.phone || !showRealContact) && (
-                          <motion.div variants={backItem}>
-                            <ContactRow
-                              icon={<PhoneIcon />}
-                              label={showRealContact && member.phone ? maskPhone(member.phone) : '[Test Tel]'}
-                              dim={!showRealContact || !member.phone}
-                            />
-                          </motion.div>
-                        )}
-                        {(member.email || !showRealContact) && (
-                          <motion.div variants={backItem}>
-                            <ContactRow
-                              icon={<MailIcon />}
-                              label={showRealContact && member.email ? maskEmail(member.email) : '[Test Mail]'}
-                              dim={!showRealContact || !member.email}
-                            />
-                          </motion.div>
-                        )}
-                        {member.linkedin && (
-                          <motion.div variants={backItem}>
-                            <ContactRow icon={<LinkedInIcon />} label="linkedin.com/in/•••" dim />
-                          </motion.div>
-                        )}
                       </div>
 
-                      {/* Divider */}
-                      <motion.div variants={backItem} style={{ margin: '0 16px', height: 1, background: 'linear-gradient(to right, rgba(0,100,220,0.2), rgba(255,255,255,0.04), transparent)', flexShrink: 0 }} />
-
-                      {/* QR */}
-                      <motion.div variants={backItem} style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '10px 16px 6px' }}>
-                        <motion.div
-                          whileHover={{ scale: 1.08 }}
-                          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '-34px 20px 0', position: 'relative' }}>
+                        <div
                           style={{
-                            background: 'white', borderRadius: 12, padding: 8,
-                            boxShadow: '0 0 0 2px rgba(0,120,220,0.3), 0 8px 32px rgba(0,80,180,0.25), 0 0 28px rgba(0,120,220,0.15)',
-                            display: 'inline-block',
-                            cursor: 'pointer',
-                          }}>
-                          {qrCodeDataUrl ? (
-                            <img src={qrCodeDataUrl} alt="QR Code" style={{ width: 82, height: 82, display: 'block', borderRadius: 4 }} />
+                            width: 64,
+                            height: 64,
+                            boxSizing: 'border-box',
+                            borderRadius: '50%',
+                            border: '2px solid #0071b5',
+                            overflow: 'hidden',
+                            flex: 'none',
+                            background: '#171a26',
+                            position: 'relative',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          {member.photo ? (
+                            <Image
+                              src={member.photo}
+                              alt=""
+                              fill
+                              sizes="64px"
+                              draggable={false}
+                              style={{ objectFit: 'cover', objectPosition: 'top' }}
+                            />
                           ) : (
-                            <div style={{ width: 82, height: 82, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#aaa', fontSize: 11, fontWeight: 600 }}>
-                              Lädt…
+                            <PersonIcon size={34} stroke="#9aa0b4" />
+                          )}
+                        </div>
+                        <div style={{ minWidth: 0, paddingTop: 30 }}>
+                          <div
+                            style={{
+                              fontFamily: HEADING_FONT,
+                              fontSize: nameFontSize(member.name, 25),
+                              lineHeight: 1.05,
+                              letterSpacing: '0.02em',
+                              overflowWrap: 'anywhere',
+                              display: '-webkit-box',
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: 'vertical',
+                              overflow: 'hidden',
+                            }}
+                          >
+                            {member.name}
+                          </div>
+                          {member.role && (
+                            <div style={{ marginTop: 4, fontSize: 12, letterSpacing: '0.12em', color: '#5aa6d6', textTransform: 'uppercase' }}>
+                              {member.role}
+                              {member.department ? ` · ${member.department}` : ''}
                             </div>
                           )}
-                        </motion.div>
-                        <motion.p
-                          animate={{ opacity: [0.4, 0.6, 0.4] }}
-                          transition={{ duration: 3, repeat: Infinity }}
-                          style={{ color: 'rgba(100,125,155,0.55)', fontSize: 8.5, marginTop: 6, textTransform: 'uppercase', letterSpacing: '0.16em', fontWeight: 800 }}>
-                          QR scannen · Kontakt speichern
-                        </motion.p>
-                      </motion.div>
+                        </div>
+                      </div>
 
-                      {/* Actions */}
-                      <motion.div variants={backItem} style={{ flexGrow: 1, padding: '4px 16px 12px', display: 'flex', flexDirection: 'column', gap: 6, justifyContent: 'flex-end' }}>
-                        <ActionButton onClick={(e) => { e.stopPropagation(); downloadVCard(member); }}>
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: 12, height: 12 }}>
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                            <polyline points="7 10 12 15 17 10" />
-                            <line x1="12" y1="15" x2="12" y2="3" />
-                          </svg>
-                          vCard herunterladen
-                        </ActionButton>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, margin: '18px 20px 0' }}>
+                        {showPhone && <ContactRow icon={<PhoneIcon />} text={maskPhone(member.phone!)} />}
+                        {showEmail && <ContactRow icon={<MailIcon />} text={maskEmail(member.email!)} />}
+                        <ContactRow icon={<GlobeIcon />} text={SITE_HOST} />
+                        <ContactRow icon={<PinIcon />} text={ADDRESS} />
+                      </div>
 
-                        <div style={{ display: 'flex', gap: 6 }}>
-                          {showRealContact && member.email && (
-                            <GhostButton href={getGoogleContactsLink()}>
-                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" style={{ width: 11, height: 11 }}>
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                                <circle cx="12" cy="7" r="4" />
-                              </svg>
-                              Google
-                            </GhostButton>
-                          )}
-                          {showRealContact && member.phone && (
-                            <GhostButton href={`tel:${member.phone}`}>
-                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" style={{ width: 11, height: 11 }}>
-                                <rect x="5" y="2" width="14" height="20" rx="2" />
-                                <line x1="12" y1="18" x2="12" y2="18" strokeWidth="2" strokeLinecap="round" />
-                              </svg>
-                              Wallet
-                            </GhostButton>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 14, margin: 'auto 20px 22px' }}>
+                        <div
+                          style={{
+                            width: 96,
+                            height: 96,
+                            flex: 'none',
+                            boxSizing: 'border-box',
+                            borderRadius: 14,
+                            background: '#ffffff',
+                            padding: 6,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          {qrCodeDataUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={qrCodeDataUrl} alt="QR-Code zum Speichern des Kontakts" draggable={false} style={{ width: '100%', height: '100%', display: 'block' }} />
+                          ) : (
+                            <span style={{ color: '#555a6b', fontSize: 11 }}>Lädt…</span>
                           )}
                         </div>
-                      </motion.div>
-
-                      {/* Footer */}
-                      <motion.div variants={backItem} style={{
-                        flexShrink: 0,
-                        borderTop: '1px solid rgba(255,255,255,0.05)',
-                        padding: '6px 16px',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                        background: 'rgba(0,0,0,0.2)',
-                      }}>
-                        <div style={{
-                          width: 13, height: 13, borderRadius: 3,
-                          background: 'linear-gradient(135deg, #0071b5, #0048cc)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          boxShadow: '0 0 6px rgba(0,113,181,0.4)',
-                        }}>
-                          <svg width="9" height="9" viewBox="0 0 40 40" fill="none">
-                            <path d="M8 28L14 12H20L16 22H22L18 32H8Z" fill="white" />
-                            <path d="M20 12H32L28 22H24L28 12" fill="white" opacity="0.55" />
-                          </svg>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minWidth: 0, flex: 1 }}>
+                          <div style={{ fontSize: 11, letterSpacing: '0.14em', color: '#9aa0b4', lineHeight: 1.5 }}>
+                            SCANNEN &amp; KONTAKT SPEICHERN
+                          </div>
+                          <button
+                            type="button"
+                            onPointerDown={(e) => e.stopPropagation()}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              downloadVCard(member);
+                            }}
+                            tabIndex={flipped ? 0 : -1}
+                            style={{
+                              minHeight: 40,
+                              borderRadius: 999,
+                              border: '1px solid #0071b5',
+                              background: '#0071b5',
+                              color: '#ffffff',
+                              fontSize: 13,
+                              cursor: 'pointer',
+                              fontFamily: BODY_FONT,
+                            }}
+                          >
+                            vCard laden
+                          </button>
+                          {showEmail && (
+                            <a
+                              href={getGoogleContactsLink()}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onPointerDown={(e) => e.stopPropagation()}
+                              onClick={(e) => e.stopPropagation()}
+                              tabIndex={flipped ? 0 : -1}
+                              style={{
+                                minHeight: 36,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                borderRadius: 999,
+                                border: '1px solid rgba(255,255,255,0.18)',
+                                color: '#f5f6f8',
+                                fontSize: 13,
+                                textDecoration: 'none',
+                              }}
+                            >
+                              Google Kontakte
+                            </a>
+                          )}
                         </div>
-                        <span style={{ color: 'rgba(100,125,155,0.45)', fontSize: 8.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em' }}>
-                          E-Motion Rennteam Aalen e.V.
-                        </span>
-                      </motion.div>
-                    </motion.div>
+                      </div>
+
+                      <div style={{ display: 'flex', height: 8, flex: 'none' }}>
+                        <div style={{ flex: 3, background: '#0071b5' }} />
+                        <div style={{ flex: 1, background: '#162e7b' }} />
+                      </div>
+                    </div>
                   </div>
-
                 </div>
-              </motion.div>
-            </motion.div>
-
-            {/* Hint below */}
-            <motion.p
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8, duration: 0.5 }}
-              style={{ color: 'rgba(255,255,255,0.15)', fontSize: 9.5, marginTop: 16, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 600 }}
-            >
-              Klicken · Umdrehen &nbsp;·&nbsp; ESC · Schließen
-            </motion.p>
+              </div>
+            </div>
           </motion.div>
+
+          {/* Controls */}
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: 'absolute',
+              left: 16,
+              right: 16,
+              bottom: 20,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 8,
+            }}
+          >
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
+              <button type="button" style={pillButton} onClick={() => setFlipped((f) => !f)}>
+                {flipped ? 'Vorderseite' : 'Umdrehen'}
+              </button>
+              <button
+                type="button"
+                aria-pressed={swayOn}
+                onClick={toggleSway}
+                style={{
+                  ...pillButton,
+                  background: swayOn ? '#0071b5' : pillButton.background,
+                  borderColor: swayOn ? '#0071b5' : '#232635',
+                  color: '#ffffff',
+                }}
+              >
+                Pendeln
+              </button>
+            </div>
+            <p style={{ margin: 0, fontSize: 12, letterSpacing: '0.12em', color: '#9aa0b4' }}>
+              Karte ziehen &amp; loslassen · Tippen zum Umdrehen · ESC schließt
+            </p>
+          </div>
         </motion.div>
-      )}
+  );
+}
+
+export default function MemberModal({ member, onClose }: MemberModalProps) {
+  return (
+    <AnimatePresence>
+      {member && <MemberDialog key={member.slug} member={member} onClose={onClose} />}
     </AnimatePresence>
-  );
-}
-
-/* ─── Helper components ─── */
-function ContactRow({ icon, label, dim }: { icon: React.ReactNode; label: string; dim?: boolean }) {
-  const [hovering, setHovering] = useState(false);
-  return (
-    <motion.div
-      onMouseEnter={() => setHovering(true)}
-      onMouseLeave={() => setHovering(false)}
-      animate={hovering ? { x: 4, backgroundColor: 'rgba(0,100,220,0.12)' } : { x: 0, backgroundColor: 'rgba(255,255,255,0.02)' }}
-      transition={{ duration: 0.2 }}
-      style={{
-        display: 'flex', alignItems: 'center', gap: 9,
-        padding: '6px 8px 6px 6px', borderRadius: 8,
-        border: '1px solid rgba(0,120,220,0.25)',
-        borderLeft: hovering ? '2px solid rgba(0,180,255,0.5)' : '2px solid rgba(0,100,200,0.25)',
-        cursor: 'pointer',
-        transition: 'border-color 0.2s',
-      }}>
-      <motion.div
-        animate={hovering ? { scale: 1.1, boxShadow: '0 0 14px rgba(0,130,220,0.4)' } : { scale: 1, boxShadow: '0 0 6px rgba(0,100,200,0.15)' }}
-        transition={{ duration: 0.2 }}
-        style={{
-          width: 24, height: 24, borderRadius: 6, flexShrink: 0,
-          background: 'linear-gradient(135deg, rgba(0,100,200,0.2) 0%, rgba(0,60,140,0.14) 100%)',
-          border: '1px solid rgba(0,120,220,0.3)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
-        {icon}
-      </motion.div>
-      <motion.span
-        animate={hovering ? { color: '#5dd9ff' } : { color: dim ? 'rgba(100,120,148,0.5)' : '#8fb8d4' }}
-        transition={{ duration: 0.2 }}
-        style={{ fontSize: 11.5, fontWeight: 500, letterSpacing: '0.01em' }}>
-        {label}
-      </motion.span>
-    </motion.div>
-  );
-}
-
-function ActionButton({ onClick, children }: { onClick: (e: React.MouseEvent) => void; children: React.ReactNode }) {
-  const [hovering, setHovering] = useState(false);
-  return (
-    <motion.button
-      onClick={onClick}
-      onMouseEnter={() => setHovering(true)}
-      onMouseLeave={() => setHovering(false)}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.96 }}
-      animate={hovering ? {
-        background: 'linear-gradient(135deg, rgba(0,120,200,0.35) 0%, rgba(0,80,160,0.28) 100%)',
-        boxShadow: '0 0 24px rgba(0,130,220,0.3), inset 0 1px 0 rgba(255,255,255,0.08)'
-      } : {
-        background: 'linear-gradient(135deg, rgba(0,90,180,0.28) 0%, rgba(0,60,140,0.22) 100%)',
-        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05), 0 2px 12px rgba(0,80,180,0.15)'
-      }}
-      transition={{ duration: 0.25 }}
-      style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
-        border: '1px solid rgba(0,140,220,0.45)',
-        borderRadius: 11, padding: '11px 16px',
-        color: hovering ? '#5dd9ff' : '#4dc4ff', fontSize: 12, fontWeight: 800,
-        cursor: 'pointer', letterSpacing: '0.04em', width: '100%',
-        transition: 'color 0.25s',
-      }}
-    >
-      {children}
-    </motion.button>
-  );
-}
-
-function GhostButton({ href, children }: { href: string; children: React.ReactNode }) {
-  const [hovering, setHovering] = useState(false);
-  return (
-    <motion.a
-      href={href}
-      target={href.startsWith('tel:') ? undefined : '_blank'}
-      rel="noopener noreferrer"
-      onClick={(e) => e.stopPropagation()}
-      onMouseEnter={() => setHovering(true)}
-      onMouseLeave={() => setHovering(false)}
-      whileHover={{ scale: 1.03 }}
-      whileTap={{ scale: 0.94 }}
-      animate={hovering ? {
-        background: 'rgba(100,180,255,0.12)',
-        borderColor: 'rgba(100,150,220,0.35)',
-        boxShadow: '0 0 16px rgba(100,150,220,0.2), inset 0 1px 0 rgba(255,255,255,0.06)'
-      } : {
-        background: 'rgba(255,255,255,0.03)',
-        borderColor: 'rgba(255,255,255,0.08)',
-        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.03)'
-      }}
-      transition={{ duration: 0.25 }}
-      style={{
-        flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-        border: '1px solid rgba(255,255,255,0.08)',
-        borderRadius: 10, padding: '9px 8px',
-        color: hovering ? '#5dd9ff' : '#5a7a95', fontSize: 11.5, fontWeight: 700,
-        textDecoration: 'none',
-        transition: 'color 0.25s',
-      }}
-    >
-      {children}
-    </motion.a>
-  );
-}
-
-function PhoneIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="#2a8cc8" strokeWidth="1.8" style={{ width: 11, height: 11 }}>
-      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.82A16 16 0 0 0 15.18 16.09l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
-    </svg>
-  );
-}
-
-function MailIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="#2a8cc8" strokeWidth="1.8" style={{ width: 11, height: 11 }}>
-      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-      <polyline points="22,6 12,13 2,6" />
-    </svg>
-  );
-}
-
-function LinkedInIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="#2a8cc8" style={{ width: 10, height: 10 }}>
-      <path d="M4.98 3.5C4.98 4.881 3.87 6 2.5 6S0 4.881 0 3.5 1.12 1 2.5 1s2.48 1.119 2.48 2.5zM.24 8.25h4.52V23H.24V8.25zM8.5 8.25h4.33v2.02h.06c.6-1.14 2.07-2.34 4.26-2.34 4.55 0 5.39 3 5.39 6.9V23h-4.52v-6.7c0-1.6-.03-3.66-2.23-3.66-2.24 0-2.58 1.75-2.58 3.55V23H8.5V8.25z" />
-    </svg>
   );
 }
