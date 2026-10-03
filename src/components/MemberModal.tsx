@@ -23,62 +23,86 @@ function maskEmail(email: string): string {
   return `${local.slice(0, 2)}•••@${domain}`;
 }
 
-/* ─── Lanyard ─── */
+/* ─── Site tokens (mirrored from globals.css :root) ─── */
+const T = {
+  bg:        '#06070d',
+  surface:   '#10121b',
+  surface2:  '#171a26',
+  fg:        '#f5f6f8',
+  muted:     '#9aa0b4',
+  accent:    '#0071b5',
+  accent2:   '#162e7b',
+  accentTxt: '#5aa6d6',
+  border:    '#232635',
+};
+
+/* ─── Lanyard — site-colored ─── */
 function Lanyard() {
   return (
-    <svg width="52" height="88" viewBox="0 0 52 88" fill="none" style={{ display: 'block', margin: '0 auto' }}>
+    <svg width="52" height="86" viewBox="0 0 52 86" fill="none" style={{ display: 'block', margin: '0 auto' }}>
       <defs>
-        <linearGradient id="rope2" x1="0" y1="0" x2="0" y2="88" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#666" />
-          <stop offset="60%" stopColor="#333" />
-          <stop offset="100%" stopColor="#111" />
+        <linearGradient id="lrope" x1="0" y1="0" x2="0" y2="86" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor={T.accentTxt} stopOpacity="0.7" />
+          <stop offset="55%" stopColor={T.accent}   stopOpacity="0.5" />
+          <stop offset="100%" stopColor={T.accent2}  stopOpacity="0.4" />
         </linearGradient>
-        <linearGradient id="clip2" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#aaa" />
-          <stop offset="40%" stopColor="#777" />
-          <stop offset="100%" stopColor="#444" />
+        <linearGradient id="lclip" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#a0aec0" />
+          <stop offset="55%" stopColor="#718096" />
+          <stop offset="100%" stopColor="#4a5568" />
         </linearGradient>
       </defs>
-      <path d="M26 0 C26 26, 26 52, 26 70" stroke="url(#rope2)" strokeWidth="2.5" strokeLinecap="round" />
-      <rect x="15" y="68" width="22" height="14" rx="2" fill="url(#clip2)" />
-      <rect x="17" y="70" width="18" height="3" rx="1" fill="rgba(255,255,255,0.18)" />
-      <circle cx="26" cy="66" r="5" fill="#0a0a0a" stroke="#555" strokeWidth="1.5" />
-      <circle cx="26" cy="66" r="2" fill="#050505" />
+      <path d="M26 0 C26 26, 26 52, 26 68" stroke="url(#lrope)" strokeWidth="2.5" strokeLinecap="round" />
+      <rect x="15" y="66" width="22" height="14" rx="2.5" fill="url(#lclip)" />
+      <rect x="17.5" y="68.5" width="17" height="3" rx="1" fill="rgba(255,255,255,0.2)" />
+      <circle cx="26" cy="64" r="5" fill={T.bg} stroke={T.border} strokeWidth="1.5" />
+      <circle cx="26" cy="64" r="2" fill={T.surface} />
     </svg>
+  );
+}
+
+/* ─── Checkered stripe (from globals.css .checkered-divider) ─── */
+function CheckeredStripe({ opacity = 0.18 }: { opacity?: number }) {
+  return (
+    <div style={{
+      height: 8, flexShrink: 0,
+      backgroundImage: [
+        'linear-gradient(45deg, rgba(255,255,255,0.9) 25%, transparent 25%)',
+        'linear-gradient(-45deg, rgba(255,255,255,0.9) 25%, transparent 25%)',
+        'linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.9) 75%)',
+        'linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.9) 75%)',
+      ].join(', '),
+      backgroundSize: '8px 8px',
+      backgroundPosition: '0 0, 0 4px, 4px -4px, -4px 0px',
+      backgroundColor: T.bg,
+      opacity,
+    }} />
   );
 }
 
 /* ─── Stagger variants ─── */
 const backContainer = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.06, delayChildren: 0.06 } },
+  visible: { transition: { staggerChildren: 0.055, delayChildren: 0.05 } },
 };
 const backItem = {
-  hidden: { opacity: 0, y: 8 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] as [number,number,number,number] } },
-};
-
-/* Carbon fiber pattern via repeating gradients */
-const carbonStyle = {
-  backgroundImage: [
-    'repeating-linear-gradient(45deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 8px)',
-    'repeating-linear-gradient(-45deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 8px)',
-  ].join(', '),
+  hidden: { opacity: 0, y: 7 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] as [number,number,number,number] } },
 };
 
 export default function MemberModal({ member, onClose }: MemberModalProps) {
-  const dialogRef = useRef<HTMLDivElement>(null);
-  const previousActiveElement = useRef<HTMLElement | null>(null);
-  const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
-  const [flipped, setFlipped] = useState(false);
+  const dialogRef    = useRef<HTMLDivElement>(null);
+  const prevFocus    = useRef<HTMLElement | null>(null);
+  const [qrUrl, setQrUrl]             = useState('');
+  const [flipped, setFlipped]         = useState(false);
   const [backShowing, setBackShowing] = useState(false);
-  const [hovering, setHovering] = useState(false);
+  const [hovering, setHovering]       = useState(false);
 
-  const isExecutive = member ? ['ceo', 'cto', 'cfo'].includes(member.roleLevel || '') : false;
+  const isExecutive  = member ? ['ceo', 'cto', 'cfo'].includes(member.roleLevel || '') : false;
   const isLeadership = member
     ? isExecutive || ['Teamleiter', 'Leitung'].includes((member.role || '').trim())
     : false;
-  const showRealContact = isLeadership;
+  const showReal = isLeadership;
 
   const tiltX = useMotionValue(0);
   const tiltY = useMotionValue(0);
@@ -87,21 +111,19 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
 
   useEffect(() => {
     if (!member) { setFlipped(false); setBackShowing(false); return; }
-    previousActiveElement.current = document.activeElement as HTMLElement;
-    const handleKeyDown = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', handleKeyDown);
+    prevFocus.current = document.activeElement as HTMLElement;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
     dialogRef.current?.focus();
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      previousActiveElement.current?.focus();
+      document.removeEventListener('keydown', onKey);
+      prevFocus.current?.focus();
     };
   }, [member, onClose]);
 
   useEffect(() => {
     if (!member) return;
-    generateQRCodeDataUrl(generateQRCodeValue(member))
-      .then(setQrCodeDataUrl)
-      .catch(() => setQrCodeDataUrl(''));
+    generateQRCodeDataUrl(generateQRCodeValue(member)).then(setQrUrl).catch(() => setQrUrl(''));
   }, [member]);
 
   useEffect(() => {
@@ -113,26 +135,37 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
     }
   }, [flipped]);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  const onMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (flipped) return;
     const r = e.currentTarget.getBoundingClientRect();
-    tiltX.set(((e.clientY - r.top) / r.height - 0.5) * -14);
-    tiltY.set(((e.clientX - r.left) / r.width - 0.5) * 14);
+    tiltX.set(((e.clientY - r.top) / r.height - 0.5) * -13);
+    tiltY.set(((e.clientX - r.left) / r.width - 0.5) * 13);
   };
-
   const resetTilt = () => { tiltX.set(0); tiltY.set(0); setHovering(false); };
 
-  const getGoogleContactsLink = () => {
+  const googleLink = () => {
     if (!member) return '#';
     const p = new URLSearchParams();
-    if (member.name) p.append('name', member.name);
-    if (member.phone) p.append('tel', member.phone);
+    if (member.name)  p.append('name',  member.name);
+    if (member.phone) p.append('tel',   member.phone);
     if (member.email) p.append('email', member.email);
     return `https://contacts.google.com/?add&contact=${p.toString()}`;
   };
 
-  const CARD_W = 'min(300px, 84vw)';
-  const CARD_H = 'min(450px, calc(84vw * 1.5))';
+  const W = 'min(296px, 83vw)';
+  const H = 'min(444px, calc(83vw * 1.5))';
+
+  /* ── shared card shell style ── */
+  const cardShell: React.CSSProperties = {
+    position: 'absolute', inset: 0,
+    backfaceVisibility:       'hidden',
+    WebkitBackfaceVisibility: 'hidden',
+    borderRadius: 16,
+    overflow: 'hidden',
+    background: `linear-gradient(160deg, ${T.surface} 0%, ${T.bg} 100%)`,
+    border: `1px solid ${T.border}`,
+    display: 'flex', flexDirection: 'column',
+  };
 
   return (
     <AnimatePresence>
@@ -147,39 +180,40 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.25 }}
+          transition={{ duration: 0.22 }}
           onClick={onClose}
           style={{
             position: 'fixed', inset: 0, zIndex: 50,
-            display: 'flex', flexDirection: 'column', alignItems: 'center',
-            justifyContent: 'flex-start',
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'flex-start',
             overflowY: 'auto',
-            paddingTop: 'clamp(28px, 5vh, 56px)',
+            paddingTop: 'clamp(24px, 5vh, 52px)',
             paddingBottom: 48,
-            background: 'rgba(0,0,0,0.92)',
-            backdropFilter: 'blur(28px) saturate(1.2)',
+            background: `radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,113,181,0.14) 0%, rgba(6,7,13,0.97) 55%)`,
+            backdropFilter: 'blur(32px) saturate(1.3)',
           }}
         >
-          {/* Close button */}
+          {/* Close */}
           <motion.button
             onClick={onClose}
             aria-label="Schließen"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            transition={{ delay: 0.25 }}
+            whileHover={{ scale: 1.06 }}
+            whileTap={{ scale: 0.93 }}
             style={{
-              position: 'fixed', right: 20, top: 20, zIndex: 60,
-              width: 38, height: 38, borderRadius: 2,
-              border: '1px solid rgba(255,255,255,0.12)',
-              background: 'rgba(18,18,18,0.85)',
-              color: 'rgba(255,255,255,0.5)',
+              position: 'fixed', right: 18, top: 18, zIndex: 60,
+              width: 38, height: 38, borderRadius: 10,
+              border: `1px solid ${T.border}`,
+              background: T.surface,
+              color: T.muted,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', backdropFilter: 'blur(12px)',
+              cursor: 'pointer',
             }}
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 14, height: 14 }}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
+              style={{ width: 14, height: 14 }}>
               <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
             </svg>
           </motion.button>
@@ -187,35 +221,35 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
           {/* Card wrapper */}
           <motion.div
             onClick={(e) => e.stopPropagation()}
-            initial={{ y: -80, opacity: 0, scale: 0.9 }}
+            initial={{ y: -70, opacity: 0, scale: 0.92 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
-            exit={{ y: -50, opacity: 0, scale: 0.92 }}
-            transition={{ type: 'spring', damping: 22, stiffness: 180, mass: 0.9 }}
+            exit={{ y: -45, opacity: 0, scale: 0.93 }}
+            transition={{ type: 'spring', damping: 22, stiffness: 190, mass: 0.85 }}
             style={{
               display: 'flex', flexDirection: 'column', alignItems: 'center',
-              filter: 'drop-shadow(0 48px 96px rgba(0,0,0,0.98)) drop-shadow(0 8px 32px rgba(0,0,0,0.6))',
+              filter: `drop-shadow(0 40px 80px rgba(0,0,0,0.96)) drop-shadow(0 0 48px rgba(0,113,181,0.12))`,
             }}
           >
             {/* Lanyard */}
             <motion.div
               style={{ pointerEvents: 'none', marginBottom: -2 }}
-              initial={{ opacity: 0, y: -16 }}
+              initial={{ opacity: 0, y: -14 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15, duration: 0.4 }}
+              transition={{ delay: 0.14, duration: 0.36 }}
             >
               <Lanyard />
             </motion.div>
 
-            {/* Swing wrapper */}
+            {/* Swing */}
             <motion.div
-              animate={hovering ? { rotate: 0 } : { rotate: [-0.8, 0.8, -0.4, 0.4, -0.8] }}
+              animate={hovering ? { rotate: 0 } : { rotate: [-0.7, 0.7, -0.35, 0.35, -0.7] }}
               transition={hovering
-                ? { duration: 0.4, ease: 'easeOut' }
-                : { repeat: Infinity, duration: 8, ease: 'easeInOut', times: [0, 0.25, 0.5, 0.75, 1] }
+                ? { duration: 0.35, ease: 'easeOut' }
+                : { repeat: Infinity, duration: 9, ease: 'easeInOut', times: [0, 0.25, 0.5, 0.75, 1] }
               }
               style={{ transformOrigin: 'top center' }}
             >
-              {/* Tilt wrapper */}
+              {/* Tilt */}
               <motion.div
                 style={{
                   rotateX: flipped ? 0 : springX,
@@ -223,140 +257,137 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                   transformPerspective: 1000,
                   cursor: 'pointer',
                 }}
-                onMouseMove={!flipped ? handleMouseMove : undefined}
+                onMouseMove={!flipped ? onMouseMove : undefined}
                 onMouseEnter={() => setHovering(true)}
                 onMouseLeave={resetTilt}
                 onClick={() => setFlipped((f) => !f)}
               >
-                {/* 3-D flip container */}
-                <div
-                  style={{
-                    width: CARD_W,
-                    height: CARD_H,
-                    position: 'relative',
-                    transformStyle: 'preserve-3d',
-                    transition: 'transform 0.72s cubic-bezier(0.25, 0.1, 0.1, 1)',
-                    transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
-                  }}
-                >
+                {/* Flip container */}
+                <div style={{
+                  width: W, height: H,
+                  position: 'relative',
+                  transformStyle: 'preserve-3d',
+                  transition: 'transform 0.7s cubic-bezier(0.25, 0.1, 0.1, 1)',
+                  transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+                }}>
 
-                  {/* ════════ FRONT ════════ */}
-                  <div style={{
-                    position: 'absolute', inset: 0,
-                    backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden',
-                    borderRadius: 4, overflow: 'hidden',
-                    background: '#0d0d0d',
-                    border: '1px solid rgba(255,255,255,0.07)',
-                    display: 'flex', flexDirection: 'column',
-                    ...carbonStyle,
-                  }}>
-                    {/* Racing accent stripe — diagonal cut */}
+                  {/* ═══════ FRONT ═══════ */}
+                  <div style={cardShell}>
+
+                    {/* Accent gradient stripe */}
                     <div style={{
                       height: 3, flexShrink: 0,
-                      background: '#D42B1E',
+                      background: `linear-gradient(90deg, ${T.accent} 0%, ${T.accent2} 100%)`,
                     }} />
 
-                    {/* Logo bar */}
+                    {/* Header bar */}
                     <div style={{
                       flexShrink: 0,
-                      padding: '11px 14px 9px',
+                      padding: '10px 14px 9px',
                       display: 'flex', alignItems: 'center', gap: 9,
-                      borderBottom: '1px solid rgba(255,255,255,0.06)',
-                      background: 'rgba(12,12,12,0.95)',
+                      borderBottom: `1px solid ${T.border}`,
+                      background: T.surface,
                     }}>
-                      {/* Logo mark — geometric "E" */}
+                      {/* Logo mark */}
                       <div style={{
-                        width: 26, height: 26, borderRadius: 2, flexShrink: 0,
-                        background: '#D42B1E',
+                        width: 26, height: 26, borderRadius: 6, flexShrink: 0,
+                        background: `linear-gradient(135deg, ${T.accent} 0%, ${T.accent2} 100%)`,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        boxShadow: `0 0 14px rgba(0,113,181,0.35)`,
                       }}>
-                        <svg width="16" height="16" viewBox="0 0 40 40" fill="none">
-                          <rect x="6" y="8" width="18" height="3.5" fill="white" />
-                          <rect x="6" y="18" width="14" height="3.5" fill="white" />
-                          <rect x="6" y="28" width="18" height="3.5" fill="white" />
-                          <rect x="6" y="8" width="3.5" height="23.5" fill="white" />
+                        {/* E-Motion "E" wordmark */}
+                        <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+                          <rect x="3" y="3"  width="10" height="2" rx="0.5" fill="white" />
+                          <rect x="3" y="9"  width="8"  height="2" rx="0.5" fill="white" />
+                          <rect x="3" y="15" width="10" height="2" rx="0.5" fill="white" />
+                          <rect x="3" y="3"  width="2"  height="14" rx="0.5" fill="white" />
                         </svg>
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{
-                          fontSize: 10, fontWeight: 800, letterSpacing: '0.14em',
-                          textTransform: 'uppercase', lineHeight: 1.1,
-                          color: '#e8e8e8',
+                          fontSize: 9.5, fontWeight: 800,
+                          letterSpacing: '0.13em', textTransform: 'uppercase',
+                          color: T.fg, lineHeight: 1.1,
+                          fontFamily: 'var(--font-heading, var(--font-sans, system-ui))',
                         }}>
                           E-Motion Rennteam
                         </div>
                         <div style={{
-                          color: 'rgba(255,255,255,0.28)', fontSize: 8,
-                          fontWeight: 600, letterSpacing: '0.14em',
-                          marginTop: 2.5, textTransform: 'uppercase',
+                          color: T.muted, fontSize: 7.5, fontWeight: 600,
+                          letterSpacing: '0.12em', marginTop: 2.5,
+                          textTransform: 'uppercase',
                         }}>
                           Hochschule Aalen
                         </div>
                       </div>
                       {isExecutive && (
-                        <div style={{
-                          background: 'rgba(212,43,30,0.15)',
-                          color: '#D42B1E', fontSize: 7.5, fontWeight: 800,
-                          padding: '3px 7px', borderRadius: 2,
-                          letterSpacing: '0.14em', textTransform: 'uppercase',
-                          flexShrink: 0,
-                          border: '1px solid rgba(212,43,30,0.35)',
-                        }}>
-                          Exec
-                        </div>
+                        <motion.span
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ delay: 0.25, type: 'spring' }}
+                          style={{
+                            background: T.accent,
+                            color: '#fff', fontSize: 7.5, fontWeight: 700,
+                            padding: '3px 7px', borderRadius: 20,
+                            letterSpacing: '0.12em', textTransform: 'uppercase',
+                            flexShrink: 0,
+                          }}
+                        >
+                          Executive
+                        </motion.span>
                       )}
                     </div>
 
-                    {/* Photo */}
+                    {/* Photo — full bleed */}
                     <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
                       {member.photo ? (
                         <>
                           <Image
-                            src={member.photo}
-                            alt={member.name}
-                            fill
+                            src={member.photo} alt={member.name} fill
                             style={{ objectFit: 'cover', objectPosition: 'top' }}
                           />
-                          {/* Clean bottom gradient — no side vignettes */}
                           <div style={{
                             position: 'absolute', inset: 0,
-                            background: 'linear-gradient(to bottom, transparent 30%, rgba(13,13,13,0.6) 68%, rgba(13,13,13,0.97) 100%)',
+                            background: `linear-gradient(to bottom, transparent 28%, rgba(6,7,13,0.55) 62%, rgba(6,7,13,0.97) 100%)`,
                           }} />
                         </>
                       ) : (
                         <div style={{
                           width: '100%', height: '100%',
                           display: 'flex', flexDirection: 'column',
-                          alignItems: 'center', justifyContent: 'center', gap: 10,
-                          background: '#111',
+                          alignItems: 'center', justifyContent: 'center', gap: 8,
+                          background: T.surface2,
                         }}>
-                          <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1" style={{ width: 40, height: 40 }}>
-                            <circle cx="12" cy="8" r="4" /><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8" />
+                          <svg viewBox="0 0 24 24" fill="none" stroke={T.border}
+                            strokeWidth="1" style={{ width: 38, height: 38 }}>
+                            <circle cx="12" cy="8" r="4" />
+                            <path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8" />
                           </svg>
                           <span style={{
-                            color: 'rgba(255,255,255,0.12)', fontSize: 8, fontWeight: 700,
-                            textTransform: 'uppercase', letterSpacing: '0.22em',
+                            color: T.muted, fontSize: 8, fontWeight: 700,
+                            textTransform: 'uppercase', letterSpacing: '0.2em',
                           }}>
                             Foto folgt
                           </span>
                         </div>
                       )}
 
-                      {/* Name / role overlay */}
+                      {/* Name / Role overlay */}
                       <motion.div
-                        initial={{ opacity: 0, y: 16 }}
+                        initial={{ opacity: 0, y: 14 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4, duration: 0.45 }}
+                        transition={{ delay: 0.38, duration: 0.4 }}
                         style={{
                           position: 'absolute', bottom: 0, left: 0, right: 0,
-                          padding: '14px 16px 16px',
-                        }}>
+                          padding: '12px 16px 14px',
+                        }}
+                      >
                         {member.role && (
                           <div style={{
-                            color: '#D42B1E',
-                            fontSize: 9, fontWeight: 800,
+                            color: T.accentTxt,
+                            fontSize: 8.5, fontWeight: 800,
                             letterSpacing: '0.2em', textTransform: 'uppercase',
-                            marginBottom: 6,
+                            marginBottom: 5,
                           }}>
                             {member.role}
                           </div>
@@ -364,17 +395,21 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                         <h2
                           id={`modal-title-${member.slug}`}
                           style={{
-                            color: '#f2f2f2', fontSize: 22, fontWeight: 900,
-                            lineHeight: 1.05, margin: 0, letterSpacing: '-0.03em',
-                            fontFamily: 'var(--font-sans, system-ui, sans-serif)',
+                            color: T.fg,
+                            fontSize: 'clamp(20px, 6.5vw, 26px)',
+                            fontWeight: 900, lineHeight: 1.0,
+                            margin: 0, letterSpacing: '-0.01em',
+                            fontFamily: 'var(--font-heading, var(--font-sans, system-ui))',
+                            textTransform: 'uppercase',
                           }}
                         >
                           {member.name}
                         </h2>
                         {member.department && (
                           <p style={{
-                            color: 'rgba(255,255,255,0.38)', fontSize: 9, marginTop: 5,
-                            fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase',
+                            color: T.muted, fontSize: 9, marginTop: 5,
+                            fontWeight: 600, letterSpacing: '0.1em',
+                            textTransform: 'uppercase',
                           }}>
                             {member.department}
                           </p>
@@ -382,46 +417,42 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                       </motion.div>
                     </div>
 
+                    {/* Checkered bottom stripe */}
+                    <CheckeredStripe opacity={0.22} />
+
                     {/* Flip hint */}
                     <div style={{
                       flexShrink: 0,
-                      borderTop: '1px solid rgba(255,255,255,0.05)',
-                      padding: '6px',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-                      background: 'rgba(10,10,10,0.8)',
+                      padding: '5px',
+                      display: 'flex', alignItems: 'center',
+                      justifyContent: 'center', gap: 5,
+                      background: T.surface,
                     }}>
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"
-                        style={{ width: 8, height: 8, color: 'rgba(255,255,255,0.2)' }}>
+                        style={{ width: 8, height: 8, color: T.muted, opacity: 0.45 }}>
                         <path d="M1 4v6h6M23 20v-6h-6" />
                         <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15" />
                       </svg>
                       <span style={{
-                        color: 'rgba(255,255,255,0.2)', fontSize: 8, fontWeight: 700,
-                        letterSpacing: '0.2em', textTransform: 'uppercase',
+                        color: T.muted, fontSize: 7.5, fontWeight: 700,
+                        letterSpacing: '0.2em', textTransform: 'uppercase', opacity: 0.45,
                       }}>
                         Umdrehen
                       </span>
                     </div>
                   </div>
 
-                  {/* ════════ BACK ════════ */}
+                  {/* ═══════ BACK ═══════ */}
                   <div style={{
-                    position: 'absolute', inset: 0,
-                    backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden',
+                    ...cardShell,
                     transform: 'rotateY(180deg)',
-                    borderRadius: 4, overflow: 'hidden',
-                    background: '#0d0d0d',
-                    border: '1px solid rgba(255,255,255,0.07)',
-                    display: 'flex', flexDirection: 'column',
-                    ...carbonStyle,
                   }}>
-                    {/* Top stripe */}
+                    {/* Accent stripe */}
                     <div style={{
                       height: 3, flexShrink: 0,
-                      background: '#D42B1E',
+                      background: `linear-gradient(90deg, ${T.accent} 0%, ${T.accent2} 100%)`,
                     }} />
 
-                    {/* Animated back content */}
                     <motion.div
                       variants={backContainer}
                       initial="hidden"
@@ -430,40 +461,46 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                     >
                       {/* Header */}
                       <motion.div variants={backItem} style={{
-                        flexShrink: 0, padding: '12px 14px 10px',
+                        flexShrink: 0,
+                        padding: '11px 14px 10px',
                         display: 'flex', alignItems: 'center', gap: 10,
-                        borderBottom: '1px solid rgba(255,255,255,0.05)',
-                        background: 'rgba(10,10,10,0.8)',
+                        borderBottom: `1px solid ${T.border}`,
+                        background: T.surface,
                       }}>
                         <div style={{
-                          width: 38, height: 38, borderRadius: 2, overflow: 'hidden',
-                          flexShrink: 0, background: '#161616',
-                          border: '1px solid rgba(255,255,255,0.1)',
+                          width: 36, height: 36, borderRadius: 8, overflow: 'hidden',
+                          flexShrink: 0, background: T.surface2,
+                          border: `1px solid ${T.border}`,
+                          boxShadow: `0 0 0 2px rgba(0,113,181,0.25)`,
                         }}>
                           {member.photo ? (
-                            <Image src={member.photo} alt={member.name} width={38} height={38}
+                            <Image src={member.photo} alt={member.name} width={36} height={36}
                               style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
                           ) : (
                             <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                              <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5" style={{ width: 16, height: 16 }}>
-                                <circle cx="12" cy="8" r="4" /><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8" />
+                              <svg viewBox="0 0 24 24" fill="none" stroke={T.muted}
+                                strokeWidth="1.5" style={{ width: 15, height: 15, opacity: 0.4 }}>
+                                <circle cx="12" cy="8" r="4" />
+                                <path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8" />
                               </svg>
                             </div>
                           )}
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <p style={{
-                            color: '#f0f0f0', fontSize: 14, fontWeight: 800, margin: 0,
-                            letterSpacing: '-0.02em', whiteSpace: 'nowrap',
-                            overflow: 'hidden', textOverflow: 'ellipsis',
-                            fontFamily: 'var(--font-sans, system-ui, sans-serif)',
+                            color: T.fg, fontSize: 13.5, fontWeight: 800, margin: 0,
+                            letterSpacing: '-0.01em',
+                            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                            fontFamily: 'var(--font-heading, var(--font-sans, system-ui))',
+                            textTransform: 'uppercase',
                           }}>
                             {member.name}
                           </p>
                           {member.role && (
                             <p style={{
-                              color: '#D42B1E', fontSize: 8.5, fontWeight: 800,
-                              margin: '3px 0 0', textTransform: 'uppercase', letterSpacing: '0.14em',
+                              color: T.accentTxt, fontSize: 8.5, fontWeight: 700,
+                              margin: '3px 0 0', textTransform: 'uppercase',
+                              letterSpacing: '0.12em',
                             }}>
                               {member.role}
                             </p>
@@ -472,23 +509,19 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                       </motion.div>
 
                       {/* Contact rows */}
-                      <div style={{ flexShrink: 0, padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 5 }}>
-                        {(member.phone || !showRealContact) && (
+                      <div style={{ flexShrink: 0, padding: '9px 14px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        {(member.phone || !showReal) && (
                           <motion.div variants={backItem}>
-                            <ContactRow
-                              icon={<PhoneIcon />}
-                              label={showRealContact && member.phone ? maskPhone(member.phone) : '[Test Tel]'}
-                              dim={!showRealContact || !member.phone}
-                            />
+                            <ContactRow icon={<PhoneIcon />}
+                              label={showReal && member.phone ? maskPhone(member.phone) : '[Test Tel]'}
+                              dim={!showReal || !member.phone} />
                           </motion.div>
                         )}
-                        {(member.email || !showRealContact) && (
+                        {(member.email || !showReal) && (
                           <motion.div variants={backItem}>
-                            <ContactRow
-                              icon={<MailIcon />}
-                              label={showRealContact && member.email ? maskEmail(member.email) : '[Test Mail]'}
-                              dim={!showRealContact || !member.email}
-                            />
+                            <ContactRow icon={<MailIcon />}
+                              label={showReal && member.email ? maskEmail(member.email) : '[Test Mail]'}
+                              dim={!showReal || !member.email} />
                           </motion.div>
                         )}
                         {member.linkedin && (
@@ -500,37 +533,35 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
 
                       {/* Divider */}
                       <motion.div variants={backItem} style={{
-                        margin: '0 14px',
-                        height: 1,
-                        background: 'rgba(255,255,255,0.06)',
-                        flexShrink: 0,
+                        margin: '0 14px', height: 1,
+                        background: T.border, flexShrink: 0,
                       }} />
 
                       {/* QR */}
                       <motion.div variants={backItem} style={{
-                        flexShrink: 0, display: 'flex', flexDirection: 'column',
-                        alignItems: 'center', padding: '10px 14px 6px',
+                        flexShrink: 0,
+                        display: 'flex', flexDirection: 'column',
+                        alignItems: 'center', padding: '10px 14px 5px',
                       }}>
                         <div style={{
-                          background: '#fff', borderRadius: 2, padding: 7,
-                          boxShadow: '0 4px 24px rgba(0,0,0,0.5)',
-                          display: 'inline-block',
+                          background: '#fff', borderRadius: 10, padding: 7,
+                          boxShadow: `0 4px 20px rgba(0,0,0,0.6), 0 0 0 1px ${T.border}`,
                         }}>
-                          {qrCodeDataUrl ? (
-                            <img src={qrCodeDataUrl} alt="QR Code" style={{ width: 78, height: 78, display: 'block' }} />
+                          {qrUrl ? (
+                            <img src={qrUrl} alt="QR Code"
+                              style={{ width: 76, height: 76, display: 'block', borderRadius: 4 }} />
                           ) : (
                             <div style={{
-                              width: 78, height: 78, display: 'flex',
+                              width: 76, height: 76, display: 'flex',
                               alignItems: 'center', justifyContent: 'center',
-                              color: '#bbb', fontSize: 10, fontWeight: 600,
-                            }}>
-                              …
-                            </div>
+                              color: T.muted, fontSize: 10,
+                            }}>…</div>
                           )}
                         </div>
                         <p style={{
-                          color: 'rgba(255,255,255,0.22)', fontSize: 8, marginTop: 6,
-                          textTransform: 'uppercase', letterSpacing: '0.18em', fontWeight: 700,
+                          color: T.muted, fontSize: 7.5, marginTop: 5,
+                          textTransform: 'uppercase', letterSpacing: '0.18em',
+                          fontWeight: 700, opacity: 0.55,
                         }}>
                           QR scannen · Kontakt speichern
                         </p>
@@ -538,11 +569,13 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
 
                       {/* Actions */}
                       <motion.div variants={backItem} style={{
-                        flexGrow: 1, padding: '4px 14px 12px',
-                        display: 'flex', flexDirection: 'column', gap: 5, justifyContent: 'flex-end',
+                        flexGrow: 1, padding: '3px 14px 10px',
+                        display: 'flex', flexDirection: 'column',
+                        gap: 5, justifyContent: 'flex-end',
                       }}>
                         <ActionButton onClick={(e) => { e.stopPropagation(); downloadVCard(member); }}>
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: 11, height: 11 }}>
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                            style={{ width: 11, height: 11 }}>
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                             <polyline points="7 10 12 15 17 10" />
                             <line x1="12" y1="15" x2="12" y2="3" />
@@ -551,18 +584,20 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                         </ActionButton>
 
                         <div style={{ display: 'flex', gap: 5 }}>
-                          {showRealContact && member.email && (
-                            <GhostButton href={getGoogleContactsLink()}>
-                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" style={{ width: 10, height: 10 }}>
+                          {showReal && member.email && (
+                            <GhostButton href={googleLink()}>
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                strokeWidth="1.8" style={{ width: 10, height: 10 }}>
                                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                                 <circle cx="12" cy="7" r="4" />
                               </svg>
                               Google
                             </GhostButton>
                           )}
-                          {showRealContact && member.phone && (
+                          {showReal && member.phone && (
                             <GhostButton href={`tel:${member.phone}`}>
-                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" style={{ width: 10, height: 10 }}>
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                strokeWidth="1.8" style={{ width: 10, height: 10 }}>
                                 <rect x="5" y="2" width="14" height="20" rx="2" />
                                 <line x1="12" y1="18" x2="12" y2="18" strokeWidth="2" strokeLinecap="round" />
                               </svg>
@@ -573,36 +608,39 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                       </motion.div>
 
                       {/* Footer */}
+                      <CheckeredStripe opacity={0.14} />
                       <motion.div variants={backItem} style={{
                         flexShrink: 0,
-                        borderTop: '1px solid rgba(255,255,255,0.05)',
-                        padding: '7px 14px',
-                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                        background: 'rgba(10,10,10,0.7)',
+                        padding: '6px 14px',
+                        display: 'flex', alignItems: 'center',
+                        justifyContent: 'space-between',
+                        background: T.surface,
+                        borderTop: `1px solid ${T.border}`,
                       }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                           <div style={{
-                            width: 12, height: 12, borderRadius: 1,
-                            background: '#D42B1E',
+                            width: 13, height: 13, borderRadius: 3,
+                            background: `linear-gradient(135deg, ${T.accent} 0%, ${T.accent2} 100%)`,
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                           }}>
-                            <svg width="8" height="8" viewBox="0 0 40 40" fill="none">
-                              <rect x="6" y="8" width="18" height="3" fill="white" />
-                              <rect x="6" y="17.5" width="14" height="3" fill="white" />
-                              <rect x="6" y="27" width="18" height="3" fill="white" />
-                              <rect x="6" y="8" width="3" height="22" fill="white" />
+                            <svg width="8" height="8" viewBox="0 0 20 20" fill="none">
+                              <rect x="3" y="3"  width="10" height="2" rx="0.5" fill="white" />
+                              <rect x="3" y="9"  width="8"  height="2" rx="0.5" fill="white" />
+                              <rect x="3" y="15" width="10" height="2" rx="0.5" fill="white" />
+                              <rect x="3" y="3"  width="2"  height="14" rx="0.5" fill="white" />
                             </svg>
                           </div>
                           <span style={{
-                            color: 'rgba(255,255,255,0.25)', fontSize: 7.5,
-                            fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em',
+                            color: T.muted, fontSize: 7.5, fontWeight: 700,
+                            textTransform: 'uppercase', letterSpacing: '0.12em',
+                            opacity: 0.55,
                           }}>
                             E-Motion Rennteam Aalen
                           </span>
                         </div>
                         <span style={{
-                          color: 'rgba(255,255,255,0.15)', fontSize: 7.5,
-                          fontWeight: 600, letterSpacing: '0.06em',
+                          color: T.muted, fontSize: 7.5, fontWeight: 600,
+                          opacity: 0.35,
                         }}>
                           e.V.
                         </span>
@@ -614,14 +652,14 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
               </motion.div>
             </motion.div>
 
-            {/* Hint below */}
+            {/* Hint */}
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.7, duration: 0.4 }}
+              transition={{ delay: 0.65, duration: 0.35 }}
               style={{
-                color: 'rgba(255,255,255,0.12)', fontSize: 9,
-                marginTop: 16, letterSpacing: '0.2em',
+                color: T.muted, fontSize: 8.5, opacity: 0.35,
+                marginTop: 14, letterSpacing: '0.2em',
                 textTransform: 'uppercase', fontWeight: 600,
               }}
             >
@@ -634,35 +672,35 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
   );
 }
 
-/* ─── Helper components ─── */
+/* ─── ContactRow ─── */
 function ContactRow({ icon, label, dim }: { icon: React.ReactNode; label: string; dim?: boolean }) {
-  const [hovering, setHovering] = useState(false);
+  const [hov, setHov] = useState(false);
   return (
     <div
-      onMouseEnter={() => setHovering(true)}
-      onMouseLeave={() => setHovering(false)}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
       style={{
         display: 'flex', alignItems: 'center', gap: 8,
-        padding: '5.5px 8px 5.5px 7px', borderRadius: 2,
-        border: `1px solid ${hovering ? 'rgba(212,43,30,0.3)' : 'rgba(255,255,255,0.07)'}`,
-        borderLeft: `2px solid ${hovering ? '#D42B1E' : 'rgba(255,255,255,0.12)'}`,
+        padding: '5px 8px 5px 6px', borderRadius: 8,
+        border: `1px solid ${hov ? 'rgba(0,113,181,0.4)' : T.border}`,
+        borderLeft: `2px solid ${hov ? T.accent : T.border}`,
+        background: hov ? 'rgba(0,113,181,0.08)' : 'transparent',
         cursor: 'default',
-        background: hovering ? 'rgba(212,43,30,0.06)' : 'rgba(255,255,255,0.02)',
-        transition: 'all 0.15s ease',
+        transition: 'all 0.14s ease',
       }}>
       <div style={{
-        width: 22, height: 22, borderRadius: 2, flexShrink: 0,
-        background: 'rgba(255,255,255,0.04)',
-        border: '1px solid rgba(255,255,255,0.08)',
+        width: 22, height: 22, borderRadius: 6, flexShrink: 0,
+        background: T.surface2,
+        border: `1px solid ${T.border}`,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
         {icon}
       </div>
       <span style={{
         fontSize: 11, fontWeight: 500,
-        color: dim ? 'rgba(255,255,255,0.2)' : (hovering ? '#e0e0e0' : 'rgba(255,255,255,0.6)'),
+        color: dim ? T.border : (hov ? T.fg : T.muted),
         letterSpacing: '0.01em',
-        transition: 'color 0.15s ease',
+        transition: 'color 0.14s ease',
       }}>
         {label}
       </span>
@@ -670,22 +708,24 @@ function ContactRow({ icon, label, dim }: { icon: React.ReactNode; label: string
   );
 }
 
+/* ─── ActionButton ─── */
 function ActionButton({ onClick, children }: { onClick: (e: React.MouseEvent) => void; children: React.ReactNode }) {
-  const [hovering, setHovering] = useState(false);
+  const [hov, setHov] = useState(false);
   return (
     <button
       onClick={onClick}
-      onMouseEnter={() => setHovering(true)}
-      onMouseLeave={() => setHovering(false)}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
       style={{
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
-        border: `1px solid ${hovering ? '#D42B1E' : 'rgba(255,255,255,0.1)'}`,
-        borderRadius: 2, padding: '10px 16px',
-        color: hovering ? '#fff' : 'rgba(255,255,255,0.65)',
+        border: `1px solid ${hov ? T.accent : T.border}`,
+        borderRadius: 10, padding: '10px 16px',
+        color: hov ? '#fff' : T.accentTxt,
         fontSize: 11.5, fontWeight: 700,
-        cursor: 'pointer', letterSpacing: '0.06em', width: '100%',
-        background: hovering ? '#D42B1E' : 'rgba(255,255,255,0.03)',
-        transition: 'all 0.18s ease',
+        cursor: 'pointer', letterSpacing: '0.05em', width: '100%',
+        background: hov ? T.accent : T.surface2,
+        boxShadow: hov ? `0 0 20px rgba(0,113,181,0.35)` : 'none',
+        transition: 'all 0.16s ease',
       }}
     >
       {children}
@@ -693,25 +733,27 @@ function ActionButton({ onClick, children }: { onClick: (e: React.MouseEvent) =>
   );
 }
 
+/* ─── GhostButton ─── */
 function GhostButton({ href, children }: { href: string; children: React.ReactNode }) {
-  const [hovering, setHovering] = useState(false);
+  const [hov, setHov] = useState(false);
   return (
     <a
       href={href}
       target={href.startsWith('tel:') ? undefined : '_blank'}
       rel="noopener noreferrer"
       onClick={(e) => e.stopPropagation()}
-      onMouseEnter={() => setHovering(true)}
-      onMouseLeave={() => setHovering(false)}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
       style={{
-        flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-        border: `1px solid ${hovering ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.07)'}`,
-        borderRadius: 2, padding: '8px',
-        color: hovering ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.35)',
+        flex: 1, display: 'flex', alignItems: 'center',
+        justifyContent: 'center', gap: 5,
+        border: `1px solid ${hov ? T.border : 'rgba(35,38,53,0.6)'}`,
+        borderRadius: 8, padding: '8px',
+        color: hov ? T.fg : T.muted,
         fontSize: 11, fontWeight: 700,
         textDecoration: 'none',
-        background: hovering ? 'rgba(255,255,255,0.06)' : 'transparent',
-        transition: 'all 0.15s ease',
+        background: hov ? T.surface2 : 'transparent',
+        transition: 'all 0.14s ease',
       }}
     >
       {children}
@@ -719,9 +761,11 @@ function GhostButton({ href, children }: { href: string; children: React.ReactNo
   );
 }
 
+/* ─── Icons ─── */
 function PhoneIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.45)" strokeWidth="1.8" style={{ width: 10, height: 10 }}>
+    <svg viewBox="0 0 24 24" fill="none" stroke={T.accentTxt} strokeWidth="1.8"
+      style={{ width: 10, height: 10, opacity: 0.75 }}>
       <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.82A16 16 0 0 0 15.18 16.09l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
     </svg>
   );
@@ -729,7 +773,8 @@ function PhoneIcon() {
 
 function MailIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.45)" strokeWidth="1.8" style={{ width: 10, height: 10 }}>
+    <svg viewBox="0 0 24 24" fill="none" stroke={T.accentTxt} strokeWidth="1.8"
+      style={{ width: 10, height: 10, opacity: 0.75 }}>
       <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
       <polyline points="22,6 12,13 2,6" />
     </svg>
@@ -738,7 +783,7 @@ function MailIcon() {
 
 function LinkedInIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="rgba(255,255,255,0.45)" style={{ width: 9, height: 9 }}>
+    <svg viewBox="0 0 24 24" fill={T.accentTxt} style={{ width: 9, height: 9, opacity: 0.75 }}>
       <path d="M4.98 3.5C4.98 4.881 3.87 6 2.5 6S0 4.881 0 3.5 1.12 1 2.5 1s2.48 1.119 2.48 2.5zM.24 8.25h4.52V23H.24V8.25zM8.5 8.25h4.33v2.02h.06c.6-1.14 2.07-2.34 4.26-2.34 4.55 0 5.39 3 5.39 6.9V23h-4.52v-6.7c0-1.6-.03-3.66-2.23-3.66-2.24 0-2.58 1.75-2.58 3.55V23H8.5V8.25z" />
     </svg>
   );
