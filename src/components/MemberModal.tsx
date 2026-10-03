@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useMotionTemplate } from 'framer-motion';
 import Image from 'next/image';
 import type { TeamMember } from '@/lib/content';
 import { downloadVCard } from '@/lib/vcard-generator';
@@ -21,6 +21,13 @@ function maskEmail(email: string): string {
   const [local, domain] = email.split('@');
   if (!domain) return email;
   return `${local.slice(0, 2)}•••@${domain}`;
+}
+
+/** Generate a deterministic pseudo member-ID from a name */
+function generateMemberId(name: string): string {
+  const letters = name.replace(/\s+/g, '').slice(0, 3).toUpperCase();
+  const num = name.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 10000;
+  return `ERT-${letters}${String(num).padStart(4, '0')}`;
 }
 
 /* ─── Site tokens (mirrored from globals.css :root) ─── */
@@ -80,6 +87,31 @@ function CheckeredStripe({ opacity = 0.18 }: { opacity?: number }) {
   );
 }
 
+/* ─── Decorative barcode strip (purely visual) ─── */
+function DecorativeBarcode() {
+  // alternating bar / gap widths — even indices are bars, odd are gaps
+  const pattern = [2,1,3,1,1,1,4,1,2,1,1,1,3,1,2,1,1,1,3,1,1,1,4,1,2,1,1,1,2,1,3,1,1,1,2];
+  const rects: Array<{ x: number; w: number }> = [];
+  let x = 0;
+  pattern.forEach((w, i) => {
+    if (i % 2 === 0) rects.push({ x, w });
+    x += w;
+  });
+  return (
+    <svg
+      width="100%"
+      height="14"
+      viewBox={`0 0 ${x} 14`}
+      preserveAspectRatio="xMidYMid meet"
+      style={{ display: 'block', opacity: 0.28 }}
+    >
+      {rects.map((r, i) => (
+        <rect key={i} x={r.x} y={0} width={r.w} height={14} fill={T.muted} />
+      ))}
+    </svg>
+  );
+}
+
 /* ─── Stagger variants ─── */
 const backContainer = {
   hidden: {},
@@ -97,6 +129,7 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
   const [flipped, setFlipped]         = useState(false);
   const [backShowing, setBackShowing] = useState(false);
   const [hovering, setHovering]       = useState(false);
+  const [sweepKey, setSweepKey]       = useState(0);
 
   const isExecutive  = member ? ['ceo', 'cto', 'cfo'].includes(member.roleLevel || '') : false;
   const isLeadership = member
@@ -108,6 +141,12 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
   const tiltY = useMotionValue(0);
   const springX = useSpring(tiltX, { stiffness: 180, damping: 22 });
   const springY = useSpring(tiltY, { stiffness: 180, damping: 22 });
+
+  // Holographic reflex: map tilt springs → highlight position on card surface
+  // tiltY positive = mouse right → highlight moves right; tiltX: inverted sign
+  const hHighlightX = useTransform(springY, [-13, 13], [20, 80]);
+  const hHighlightY = useTransform(springX, [13, -13], [20, 80]);
+  const holoBg = useMotionTemplate`radial-gradient(ellipse 60% 40% at ${hHighlightX}% ${hHighlightY}%, rgba(180,220,255,0.15) 0%, rgba(100,170,255,0.07) 40%, transparent 68%)`;
 
   useEffect(() => {
     if (!member) { setFlipped(false); setBackShowing(false); return; }
@@ -141,7 +180,13 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
     tiltX.set(((e.clientY - r.top) / r.height - 0.5) * -13);
     tiltY.set(((e.clientX - r.left) / r.width - 0.5) * 13);
   };
+
   const resetTilt = () => { tiltX.set(0); tiltY.set(0); setHovering(false); };
+
+  const handleMouseEnter = () => {
+    setHovering(true);
+    if (!flipped) setSweepKey((k) => k + 1);
+  };
 
   const googleLink = () => {
     if (!member) return '#';
@@ -155,7 +200,7 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
   const W = 'min(296px, 83vw)';
   const H = 'min(444px, calc(83vw * 1.5))';
 
-  /* ── shared card shell style ── */
+  /* ── shared card shell style — inset top shine for plastic card feel ── */
   const cardShell: React.CSSProperties = {
     position: 'absolute', inset: 0,
     backfaceVisibility:       'hidden',
@@ -165,7 +210,11 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
     background: `linear-gradient(160deg, ${T.surface} 0%, ${T.bg} 100%)`,
     border: `1px solid ${T.border}`,
     display: 'flex', flexDirection: 'column',
+    // Subtle top-edge gloss: like light catching a plastic card edge
+    boxShadow: `inset 0 1px 0 rgba(255,255,255,0.09), inset 0 0 0 1px rgba(255,255,255,0.025)`,
   };
+
+  const memberId = member ? generateMemberId(member.name) : '';
 
   return (
     <AnimatePresence>
@@ -189,7 +238,11 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
             overflowY: 'auto',
             paddingTop: 'clamp(24px, 5vh, 52px)',
             paddingBottom: 48,
-            background: `radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,113,181,0.14) 0%, rgba(6,7,13,0.97) 55%)`,
+            // Radial brand glow + subtle security-paper diagonal lines
+            background: [
+              'repeating-linear-gradient(-45deg, transparent, transparent 20px, rgba(255,255,255,0.012) 20px, rgba(255,255,255,0.012) 21px)',
+              `radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,113,181,0.14) 0%, rgba(6,7,13,0.97) 55%)`,
+            ].join(', '),
             backdropFilter: 'blur(32px) saturate(1.3)',
           }}
         >
@@ -218,16 +271,17 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
             </svg>
           </motion.button>
 
-          {/* Card wrapper */}
+          {/* Card wrapper — entry: drops with subtle Y-axis pendulum swing */}
           <motion.div
             onClick={(e) => e.stopPropagation()}
-            initial={{ y: -70, opacity: 0, scale: 0.92 }}
-            animate={{ y: 0, opacity: 1, scale: 1 }}
+            initial={{ y: -70, opacity: 0, scale: 0.92, rotateY: -5 }}
+            animate={{ y: 0, opacity: 1, scale: 1, rotateY: 0 }}
             exit={{ y: -45, opacity: 0, scale: 0.93 }}
             transition={{ type: 'spring', damping: 22, stiffness: 190, mass: 0.85 }}
             style={{
               display: 'flex', flexDirection: 'column', alignItems: 'center',
               filter: `drop-shadow(0 40px 80px rgba(0,0,0,0.96)) drop-shadow(0 0 48px rgba(0,113,181,0.12))`,
+              transformPerspective: 1200,
             }}
           >
             {/* Lanyard */}
@@ -258,16 +312,16 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                   cursor: 'pointer',
                 }}
                 onMouseMove={!flipped ? onMouseMove : undefined}
-                onMouseEnter={() => setHovering(true)}
+                onMouseEnter={handleMouseEnter}
                 onMouseLeave={resetTilt}
                 onClick={() => setFlipped((f) => !f)}
               >
-                {/* Flip container */}
+                {/* Flip container — 0.55s springier cubic-bezier */}
                 <div style={{
                   width: W, height: H,
                   position: 'relative',
                   transformStyle: 'preserve-3d',
-                  transition: 'transform 0.7s cubic-bezier(0.25, 0.1, 0.1, 1)',
+                  transition: 'transform 0.55s cubic-bezier(0.34, 1.26, 0.64, 1)',
                   transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
                 }}>
 
@@ -280,6 +334,41 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                       background: `linear-gradient(90deg, ${T.accent} 0%, ${T.accent2} 100%)`,
                     }} />
 
+                    {/* Holographic tilt reflex — moves with mouse position */}
+                    <motion.div
+                      style={{
+                        position: 'absolute', inset: 0,
+                        borderRadius: 16,
+                        pointerEvents: 'none',
+                        background: holoBg,
+                        opacity: hovering && !flipped ? 1 : 0,
+                        transition: 'opacity 0.3s ease',
+                        zIndex: 4,
+                        mixBlendMode: 'screen',
+                      }}
+                    />
+
+                    {/* Glanz-Sweep on mouseEnter (remounts on each hover entry) */}
+                    <AnimatePresence>
+                      {sweepKey > 0 && (
+                        <motion.div
+                          key={sweepKey}
+                          initial={{ x: '-130%', skewX: -20 }}
+                          animate={{ x: '240%', skewX: -20 }}
+                          exit={{}}
+                          transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+                          style={{
+                            position: 'absolute',
+                            top: 0, bottom: 0, left: 0,
+                            width: '48%',
+                            background: 'linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.055) 50%, transparent 100%)',
+                            pointerEvents: 'none',
+                            zIndex: 5,
+                          }}
+                        />
+                      )}
+                    </AnimatePresence>
+
                     {/* Header bar */}
                     <div style={{
                       flexShrink: 0,
@@ -288,19 +377,19 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                       borderBottom: `1px solid ${T.border}`,
                       background: T.surface,
                     }}>
-                      {/* Logo mark */}
+                      {/* Logo — white badge so it renders cleanly on dark surfaces */}
                       <div style={{
                         width: 30, height: 30, borderRadius: 6, flexShrink: 0,
-                        background: T.bg,
+                        background: '#ffffff',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         overflow: 'hidden',
                       }}>
                         <Image
                           src="/uploads/logo.png"
                           alt="E-Motion Rennteam Logo"
-                          width={28}
-                          height={28}
-                          style={{ objectFit: 'contain', width: 28, height: 28 }}
+                          width={24}
+                          height={24}
+                          style={{ objectFit: 'contain', width: 24, height: 24 }}
                         />
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
@@ -340,6 +429,15 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
 
                     {/* Photo — full bleed */}
                     <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+                      {/* Left accent bar — print design element, 3 px, full photo height */}
+                      <div style={{
+                        position: 'absolute',
+                        left: 0, top: 0, bottom: 0,
+                        width: 3,
+                        background: `linear-gradient(to bottom, ${T.accent} 0%, ${T.accent2} 100%)`,
+                        zIndex: 2,
+                      }} />
+
                       {member.photo ? (
                         <>
                           <Image
@@ -505,6 +603,15 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                               {member.role}
                             </p>
                           )}
+                          {/* Member ID — deterministic pseudo-number */}
+                          <p style={{
+                            color: T.muted, fontSize: 7, fontWeight: 600,
+                            margin: '3px 0 0', letterSpacing: '0.14em',
+                            fontFamily: 'var(--font-mono, monospace)',
+                            opacity: 0.45,
+                          }}>
+                            {memberId}
+                          </p>
                         </div>
                       </motion.div>
 
@@ -541,7 +648,7 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                       <motion.div variants={backItem} style={{
                         flexShrink: 0,
                         display: 'flex', flexDirection: 'column',
-                        alignItems: 'center', padding: '10px 14px 5px',
+                        alignItems: 'center', padding: '10px 14px 4px',
                       }}>
                         <div style={{
                           background: '#fff', borderRadius: 10, padding: 7,
@@ -565,6 +672,10 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                         }}>
                           QR scannen · Kontakt speichern
                         </p>
+                        {/* Decorative barcode — purely visual document element */}
+                        <div style={{ width: '100%', marginTop: 6 }}>
+                          <DecorativeBarcode />
+                        </div>
                       </motion.div>
 
                       {/* Actions */}
@@ -611,25 +722,26 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                       <CheckeredStripe opacity={0.14} />
                       <motion.div variants={backItem} style={{
                         flexShrink: 0,
-                        padding: '6px 14px',
+                        padding: '5px 14px',
                         display: 'flex', alignItems: 'center',
                         justifyContent: 'space-between',
                         background: T.surface,
                         borderTop: `1px solid ${T.border}`,
                       }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                          {/* Logo in footer — white badge */}
                           <div style={{
                             width: 16, height: 16, borderRadius: 2,
-                            background: T.bg,
+                            background: '#ffffff',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                             overflow: 'hidden',
                           }}>
                             <Image
                               src="/uploads/logo.png"
                               alt=""
-                              width={14}
-                              height={14}
-                              style={{ objectFit: 'contain', width: 14, height: 14 }}
+                              width={12}
+                              height={12}
+                              style={{ objectFit: 'contain', width: 12, height: 12 }}
                             />
                           </div>
                           <span style={{
@@ -640,12 +752,23 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                             E-Motion Rennteam Aalen
                           </span>
                         </div>
-                        <span style={{
-                          color: T.muted, fontSize: 7.5, fontWeight: 600,
-                          opacity: 0.35,
-                        }}>
-                          e.V.
-                        </span>
+                        {/* Gültig bis — like a real ID card */}
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 1 }}>
+                          <span style={{
+                            color: T.muted, fontSize: 6.5, fontWeight: 600,
+                            textTransform: 'uppercase', letterSpacing: '0.1em',
+                            opacity: 0.38,
+                          }}>
+                            Gültig bis
+                          </span>
+                          <span style={{
+                            color: T.muted, fontSize: 7.5, fontWeight: 700,
+                            letterSpacing: '0.06em',
+                            opacity: 0.52,
+                          }}>
+                            Saison 2025/26
+                          </span>
+                        </div>
                       </motion.div>
                     </motion.div>
                   </div>
