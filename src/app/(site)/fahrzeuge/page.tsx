@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { getVehicles } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
+import RainCanvas from "@/components/motion/RainCanvas";
 import VehicleSpecs from "@/components/VehicleSpecs";
 import { getBreadcrumbJsonLd, getItemListJsonLd } from "@/lib/structuredData";
 import { SITE_URL } from "@/lib/site";
@@ -34,7 +35,7 @@ export default function VehiclesPage() {
   );
 
   return (
-    <div className="container-page py-20">
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
@@ -43,16 +44,23 @@ export default function VehiclesPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(vehicleListJsonLd) }}
       />
-      <Reveal className="text-center">
-        <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Fahrzeuge</p>
-        <h1 className="mx-auto mt-2 max-w-2xl text-4xl font-extrabold leading-tight tracking-normal sm:text-5xl md:text-6xl xl:text-7xl">
-          Unsere Boliden
-        </h1>
-        <p className="mx-auto mt-5 max-w-xl text-lg text-muted">
-          Jedes Jahr entwickeln wir ein neues, vollelektrisches Formula-Student-Fahrzeug – von
-          der Simulation bis zur Rennstrecke.
-        </p>
-      </Reveal>
+      <section className="relative bg-surface/50 py-20">
+        <RainCanvas className="absolute inset-0 h-full w-full pointer-events-none opacity-50 mix-blend-screen" />
+        <div className="container-page relative z-10">
+          <Reveal className="text-center">
+            <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Fahrzeuge</p>
+            <h1 className="mx-auto mt-2 max-w-2xl text-4xl font-extrabold leading-tight tracking-normal sm:text-5xl md:text-6xl xl:text-7xl">
+              Unsere Boliden
+            </h1>
+            <p className="mx-auto mt-5 max-w-xl text-lg text-muted">
+              Jedes Jahr entwickeln wir ein neues, vollelektrisches Formula-Student-Fahrzeug – von
+              der Simulation bis zur Rennstrecke.
+            </p>
+          </Reveal>
+        </div>
+      </section>
+
+      <div className="container-page py-20">
 
       <div className="relative mt-20">
         <div className="absolute left-4 top-0 h-full w-px bg-border lg:left-1/2" />
@@ -130,6 +138,7 @@ export default function VehiclesPage() {
           })}
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

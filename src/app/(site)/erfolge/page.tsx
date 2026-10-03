@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { getResults } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
+import RainCanvas from "@/components/motion/RainCanvas";
 import { getBreadcrumbJsonLd } from "@/lib/structuredData";
 
 type ParsedChip =
@@ -54,34 +55,41 @@ export default function ResultsPage() {
   ]);
 
   return (
-    <div className="container-page py-20">
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <Reveal>
-        <div className="flex flex-col gap-8 sm:flex-row sm:items-center sm:gap-12">
-          <div className="flex-1">
-            <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Timeline</p>
-            <h1 className="mt-2 text-4xl font-extrabold leading-tight tracking-normal sm:text-5xl md:text-6xl xl:text-7xl">Unsere Historie</h1>
-            <p className="mt-4 max-w-2xl text-muted">
-              Von der Teamgründung bis zu unseren besten Wettbewerbsergebnissen – eine Zeitreise
-              durch die Geschichte des E-Motion Rennteams. Seit 2009 sind wir bei internationalen
-              FS-Events angetreten und landeten dabei immer wieder in den Top 5
-              einzelner Disziplinen und in der Gesamtwertung unter den besten 10 Teams.
-            </p>
-          </div>
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl sm:w-80 lg:w-96">
-            <Image
-              src="/uploads/rollout-2026/rollout-2026-team-buehne.webp"
-              alt="E-Motion Team auf der Bühne beim Rollout 2026"
-              fill
-              sizes="(min-width: 1024px) 384px, (min-width: 640px) 320px, 100vw"
-              className="object-cover"
-            />
-          </div>
+      <section className="relative bg-surface/50 py-20">
+        <RainCanvas className="absolute inset-0 h-full w-full pointer-events-none opacity-50 mix-blend-screen" />
+        <div className="container-page relative z-10">
+          <Reveal>
+            <div className="flex flex-col gap-8 sm:flex-row sm:items-center sm:gap-12">
+              <div className="flex-1">
+                <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Timeline</p>
+                <h1 className="mt-2 text-4xl font-extrabold leading-tight tracking-normal sm:text-5xl md:text-6xl xl:text-7xl">Unsere Historie</h1>
+                <p className="mt-4 max-w-2xl text-muted">
+                  Von der Teamgründung bis zu unseren besten Wettbewerbsergebnissen – eine Zeitreise
+                  durch die Geschichte des E-Motion Rennteams. Seit 2009 sind wir bei internationalen
+                  FS-Events angetreten und landeten dabei immer wieder in den Top 5
+                  einzelner Disziplinen und in der Gesamtwertung unter den besten 10 Teams.
+                </p>
+              </div>
+              <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl sm:w-80 lg:w-96">
+                <Image
+                  src="/uploads/rollout-2026/rollout-2026-team-buehne.webp"
+                  alt="E-Motion Team auf der Bühne beim Rollout 2026"
+                  fill
+                  sizes="(min-width: 1024px) 384px, (min-width: 640px) 320px, 100vw"
+                  className="object-cover"
+                />
+              </div>
+            </div>
+          </Reveal>
         </div>
-      </Reveal>
+      </section>
+
+      <div className="container-page py-20">
 
       <div className="relative mt-20">
         {/* Central timeline line: left edge on mobile, centered on desktop */}
@@ -147,6 +155,7 @@ export default function ResultsPage() {
           ))}
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
