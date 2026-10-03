@@ -39,23 +39,33 @@ export default function HeroMedia({
       )}
 
       {/* Dark gradients for text legibility */}
-      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/55 to-background/10" />
-      <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-background/30" />
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/5" />
+      <div className="absolute inset-0 bg-gradient-to-r from-background/85 via-background/20 to-transparent" />
 
       {/* Diagonal accent cut, echoing the team's race-livery stripes */}
       <div
-        className="absolute inset-y-0 right-0 w-[45%] bg-accent/25 mix-blend-screen sm:w-[35%]"
-        style={{ clipPath: "polygon(100% 0, 100% 100%, 40% 100%, 70% 0)" }}
+        className="absolute inset-y-0 right-0 w-[45%] bg-accent/30 mix-blend-screen sm:w-[38%]"
+        style={{ clipPath: "polygon(100% 0, 100% 100%, 38% 100%, 68% 0)" }}
       />
       <div
-        className="absolute inset-y-0 right-0 w-[45%] border-l-2 border-accent/70 sm:w-[35%]"
-        style={{ clipPath: "polygon(100% 0, 100% 100%, 40% 100%, 70% 0)" }}
+        className="absolute inset-y-0 right-0 w-[45%] border-l-2 border-accent/80 sm:w-[38%]"
+        style={{ clipPath: "polygon(100% 0, 100% 100%, 38% 100%, 68% 0)" }}
+      />
+      {/* Secondary thinner stripe for depth */}
+      <div
+        className="absolute inset-y-0 right-0 hidden w-[35%] border-l border-accent/30 sm:block"
+        style={{ clipPath: "polygon(100% 0, 100% 100%, 46% 100%, 74% 0)" }}
       />
 
       <motion.div
-        className="absolute -left-24 bottom-0 h-72 w-72 rounded-full bg-accent-2/25 blur-[110px]"
-        animate={{ x: [0, 30, 0], y: [0, -20, 0] }}
-        transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute -left-24 bottom-0 h-96 w-96 rounded-full bg-accent-2/20 blur-[130px]"
+        animate={{ x: [0, 40, 0], y: [0, -25, 0] }}
+        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="absolute right-0 top-0 h-64 w-64 rounded-full bg-accent/10 blur-[100px]"
+        animate={{ x: [0, -20, 0], y: [0, 30, 0] }}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 3 }}
       />
     </div>
   );

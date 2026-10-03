@@ -6,7 +6,7 @@ import { getBlogPosts, getBlogPostBySlug } from "@/lib/content";
 import { renderMarkdown } from "@/lib/markdown";
 import Reveal from "@/components/motion/Reveal";
 import ShareButtons from "@/components/ShareButtons";
-import { getArticleJsonLd } from "@/lib/structuredData";
+import { getArticleJsonLd, getBreadcrumbJsonLd } from "@/lib/structuredData";
 
 export function generateStaticParams() {
   return getBlogPosts().map((post) => ({ slug: post.slug }));
@@ -59,12 +59,20 @@ export default async function BlogDetailPage({
     author: post.author,
     coverImage: post.coverImage,
   });
+  const breadcrumbJsonLd = getBreadcrumbJsonLd([
+    { name: "Blog", path: "/blog" },
+    { name: post.title, path: `/blog/${post.slug}` },
+  ]);
 
   return (
     <div className="container-page py-20">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <Reveal className="mx-auto max-w-3xl">
         <Link

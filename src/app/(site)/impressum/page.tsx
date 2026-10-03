@@ -3,9 +3,10 @@ import Reveal from "@/components/motion/Reveal";
 import HumanCreatedBadge from "@/components/HumanCreatedBadge";
 
 export const metadata: Metadata = {
-  title: "Impressum",
+  title: "Impressum – E-Motion Rennteam Aalen",
   description: "Impressum und Anbieterkennzeichnung des E-Motion Rennteams Aalen gemäß § 5 TMG.",
   alternates: { canonical: "/impressum" },
+  robots: { index: false },
 };
 
 export default function ImpressumPage() {

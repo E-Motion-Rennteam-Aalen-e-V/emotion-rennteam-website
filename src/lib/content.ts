@@ -45,6 +45,9 @@ export type TeamMember = {
   order?: number;
   photo?: string;
   linkedin?: string;
+  phone?: string;
+  email?: string;
+  roleLevel?: 'ceo' | 'cto' | 'cfo' | 'member';
   body: string;
   slug: string;
 };

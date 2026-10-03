@@ -6,32 +6,47 @@ import Reveal from "@/components/motion/Reveal";
 import RainCanvas from "@/components/motion/RainCanvas";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import NewsletterForm from "@/components/NewsletterForm";
+import { getBreadcrumbJsonLd } from "@/lib/structuredData";
 
 export const metadata: Metadata = {
-  title: "Blog",
+  title: "Blog – Einblicke aus dem Teamalltag",
   description:
-    "Einblicke aus dem Teamalltag des E-Motion Rennteams Aalen – Werkstatt, Onboarding und Geschichten hinter dem Fahrzeug.",
+    "Einblicke aus dem Teamalltag des E-Motion Rennteams Aalen – Werkstatt, Onboarding und Geschichten hinter dem Formula-Student-Fahrzeug.",
   alternates: { canonical: "/blog" },
+  openGraph: {
+    title: "Blog – E-Motion Rennteam Aalen",
+    description: "Einblicke aus dem Teamalltag: Werkstatt, Onboarding und Geschichten hinter dem Formula-Student-Fahrzeug.",
+    type: "website",
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
+  },
 };
 
 export default function BlogPage() {
   const posts = getBlogPosts();
+  const breadcrumbJsonLd = getBreadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Blog", path: "/blog" },
+  ]);
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <section className="relative bg-surface/50 py-20">
         <RainCanvas className="absolute inset-0 h-full w-full pointer-events-none opacity-50 mix-blend-screen" />
         <div className="container-page relative z-10">
-        <Reveal>
-          <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Blog</p>
-          <h1 className="mt-2 text-4xl font-extrabold leading-tight tracking-normal sm:text-5xl md:text-6xl xl:text-7xl">
-            Einblicke ins Team
-          </h1>
-          <p className="mt-4 max-w-2xl text-muted">
-            Geschichten aus der Werkstatt, dem Onboarding neuer Mitglieder und dem Alltag hinter
-            unserem Rennwagen.
-          </p>
-        </Reveal>
+          <Reveal>
+            <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Blog</p>
+            <h1 className="mt-2 text-4xl font-extrabold leading-tight tracking-normal sm:text-5xl md:text-6xl xl:text-7xl">
+              Einblicke ins Team
+            </h1>
+            <p className="mt-4 max-w-2xl text-muted">
+              Geschichten aus der Werkstatt, dem Onboarding neuer Mitglieder und dem Alltag hinter
+              unserem Rennwagen.
+            </p>
+          </Reveal>
         </div>
       </section>
 

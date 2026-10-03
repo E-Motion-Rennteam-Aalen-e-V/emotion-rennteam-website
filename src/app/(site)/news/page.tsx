@@ -4,19 +4,34 @@ import Image from "next/image";
 import { getNews } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
+import { getBreadcrumbJsonLd } from "@/lib/structuredData";
 
 export const metadata: Metadata = {
-  title: "News",
+  title: "Aktuelles & News",
   description:
-    "Aktuelle Neuigkeiten vom E-Motion Rennteam Aalen: Rollouts, Wettbewerbsergebnisse und Team-Updates.",
+    "Aktuelle Neuigkeiten vom E-Motion Rennteam Aalen: Rollouts, Wettbewerbsergebnisse und Team-Updates aus dem Formula-Student-Alltag.",
   alternates: { canonical: "/news" },
+  openGraph: {
+    title: "Aktuelles & News – E-Motion Rennteam Aalen",
+    description: "Rollouts, Wettbewerbsergebnisse und Team-Updates aus dem Formula-Student-Alltag.",
+    type: "website",
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
+  },
 };
 
 export default function NewsPage() {
   const news = getNews();
+  const breadcrumbJsonLd = getBreadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "News", path: "/news" },
+  ]);
 
   return (
     <div className="container-page py-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <Reveal>
         <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">News</p>
         <h1 className="mt-2 text-4xl font-extrabold leading-tight tracking-normal sm:text-5xl md:text-6xl xl:text-7xl">Aktuelles</h1>

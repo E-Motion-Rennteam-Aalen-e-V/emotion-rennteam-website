@@ -148,7 +148,7 @@ function NicknameCard({ spec }: { spec: Spec }) {
   );
 }
 
-function renderSpec(spec: Spec, i: number) {
+function renderSpec(spec: Spec) {
   const label = spec.label.toLowerCase();
 
   if (label === "spitzname") {
@@ -216,8 +216,8 @@ export default function VehicleSpecs({
   return (
     <div className="mt-6 @container">
       <StaggerGroup className="grid grid-cols-1 items-start gap-3 @min-[420px]:grid-cols-2">
-        {specs.map((spec, i) => (
-          <StaggerItem key={spec.label}>{renderSpec(spec, i)}</StaggerItem>
+        {specs.map((spec) => (
+          <StaggerItem key={spec.label}>{renderSpec(spec)}</StaggerItem>
         ))}
       </StaggerGroup>
 

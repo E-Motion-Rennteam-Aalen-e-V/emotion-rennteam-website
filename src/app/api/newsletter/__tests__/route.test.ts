@@ -56,7 +56,7 @@ describe("POST /api/newsletter", () => {
     expect(response.status).toBe(400);
   });
 
-  it("silently accepts but does not deliver honeypot-tripped submissions", async () => {
+  it("rejects honeypot-tripped submissions with 400", async () => {
     const deliverSpy = vi
       .spyOn(formDelivery, "deliverFormSubmission")
       .mockResolvedValue(undefined);
@@ -66,8 +66,8 @@ describe("POST /api/newsletter", () => {
     );
     const json = await response.json();
 
-    expect(response.status).toBe(200);
-    expect(json.ok).toBe(true);
+    expect(response.status).toBe(400);
+    expect(json.ok).toBe(false);
     expect(deliverSpy).not.toHaveBeenCalled();
   });
 

@@ -1,6 +1,13 @@
-// Thin wrapper around the GitHub Contents API so CMS saves become real
-// commits on the target repo/branch, not just local filesystem writes
-// (which don't persist on most serverless hosts).
+// ⚠️ AI-assisted – the GitHub API retry logic and race-condition handling
+// were developed with AI help. Race conditions are tricky to reason about.
+// (GitHub-API-Logik inkl. Race-Condition-Handling – mit KI-Hilfe entwickelt.)
+
+// Saves CMS content directly to GitHub as real commits, not local files.
+// Speichert CMS-Inhalte direkt als Git-Commits auf GitHub – nicht lokal.
+// Why? Because on serverless hosts like Vercel, the filesystem is read-only
+// or at least doesn't persist between deploys. GitHub is our "database".
+// (Auf Vercel gibt es kein persistentes Dateisystem – GitHub übernimmt
+// daher die Rolle der Datenbank für alle CMS-Inhalte.)
 
 interface GithubConfig {
   token: string;
@@ -92,7 +99,8 @@ async function putFile(
   });
 }
 
-/** Creates or updates a file at `path` with UTF-8 `content`, returns the commit URL. */
+// Saves a text file to GitHub and returns the commit URL.
+// Speichert eine Textdatei auf GitHub und gibt die Commit-URL zurück.
 export async function commitFile(
   path: string,
   content: string,
@@ -105,7 +113,10 @@ export async function commitFile(
   const b64 = Buffer.from(content, "utf-8").toString("base64");
   let sha = await getFileSha(config, path);
   let res = await putFile(config, path, b64, message, authorName, sha);
-  // 422 means our SHA is stale (another write raced us); re-fetch and retry once.
+  // 422 = "SHA stale" – another save snuck in between our read and write.
+  // 422 = "SHA veraltet" – ein anderer Speichervorgang kam uns zuvor.
+  // We re-fetch the current SHA and try once more – that's enough for the
+  // typical "two admins saving at the same time" scenario.
   if (res.status === 422) {
     sha = await getFileSha(config, path);
     res = await putFile(config, path, b64, message, authorName, sha);

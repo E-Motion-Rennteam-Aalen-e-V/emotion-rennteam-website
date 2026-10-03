@@ -14,4 +14,4 @@ export const SITE_URL = (
 export const SITE_NAME = "E-Motion Rennteam Aalen";
 
 export const SITE_DESCRIPTION =
-  "E-Motion Rennteam Aalen – das Formula-Student-Electric-Team der Hochschule Aalen. Team, Fahrzeuge, Sponsoren und News.";
+  "E-Motion Rennteam Aalen – Formula Student Electric Team der Hochschule Aalen. Wir entwickeln und bauen eigenständig Elektro-Rennwagen für den internationalen Formula-Student-Wettbewerb.";

@@ -4,20 +4,35 @@ import { getGalleryAlbums } from "@/lib/content";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import ImageWithFallback from "@/components/ImageWithFallback";
+import { getBreadcrumbJsonLd } from "@/lib/structuredData";
 
 export const metadata: Metadata = {
-  title: "Galerie",
+  title: "Galerie – Fotos & Impressionen",
   description:
-    "Bildergalerie des E-Motion Rennteams Aalen: Impressionen von Fahrzeugbau, Testfahrten, Events und Wettbewerben, nach Album sortiert.",
+    "Bildergalerie des E-Motion Rennteams Aalen: Impressionen von Fahrzeugbau, Testfahrten, Rollout-Events und Formula-Student-Wettbewerben.",
   alternates: { canonical: "/galerie" },
+  openGraph: {
+    title: "Galerie – E-Motion Rennteam Aalen",
+    description: "Fotos vom Fahrzeugbau, Testfahrten und internationalen Formula-Student-Wettbewerben.",
+    type: "website",
+    images: [{ url: "/uploads/ert-14-26-studio.jpg", width: 1200, height: 630 }],
+  },
 };
 
 export default function GalleryPage() {
   const albums = getGalleryAlbums();
   const hasAlbums = albums.length > 0;
+  const breadcrumbJsonLd = getBreadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Galerie", path: "/galerie" },
+  ]);
 
   return (
     <div className="container-page py-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <Reveal>
         <p className="text-sm font-semibold uppercase tracking-widest text-accent-text">Galerie</p>
         <h1 className="mt-2 text-4xl font-extrabold leading-tight tracking-normal sm:text-5xl md:text-6xl xl:text-7xl">Impressionen</h1>
