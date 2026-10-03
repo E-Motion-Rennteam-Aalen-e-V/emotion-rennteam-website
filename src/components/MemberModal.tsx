@@ -379,17 +379,18 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                     }}>
                       {/* Logo — white badge so it renders cleanly on dark surfaces */}
                       <div style={{
-                        width: 30, height: 30, borderRadius: 6, flexShrink: 0,
+                        width: 42, height: 42, borderRadius: 8, flexShrink: 0,
                         background: '#ffffff',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         overflow: 'hidden',
+                        boxShadow: `0 0 0 1px rgba(255,255,255,0.15), 0 2px 8px rgba(0,0,0,0.4)`,
                       }}>
                         <Image
                           src="/uploads/logo.png"
                           alt="E-Motion Rennteam Logo"
-                          width={24}
-                          height={24}
-                          style={{ objectFit: 'contain', width: 24, height: 24 }}
+                          width={34}
+                          height={34}
+                          style={{ objectFit: 'contain', width: 34, height: 34 }}
                         />
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
@@ -603,20 +604,11 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                               {member.role}
                             </p>
                           )}
-                          {/* Member ID — deterministic pseudo-number */}
-                          <p style={{
-                            color: T.muted, fontSize: 7, fontWeight: 600,
-                            margin: '3px 0 0', letterSpacing: '0.14em',
-                            fontFamily: 'var(--font-mono, monospace)',
-                            opacity: 0.45,
-                          }}>
-                            {memberId}
-                          </p>
                         </div>
                       </motion.div>
 
                       {/* Contact rows */}
-                      <div style={{ flexShrink: 0, padding: '9px 14px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      <div style={{ flexShrink: 0, padding: '8px 12px 6px', display: 'flex', flexDirection: 'column', gap: 3 }}>
                         {(member.phone || !showReal) && (
                           <motion.div variants={backItem}>
                             <ContactRow icon={<PhoneIcon />}
@@ -638,49 +630,62 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                         )}
                       </div>
 
-                      {/* Divider */}
+                      {/* QR section — center of attention */}
                       <motion.div variants={backItem} style={{
-                        margin: '0 14px', height: 1,
-                        background: T.border, flexShrink: 0,
-                      }} />
-
-                      {/* QR */}
-                      <motion.div variants={backItem} style={{
-                        flexShrink: 0,
-                        display: 'flex', flexDirection: 'column',
-                        alignItems: 'center', padding: '10px 14px 4px',
+                        flexShrink: 0, margin: '0 12px',
+                        borderTop: `1px solid ${T.border}`,
+                        borderBottom: `1px solid ${T.border}`,
+                        padding: '10px 0 8px',
+                        display: 'flex', flexDirection: 'column', alignItems: 'center',
+                        background: `linear-gradient(180deg, transparent, rgba(0,113,181,0.04) 50%, transparent)`,
                       }}>
+                        {/* Label above QR */}
                         <div style={{
-                          background: '#fff', borderRadius: 10, padding: 7,
-                          boxShadow: `0 4px 20px rgba(0,0,0,0.6), 0 0 0 1px ${T.border}`,
+                          display: 'flex', alignItems: 'center', gap: 5, marginBottom: 7,
+                        }}>
+                          <div style={{ height: 1, width: 16, background: `linear-gradient(90deg, transparent, ${T.border})` }} />
+                          <span style={{
+                            color: T.accentTxt, fontSize: 7, fontWeight: 700,
+                            textTransform: 'uppercase', letterSpacing: '0.22em',
+                            opacity: 0.7,
+                          }}>
+                            Kontakt scannen
+                          </span>
+                          <div style={{ height: 1, width: 16, background: `linear-gradient(90deg, ${T.border}, transparent)` }} />
+                        </div>
+
+                        <div style={{
+                          background: '#fff', borderRadius: 10, padding: 6,
+                          boxShadow: `0 6px 24px rgba(0,0,0,0.7), 0 0 0 1px ${T.border}, 0 0 20px rgba(0,113,181,0.08)`,
                         }}>
                           {qrUrl ? (
                             <img src={qrUrl} alt="QR Code"
-                              style={{ width: 76, height: 76, display: 'block', borderRadius: 4 }} />
+                              style={{ width: 96, height: 96, display: 'block', borderRadius: 5 }} />
                           ) : (
                             <div style={{
-                              width: 76, height: 76, display: 'flex',
+                              width: 96, height: 96, display: 'flex',
                               alignItems: 'center', justifyContent: 'center',
                               color: T.muted, fontSize: 10,
                             }}>…</div>
                           )}
                         </div>
-                        <p style={{
-                          color: T.muted, fontSize: 7.5, marginTop: 5,
-                          textTransform: 'uppercase', letterSpacing: '0.18em',
-                          fontWeight: 700, opacity: 0.55,
-                        }}>
-                          QR scannen · Kontakt speichern
-                        </p>
-                        {/* Decorative barcode — purely visual document element */}
-                        <div style={{ width: '100%', marginTop: 6 }}>
+
+                        {/* Decorative barcode + member ID row */}
+                        <div style={{ width: '100%', marginTop: 8, padding: '0 4px' }}>
                           <DecorativeBarcode />
                         </div>
+                        <p style={{
+                          color: T.muted, fontSize: 7, marginTop: 4,
+                          fontFamily: 'var(--font-mono, monospace)',
+                          letterSpacing: '0.16em', fontWeight: 600, opacity: 0.38,
+                        }}>
+                          {memberId}
+                        </p>
                       </motion.div>
 
                       {/* Actions */}
                       <motion.div variants={backItem} style={{
-                        flexGrow: 1, padding: '3px 14px 10px',
+                        flexGrow: 1, padding: '8px 12px 10px',
                         display: 'flex', flexDirection: 'column',
                         gap: 5, justifyContent: 'flex-end',
                       }}>
