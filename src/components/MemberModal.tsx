@@ -68,18 +68,19 @@ function Lanyard() {
   );
 }
 
-/* ─── Checkered stripe (from globals.css .checkered-divider) ─── */
-function CheckeredStripe({ opacity = 0.18 }: { opacity?: number }) {
+/* ─── Checkered stripe ─── */
+function CheckeredStripe({ opacity = 0.22, height = 8 }: { opacity?: number; height?: number }) {
   return (
     <div style={{
-      height: 8, flexShrink: 0,
+      height,
+      flexShrink: 0,
       backgroundImage: [
         'linear-gradient(45deg, rgba(255,255,255,0.9) 25%, transparent 25%)',
         'linear-gradient(-45deg, rgba(255,255,255,0.9) 25%, transparent 25%)',
         'linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.9) 75%)',
         'linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.9) 75%)',
       ].join(', '),
-      backgroundSize: '8px 8px',
+      backgroundSize: `${height}px ${height}px`,
       backgroundPosition: '0 0, 0 4px, 4px -4px, -4px 0px',
       backgroundColor: T.bg,
       opacity,
@@ -89,7 +90,6 @@ function CheckeredStripe({ opacity = 0.18 }: { opacity?: number }) {
 
 /* ─── Decorative barcode strip (purely visual) ─── */
 function DecorativeBarcode() {
-  // alternating bar / gap widths — even indices are bars, odd are gaps
   const pattern = [2,1,3,1,1,1,4,1,2,1,1,1,3,1,2,1,1,1,3,1,1,1,4,1,2,1,1,1,2,1,3,1,1,1,2];
   const rects: Array<{ x: number; w: number }> = [];
   let x = 0;
@@ -142,8 +142,6 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
   const springX = useSpring(tiltX, { stiffness: 180, damping: 22 });
   const springY = useSpring(tiltY, { stiffness: 180, damping: 22 });
 
-  // Holographic reflex: map tilt springs → highlight position on card surface
-  // tiltY positive = mouse right → highlight moves right; tiltX: inverted sign
   const hHighlightX = useTransform(springY, [-13, 13], [20, 80]);
   const hHighlightY = useTransform(springX, [13, -13], [20, 80]);
   const holoBg = useMotionTemplate`radial-gradient(ellipse 60% 40% at ${hHighlightX}% ${hHighlightY}%, rgba(180,220,255,0.15) 0%, rgba(100,170,255,0.07) 40%, transparent 68%)`;
@@ -197,10 +195,11 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
     return `https://contacts.google.com/?add&contact=${p.toString()}`;
   };
 
-  const W = 'min(296px, 83vw)';
-  const H = 'min(444px, calc(83vw * 1.5))';
+  /* Standard ID card: 85.6 × 54 mm ≈ 1.585:1 portrait */
+  const W = 'min(300px, 85vw)';
+  const H = 'min(474px, calc(85vw * 1.585))';
 
-  /* ── shared card shell style — inset top shine for plastic card feel ── */
+  /* ── shared card shell — inset top shine for plastic card feel ── */
   const cardShell: React.CSSProperties = {
     position: 'absolute', inset: 0,
     backfaceVisibility:       'hidden',
@@ -210,7 +209,6 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
     background: `linear-gradient(160deg, ${T.surface} 0%, ${T.bg} 100%)`,
     border: `1px solid ${T.border}`,
     display: 'flex', flexDirection: 'column',
-    // Subtle top-edge gloss: like light catching a plastic card edge
     boxShadow: `inset 0 1px 0 rgba(255,255,255,0.09), inset 0 0 0 1px rgba(255,255,255,0.025)`,
   };
 
@@ -238,7 +236,6 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
             overflowY: 'auto',
             paddingTop: 'clamp(24px, 5vh, 52px)',
             paddingBottom: 48,
-            // Radial brand glow + subtle security-paper diagonal lines
             background: [
               'repeating-linear-gradient(-45deg, transparent, transparent 20px, rgba(255,255,255,0.012) 20px, rgba(255,255,255,0.012) 21px)',
               `radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,113,181,0.14) 0%, rgba(6,7,13,0.97) 55%)`,
@@ -271,7 +268,7 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
             </svg>
           </motion.button>
 
-          {/* Card wrapper — entry: drops with subtle Y-axis pendulum swing */}
+          {/* Card wrapper */}
           <motion.div
             onClick={(e) => e.stopPropagation()}
             initial={{ y: -70, opacity: 0, scale: 0.92, rotateY: -5 }}
@@ -316,7 +313,7 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                 onMouseLeave={resetTilt}
                 onClick={() => setFlipped((f) => !f)}
               >
-                {/* Flip container — 0.55s springier cubic-bezier */}
+                {/* Flip container */}
                 <div style={{
                   width: W, height: H,
                   position: 'relative',
@@ -325,16 +322,16 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                   transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
                 }}>
 
-                  {/* ═══════ FRONT ═══════ */}
+                  {/* ═══════════════ FRONT ═══════════════ */}
                   <div style={cardShell}>
 
-                    {/* Accent gradient stripe */}
+                    {/* Top accent gradient bar */}
                     <div style={{
-                      height: 3, flexShrink: 0,
+                      height: 4, flexShrink: 0,
                       background: `linear-gradient(90deg, ${T.accent} 0%, ${T.accent2} 100%)`,
                     }} />
 
-                    {/* Holographic tilt reflex — moves with mouse position */}
+                    {/* Holographic tilt reflex */}
                     <motion.div
                       style={{
                         position: 'absolute', inset: 0,
@@ -348,7 +345,7 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                       }}
                     />
 
-                    {/* Glanz-Sweep on mouseEnter (remounts on each hover entry) */}
+                    {/* Glanz-Sweep on mouseEnter */}
                     <AnimatePresence>
                       {sweepKey > 0 && (
                         <motion.div
@@ -369,47 +366,61 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                       )}
                     </AnimatePresence>
 
-                    {/* Header bar */}
+                    {/* ── Header bar ── */}
                     <div style={{
                       flexShrink: 0,
-                      padding: '10px 14px 9px',
-                      display: 'flex', alignItems: 'center', gap: 9,
+                      padding: '10px 14px 10px',
+                      display: 'flex', alignItems: 'center', gap: 11,
                       borderBottom: `1px solid ${T.border}`,
                       background: T.surface,
                     }}>
-                      {/* Logo — white badge so it renders cleanly on dark surfaces */}
+                      {/* Logo badge — white so logo renders on dark bg */}
                       <div style={{
-                        width: 42, height: 42, borderRadius: 8, flexShrink: 0,
+                        width: 52, height: 52,
+                        borderRadius: 10,
+                        flexShrink: 0,
                         background: '#ffffff',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         overflow: 'hidden',
-                        boxShadow: `0 0 0 1px rgba(255,255,255,0.15), 0 2px 8px rgba(0,0,0,0.4)`,
+                        boxShadow: `0 0 0 1px rgba(255,255,255,0.18), 0 2px 10px rgba(0,0,0,0.5)`,
                       }}>
                         <Image
                           src="/uploads/logo.png"
                           alt="E-Motion Rennteam Logo"
-                          width={34}
-                          height={34}
-                          style={{ objectFit: 'contain', width: 34, height: 34 }}
+                          width={42}
+                          height={42}
+                          style={{ objectFit: 'contain', width: 42, height: 42 }}
                         />
                       </div>
+
+                      {/* Team name */}
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{
-                          fontSize: 9.5, fontWeight: 800,
-                          letterSpacing: '0.13em', textTransform: 'uppercase',
-                          color: T.fg, lineHeight: 1.1,
+                          fontSize: 15,
+                          fontWeight: 900,
+                          letterSpacing: '0.04em',
+                          textTransform: 'uppercase',
+                          color: T.fg,
+                          lineHeight: 1.1,
                           fontFamily: 'var(--font-heading, var(--font-sans, system-ui))',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
                         }}>
                           E-Motion Rennteam
                         </div>
                         <div style={{
-                          color: T.muted, fontSize: 7.5, fontWeight: 600,
-                          letterSpacing: '0.12em', marginTop: 2.5,
+                          color: T.accentTxt,
+                          fontSize: 10,
+                          fontWeight: 600,
+                          letterSpacing: '0.14em',
+                          marginTop: 3,
                           textTransform: 'uppercase',
                         }}>
                           Hochschule Aalen
                         </div>
                       </div>
+
                       {isExecutive && (
                         <motion.span
                           initial={{ scale: 0.8, opacity: 0 }}
@@ -417,9 +428,9 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                           transition={{ delay: 0.25, type: 'spring' }}
                           style={{
                             background: T.accent,
-                            color: '#fff', fontSize: 7.5, fontWeight: 700,
-                            padding: '3px 7px', borderRadius: 20,
-                            letterSpacing: '0.12em', textTransform: 'uppercase',
+                            color: '#fff', fontSize: 9, fontWeight: 700,
+                            padding: '4px 8px', borderRadius: 20,
+                            letterSpacing: '0.1em', textTransform: 'uppercase',
                             flexShrink: 0,
                           }}
                         >
@@ -428,13 +439,13 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                       )}
                     </div>
 
-                    {/* Photo — full bleed */}
+                    {/* ── Photo — main body of card ── */}
                     <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
-                      {/* Left accent bar — print design element, 3 px, full photo height */}
+                      {/* Left accent bar */}
                       <div style={{
                         position: 'absolute',
                         left: 0, top: 0, bottom: 0,
-                        width: 3,
+                        width: 4,
                         background: `linear-gradient(to bottom, ${T.accent} 0%, ${T.accent2} 100%)`,
                         zIndex: 2,
                       }} />
@@ -445,25 +456,30 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                             src={member.photo} alt={member.name} fill
                             style={{ objectFit: 'cover', objectPosition: 'top' }}
                           />
+                          {/* Gradient overlay — darker at bottom for text legibility */}
                           <div style={{
                             position: 'absolute', inset: 0,
-                            background: `linear-gradient(to bottom, transparent 28%, rgba(6,7,13,0.55) 62%, rgba(6,7,13,0.97) 100%)`,
+                            background: `linear-gradient(to bottom,
+                              transparent 15%,
+                              rgba(6,7,13,0.3) 50%,
+                              rgba(6,7,13,0.75) 72%,
+                              rgba(6,7,13,0.97) 100%)`,
                           }} />
                         </>
                       ) : (
                         <div style={{
                           width: '100%', height: '100%',
                           display: 'flex', flexDirection: 'column',
-                          alignItems: 'center', justifyContent: 'center', gap: 8,
+                          alignItems: 'center', justifyContent: 'center', gap: 10,
                           background: T.surface2,
                         }}>
                           <svg viewBox="0 0 24 24" fill="none" stroke={T.border}
-                            strokeWidth="1" style={{ width: 38, height: 38 }}>
+                            strokeWidth="1" style={{ width: 48, height: 48 }}>
                             <circle cx="12" cy="8" r="4" />
                             <path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8" />
                           </svg>
                           <span style={{
-                            color: T.muted, fontSize: 8, fontWeight: 700,
+                            color: T.muted, fontSize: 9, fontWeight: 700,
                             textTransform: 'uppercase', letterSpacing: '0.2em',
                           }}>
                             Foto folgt
@@ -478,15 +494,19 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                         transition={{ delay: 0.38, duration: 0.4 }}
                         style={{
                           position: 'absolute', bottom: 0, left: 0, right: 0,
-                          padding: '12px 16px 14px',
+                          padding: '0 18px 16px 20px',
+                          zIndex: 3,
                         }}
                       >
                         {member.role && (
                           <div style={{
                             color: T.accentTxt,
-                            fontSize: 8.5, fontWeight: 800,
-                            letterSpacing: '0.2em', textTransform: 'uppercase',
-                            marginBottom: 5,
+                            fontSize: 10,
+                            fontWeight: 700,
+                            letterSpacing: '0.22em',
+                            textTransform: 'uppercase',
+                            marginBottom: 6,
+                            textShadow: '0 1px 4px rgba(0,0,0,0.8)',
                           }}>
                             {member.role}
                           </div>
@@ -495,20 +515,27 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                           id={`modal-title-${member.slug}`}
                           style={{
                             color: T.fg,
-                            fontSize: 'clamp(20px, 6.5vw, 26px)',
-                            fontWeight: 900, lineHeight: 1.0,
-                            margin: 0, letterSpacing: '-0.01em',
+                            fontSize: 'clamp(22px, 7vw, 28px)',
+                            fontWeight: 900,
+                            lineHeight: 1.0,
+                            margin: 0,
+                            letterSpacing: '-0.01em',
                             fontFamily: 'var(--font-heading, var(--font-sans, system-ui))',
                             textTransform: 'uppercase',
+                            textShadow: '0 2px 8px rgba(0,0,0,0.9)',
                           }}
                         >
                           {member.name}
                         </h2>
                         {member.department && (
                           <p style={{
-                            color: T.muted, fontSize: 9, marginTop: 5,
-                            fontWeight: 600, letterSpacing: '0.1em',
+                            color: T.muted,
+                            fontSize: 10,
+                            marginTop: 6,
+                            fontWeight: 600,
+                            letterSpacing: '0.12em',
                             textTransform: 'uppercase',
+                            textShadow: '0 1px 4px rgba(0,0,0,0.8)',
                           }}>
                             {member.department}
                           </p>
@@ -516,39 +543,39 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                       </motion.div>
                     </div>
 
-                    {/* Checkered bottom stripe */}
-                    <CheckeredStripe opacity={0.22} />
+                    {/* Checkered motorsport stripe */}
+                    <CheckeredStripe opacity={0.28} height={10} />
 
                     {/* Flip hint */}
                     <div style={{
                       flexShrink: 0,
-                      padding: '5px',
+                      padding: '6px 14px',
                       display: 'flex', alignItems: 'center',
-                      justifyContent: 'center', gap: 5,
+                      justifyContent: 'center', gap: 6,
                       background: T.surface,
                     }}>
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"
-                        style={{ width: 8, height: 8, color: T.muted, opacity: 0.45 }}>
+                        style={{ width: 10, height: 10, color: T.muted, opacity: 0.5 }}>
                         <path d="M1 4v6h6M23 20v-6h-6" />
                         <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15" />
                       </svg>
                       <span style={{
-                        color: T.muted, fontSize: 7.5, fontWeight: 700,
-                        letterSpacing: '0.2em', textTransform: 'uppercase', opacity: 0.45,
+                        color: T.muted, fontSize: 9, fontWeight: 700,
+                        letterSpacing: '0.2em', textTransform: 'uppercase', opacity: 0.5,
                       }}>
                         Umdrehen
                       </span>
                     </div>
                   </div>
 
-                  {/* ═══════ BACK ═══════ */}
+                  {/* ═══════════════ BACK ═══════════════ */}
                   <div style={{
                     ...cardShell,
                     transform: 'rotateY(180deg)',
                   }}>
-                    {/* Accent stripe */}
+                    {/* Top accent gradient bar */}
                     <div style={{
-                      height: 3, flexShrink: 0,
+                      height: 4, flexShrink: 0,
                       background: `linear-gradient(90deg, ${T.accent} 0%, ${T.accent2} 100%)`,
                     }} />
 
@@ -556,38 +583,46 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                       variants={backContainer}
                       initial="hidden"
                       animate={backShowing ? 'visible' : 'hidden'}
-                      style={{ display: 'flex', flexDirection: 'column', flex: 1 }}
+                      style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}
                     >
-                      {/* Header */}
+                      {/* ── Back header: avatar + name ── */}
                       <motion.div variants={backItem} style={{
                         flexShrink: 0,
-                        padding: '11px 14px 10px',
-                        display: 'flex', alignItems: 'center', gap: 10,
+                        padding: '11px 14px 11px',
+                        display: 'flex', alignItems: 'center', gap: 11,
                         borderBottom: `1px solid ${T.border}`,
                         background: T.surface,
                       }}>
+                        {/* Small photo avatar */}
                         <div style={{
-                          width: 36, height: 36, borderRadius: 8, overflow: 'hidden',
-                          flexShrink: 0, background: T.surface2,
+                          width: 42, height: 42,
+                          borderRadius: 8,
+                          overflow: 'hidden',
+                          flexShrink: 0,
+                          background: T.surface2,
                           border: `1px solid ${T.border}`,
-                          boxShadow: `0 0 0 2px rgba(0,113,181,0.25)`,
+                          boxShadow: `0 0 0 2px rgba(0,113,181,0.3)`,
                         }}>
                           {member.photo ? (
-                            <Image src={member.photo} alt={member.name} width={36} height={36}
+                            <Image src={member.photo} alt={member.name} width={42} height={42}
                               style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
                           ) : (
                             <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                               <svg viewBox="0 0 24 24" fill="none" stroke={T.muted}
-                                strokeWidth="1.5" style={{ width: 15, height: 15, opacity: 0.4 }}>
+                                strokeWidth="1.5" style={{ width: 18, height: 18, opacity: 0.4 }}>
                                 <circle cx="12" cy="8" r="4" />
                                 <path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8" />
                               </svg>
                             </div>
                           )}
                         </div>
+
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <p style={{
-                            color: T.fg, fontSize: 13.5, fontWeight: 800, margin: 0,
+                            color: T.fg,
+                            fontSize: 15,
+                            fontWeight: 800,
+                            margin: 0,
                             letterSpacing: '-0.01em',
                             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                             fontFamily: 'var(--font-heading, var(--font-sans, system-ui))',
@@ -597,9 +632,12 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                           </p>
                           {member.role && (
                             <p style={{
-                              color: T.accentTxt, fontSize: 8.5, fontWeight: 700,
-                              margin: '3px 0 0', textTransform: 'uppercase',
-                              letterSpacing: '0.12em',
+                              color: T.accentTxt,
+                              fontSize: 10,
+                              fontWeight: 700,
+                              margin: '3px 0 0',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.14em',
                             }}>
                               {member.role}
                             </p>
@@ -607,20 +645,28 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                         </div>
                       </motion.div>
 
-                      {/* Contact rows */}
-                      <div style={{ flexShrink: 0, padding: '8px 12px 6px', display: 'flex', flexDirection: 'column', gap: 3 }}>
+                      {/* ── Contact rows ── */}
+                      <div style={{
+                        flexShrink: 0,
+                        padding: '10px 12px 8px',
+                        display: 'flex', flexDirection: 'column', gap: 5,
+                      }}>
                         {(member.phone || !showReal) && (
                           <motion.div variants={backItem}>
-                            <ContactRow icon={<PhoneIcon />}
+                            <ContactRow
+                              icon={<PhoneIcon />}
                               label={showReal && member.phone ? maskPhone(member.phone) : '[Test Tel]'}
-                              dim={!showReal || !member.phone} />
+                              dim={!showReal || !member.phone}
+                            />
                           </motion.div>
                         )}
                         {(member.email || !showReal) && (
                           <motion.div variants={backItem}>
-                            <ContactRow icon={<MailIcon />}
+                            <ContactRow
+                              icon={<MailIcon />}
                               label={showReal && member.email ? maskEmail(member.email) : '[Test Mail]'}
-                              dim={!showReal || !member.email} />
+                              dim={!showReal || !member.email}
+                            />
                           </motion.div>
                         )}
                         {member.linkedin && (
@@ -630,80 +676,97 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                         )}
                       </div>
 
-                      {/* QR section — center of attention */}
+                      {/* ── QR code — center piece ── */}
                       <motion.div variants={backItem} style={{
-                        flexShrink: 0, margin: '0 12px',
+                        flexShrink: 0,
+                        margin: '0 12px',
                         borderTop: `1px solid ${T.border}`,
                         borderBottom: `1px solid ${T.border}`,
-                        padding: '10px 0 8px',
+                        padding: '12px 0 10px',
                         display: 'flex', flexDirection: 'column', alignItems: 'center',
-                        background: `linear-gradient(180deg, transparent, rgba(0,113,181,0.04) 50%, transparent)`,
+                        background: `linear-gradient(180deg, transparent, rgba(0,113,181,0.05) 50%, transparent)`,
                       }}>
-                        {/* Label above QR */}
-                        <div style={{
-                          display: 'flex', alignItems: 'center', gap: 5, marginBottom: 7,
-                        }}>
-                          <div style={{ height: 1, width: 16, background: `linear-gradient(90deg, transparent, ${T.border})` }} />
+                        {/* Label */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
+                          <div style={{ height: 1, width: 20, background: `linear-gradient(90deg, transparent, ${T.border})` }} />
                           <span style={{
-                            color: T.accentTxt, fontSize: 7, fontWeight: 700,
-                            textTransform: 'uppercase', letterSpacing: '0.22em',
-                            opacity: 0.7,
+                            color: T.accentTxt,
+                            fontSize: 9,
+                            fontWeight: 700,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.22em',
+                            opacity: 0.8,
                           }}>
                             Kontakt scannen
                           </span>
-                          <div style={{ height: 1, width: 16, background: `linear-gradient(90deg, ${T.border}, transparent)` }} />
+                          <div style={{ height: 1, width: 20, background: `linear-gradient(90deg, ${T.border}, transparent)` }} />
                         </div>
 
+                        {/* QR code — white card, min 100x100 */}
                         <div style={{
-                          background: '#fff', borderRadius: 10, padding: 6,
-                          boxShadow: `0 6px 24px rgba(0,0,0,0.7), 0 0 0 1px ${T.border}, 0 0 20px rgba(0,113,181,0.08)`,
+                          background: '#ffffff',
+                          borderRadius: 12,
+                          padding: 8,
+                          boxShadow: `0 8px 28px rgba(0,0,0,0.75), 0 0 0 1px ${T.border}, 0 0 24px rgba(0,113,181,0.1)`,
                         }}>
                           {qrUrl ? (
-                            <img src={qrUrl} alt="QR Code"
-                              style={{ width: 96, height: 96, display: 'block', borderRadius: 5 }} />
+                            <img
+                              src={qrUrl}
+                              alt="QR Code — Kontakt scannen"
+                              style={{ width: 108, height: 108, display: 'block', borderRadius: 6 }}
+                            />
                           ) : (
                             <div style={{
-                              width: 96, height: 96, display: 'flex',
-                              alignItems: 'center', justifyContent: 'center',
-                              color: T.muted, fontSize: 10,
-                            }}>…</div>
+                              width: 108, height: 108,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              color: T.muted, fontSize: 11,
+                            }}>
+                              …
+                            </div>
                           )}
                         </div>
 
-                        {/* Decorative barcode + member ID row */}
-                        <div style={{ width: '100%', marginTop: 8, padding: '0 4px' }}>
+                        {/* Decorative barcode + member ID */}
+                        <div style={{ width: '100%', marginTop: 10, padding: '0 4px' }}>
                           <DecorativeBarcode />
                         </div>
                         <p style={{
-                          color: T.muted, fontSize: 7, marginTop: 4,
+                          color: T.muted,
+                          fontSize: 8,
+                          marginTop: 5,
                           fontFamily: 'var(--font-mono, monospace)',
-                          letterSpacing: '0.16em', fontWeight: 600, opacity: 0.38,
+                          letterSpacing: '0.18em',
+                          fontWeight: 600,
+                          opacity: 0.42,
                         }}>
                           {memberId}
                         </p>
                       </motion.div>
 
-                      {/* Actions */}
+                      {/* ── Action buttons ── */}
                       <motion.div variants={backItem} style={{
-                        flexGrow: 1, padding: '8px 12px 10px',
+                        flexGrow: 1,
+                        padding: '10px 12px 10px',
                         display: 'flex', flexDirection: 'column',
-                        gap: 5, justifyContent: 'flex-end',
+                        gap: 6, justifyContent: 'flex-end',
                       }}>
-                        <ActionButton onClick={(e) => { e.stopPropagation(); downloadVCard(member); }}>
+                        {/* Primary CTA — always accent blue */}
+                        <PrimaryButton onClick={(e) => { e.stopPropagation(); downloadVCard(member); }}>
                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-                            style={{ width: 11, height: 11 }}>
+                            style={{ width: 13, height: 13 }}>
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                             <polyline points="7 10 12 15 17 10" />
                             <line x1="12" y1="15" x2="12" y2="3" />
                           </svg>
                           vCard herunterladen
-                        </ActionButton>
+                        </PrimaryButton>
 
-                        <div style={{ display: 'flex', gap: 5 }}>
+                        {/* Secondary ghost buttons */}
+                        <div style={{ display: 'flex', gap: 6 }}>
                           {showReal && member.email && (
                             <GhostButton href={googleLink()}>
                               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                strokeWidth="1.8" style={{ width: 10, height: 10 }}>
+                                strokeWidth="1.8" style={{ width: 11, height: 11 }}>
                                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                                 <circle cx="12" cy="7" r="4" />
                               </svg>
@@ -713,7 +776,7 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                           {showReal && member.phone && (
                             <GhostButton href={`tel:${member.phone}`}>
                               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                strokeWidth="1.8" style={{ width: 10, height: 10 }}>
+                                strokeWidth="1.8" style={{ width: 11, height: 11 }}>
                                 <rect x="5" y="2" width="14" height="20" rx="2" />
                                 <line x1="12" y1="18" x2="12" y2="18" strokeWidth="2" strokeLinecap="round" />
                               </svg>
@@ -723,53 +786,58 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                         </div>
                       </motion.div>
 
-                      {/* Footer */}
-                      <CheckeredStripe opacity={0.14} />
+                      {/* ── Footer ── */}
+                      <CheckeredStripe opacity={0.16} height={8} />
                       <motion.div variants={backItem} style={{
                         flexShrink: 0,
-                        padding: '5px 14px',
+                        padding: '7px 14px',
                         display: 'flex', alignItems: 'center',
                         justifyContent: 'space-between',
                         background: T.surface,
                         borderTop: `1px solid ${T.border}`,
                       }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
                           {/* Logo in footer — white badge */}
                           <div style={{
-                            width: 16, height: 16, borderRadius: 2,
+                            width: 22, height: 22,
+                            borderRadius: 4,
                             background: '#ffffff',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                             overflow: 'hidden',
+                            flexShrink: 0,
                           }}>
                             <Image
                               src="/uploads/logo.png"
                               alt=""
-                              width={12}
-                              height={12}
-                              style={{ objectFit: 'contain', width: 12, height: 12 }}
+                              width={16}
+                              height={16}
+                              style={{ objectFit: 'contain', width: 16, height: 16 }}
                             />
                           </div>
                           <span style={{
-                            color: T.muted, fontSize: 7.5, fontWeight: 700,
-                            textTransform: 'uppercase', letterSpacing: '0.12em',
-                            opacity: 0.55,
+                            color: T.muted,
+                            fontSize: 9,
+                            fontWeight: 700,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.1em',
+                            opacity: 0.6,
                           }}>
                             E-Motion Rennteam Aalen
                           </span>
                         </div>
-                        {/* Gültig bis — like a real ID card */}
+
+                        {/* Validity */}
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 1 }}>
                           <span style={{
-                            color: T.muted, fontSize: 6.5, fontWeight: 600,
+                            color: T.muted, fontSize: 7, fontWeight: 600,
                             textTransform: 'uppercase', letterSpacing: '0.1em',
-                            opacity: 0.38,
+                            opacity: 0.4,
                           }}>
                             Gültig bis
                           </span>
                           <span style={{
-                            color: T.muted, fontSize: 7.5, fontWeight: 700,
-                            letterSpacing: '0.06em',
-                            opacity: 0.52,
+                            color: T.muted, fontSize: 9, fontWeight: 700,
+                            letterSpacing: '0.06em', opacity: 0.55,
                           }}>
                             Saison 2025/26
                           </span>
@@ -782,14 +850,14 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
               </motion.div>
             </motion.div>
 
-            {/* Hint */}
+            {/* Hint text below card */}
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.65, duration: 0.35 }}
               style={{
-                color: T.muted, fontSize: 8.5, opacity: 0.35,
-                marginTop: 14, letterSpacing: '0.2em',
+                color: T.muted, fontSize: 9, opacity: 0.38,
+                marginTop: 16, letterSpacing: '0.2em',
                 textTransform: 'uppercase', fontWeight: 600,
               }}
             >
@@ -810,16 +878,19 @@ function ContactRow({ icon, label, dim }: { icon: React.ReactNode; label: string
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{
-        display: 'flex', alignItems: 'center', gap: 8,
-        padding: '5px 8px 5px 6px', borderRadius: 8,
-        border: `1px solid ${hov ? 'rgba(0,113,181,0.4)' : T.border}`,
-        borderLeft: `2px solid ${hov ? T.accent : T.border}`,
-        background: hov ? 'rgba(0,113,181,0.08)' : 'transparent',
+        display: 'flex', alignItems: 'center', gap: 9,
+        padding: '6px 10px 6px 7px',
+        borderRadius: 8,
+        border: `1px solid ${hov ? 'rgba(0,113,181,0.45)' : T.border}`,
+        borderLeft: `3px solid ${hov ? T.accent : T.border}`,
+        background: hov ? 'rgba(0,113,181,0.09)' : 'transparent',
         cursor: 'default',
         transition: 'all 0.14s ease',
       }}>
       <div style={{
-        width: 22, height: 22, borderRadius: 6, flexShrink: 0,
+        width: 24, height: 24,
+        borderRadius: 6,
+        flexShrink: 0,
         background: T.surface2,
         border: `1px solid ${T.border}`,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -827,7 +898,8 @@ function ContactRow({ icon, label, dim }: { icon: React.ReactNode; label: string
         {icon}
       </div>
       <span style={{
-        fontSize: 11, fontWeight: 500,
+        fontSize: 12,
+        fontWeight: 500,
         color: dim ? T.border : (hov ? T.fg : T.muted),
         letterSpacing: '0.01em',
         transition: 'color 0.14s ease',
@@ -838,8 +910,8 @@ function ContactRow({ icon, label, dim }: { icon: React.ReactNode; label: string
   );
 }
 
-/* ─── ActionButton ─── */
-function ActionButton({ onClick, children }: { onClick: (e: React.MouseEvent) => void; children: React.ReactNode }) {
+/* ─── PrimaryButton — always accent blue CTA ─── */
+function PrimaryButton({ onClick, children }: { onClick: (e: React.MouseEvent) => void; children: React.ReactNode }) {
   const [hov, setHov] = useState(false);
   return (
     <button
@@ -847,14 +919,22 @@ function ActionButton({ onClick, children }: { onClick: (e: React.MouseEvent) =>
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
-        border: `1px solid ${hov ? T.accent : T.border}`,
-        borderRadius: 10, padding: '10px 16px',
-        color: hov ? '#fff' : T.accentTxt,
-        fontSize: 11.5, fontWeight: 700,
-        cursor: 'pointer', letterSpacing: '0.05em', width: '100%',
-        background: hov ? T.accent : T.surface2,
-        boxShadow: hov ? `0 0 20px rgba(0,113,181,0.35)` : 'none',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+        border: 'none',
+        borderRadius: 10,
+        padding: '11px 18px',
+        color: '#ffffff',
+        fontSize: 12.5,
+        fontWeight: 700,
+        cursor: 'pointer',
+        letterSpacing: '0.04em',
+        width: '100%',
+        background: hov
+          ? `linear-gradient(135deg, #0086d4 0%, #0071b5 100%)`
+          : `linear-gradient(135deg, #0071b5 0%, #005a8e 100%)`,
+        boxShadow: hov
+          ? `0 4px 20px rgba(0,113,181,0.55), 0 0 0 1px rgba(0,113,181,0.4)`
+          : `0 2px 12px rgba(0,113,181,0.35), 0 0 0 1px rgba(0,113,181,0.25)`,
         transition: 'all 0.16s ease',
       }}
     >
@@ -876,11 +956,13 @@ function GhostButton({ href, children }: { href: string; children: React.ReactNo
       onMouseLeave={() => setHov(false)}
       style={{
         flex: 1, display: 'flex', alignItems: 'center',
-        justifyContent: 'center', gap: 5,
-        border: `1px solid ${hov ? T.border : 'rgba(35,38,53,0.6)'}`,
-        borderRadius: 8, padding: '8px',
+        justifyContent: 'center', gap: 6,
+        border: `1px solid ${hov ? T.border : 'rgba(35,38,53,0.7)'}`,
+        borderRadius: 8,
+        padding: '9px',
         color: hov ? T.fg : T.muted,
-        fontSize: 11, fontWeight: 700,
+        fontSize: 11.5,
+        fontWeight: 700,
         textDecoration: 'none',
         background: hov ? T.surface2 : 'transparent',
         transition: 'all 0.14s ease',
@@ -895,7 +977,7 @@ function GhostButton({ href, children }: { href: string; children: React.ReactNo
 function PhoneIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke={T.accentTxt} strokeWidth="1.8"
-      style={{ width: 10, height: 10, opacity: 0.75 }}>
+      style={{ width: 12, height: 12, opacity: 0.8 }}>
       <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.82A16 16 0 0 0 15.18 16.09l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
     </svg>
   );
@@ -904,7 +986,7 @@ function PhoneIcon() {
 function MailIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke={T.accentTxt} strokeWidth="1.8"
-      style={{ width: 10, height: 10, opacity: 0.75 }}>
+      style={{ width: 12, height: 12, opacity: 0.8 }}>
       <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
       <polyline points="22,6 12,13 2,6" />
     </svg>
@@ -913,7 +995,7 @@ function MailIcon() {
 
 function LinkedInIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill={T.accentTxt} style={{ width: 9, height: 9, opacity: 0.75 }}>
+    <svg viewBox="0 0 24 24" fill={T.accentTxt} style={{ width: 11, height: 11, opacity: 0.8 }}>
       <path d="M4.98 3.5C4.98 4.881 3.87 6 2.5 6S0 4.881 0 3.5 1.12 1 2.5 1s2.48 1.119 2.48 2.5zM.24 8.25h4.52V23H.24V8.25zM8.5 8.25h4.33v2.02h.06c.6-1.14 2.07-2.34 4.26-2.34 4.55 0 5.39 3 5.39 6.9V23h-4.52v-6.7c0-1.6-.03-3.66-2.23-3.66-2.24 0-2.58 1.75-2.58 3.55V23H8.5V8.25z" />
     </svg>
   );
