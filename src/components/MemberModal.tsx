@@ -460,7 +460,6 @@ function MemberDialog({ member, onClose }: { member: TeamMember; onClose: () => 
                     top: CARD_TOP,
                     width: CARD_W,
                     height: CARD_H,
-                    perspective: 1600,
                     cursor: 'grab',
                     touchAction: 'none',
                     userSelect: 'none',
@@ -471,9 +470,6 @@ function MemberDialog({ member, onClose }: { member: TeamMember; onClose: () => 
                       position: 'relative',
                       width: CARD_W,
                       height: CARD_H,
-                      transformStyle: 'preserve-3d',
-                      transition: 'transform 0.8s cubic-bezier(.25,.8,.2,1)',
-                      transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
                     }}
                   >
                     {/* ════════ FRONT ════════ */}
@@ -487,10 +483,9 @@ function MemberDialog({ member, onClose }: { member: TeamMember; onClose: () => 
                         borderRadius: 26,
                         border: '1px solid rgba(255,255,255,0.16)',
                         background: '#06070d',
-                        backfaceVisibility: 'hidden',
-                        WebkitBackfaceVisibility: 'hidden',
                         visibility: flipped ? 'hidden' : 'visible',
-                        transition: 'visibility 0s linear 0.4s',
+                        transform: flipped ? 'scaleX(0)' : 'scaleX(1)',
+                        transition: `transform 0.4s ease ${flipped ? 0 : 0.4}s, visibility 0s linear 0.4s`,
                         boxShadow: '0 30px 60px -10px rgba(0,0,0,0.7)',
                       }}
                     >
@@ -665,12 +660,10 @@ function MemberDialog({ member, onClose }: { member: TeamMember; onClose: () => 
                         borderRadius: 26,
                         border: '1px solid rgba(255,255,255,0.16)',
                         background: '#06070d',
-                        backfaceVisibility: 'hidden',
-                        WebkitBackfaceVisibility: 'hidden',
                         visibility: flipped ? 'visible' : 'hidden',
-                        transition: 'visibility 0s linear 0.4s',
+                        transform: flipped ? 'scaleX(1)' : 'scaleX(0)',
+                        transition: `transform 0.4s ease ${flipped ? 0.4 : 0}s, visibility 0s linear 0.4s`,
                         boxShadow: '0 30px 60px -10px rgba(0,0,0,0.7)',
-                        transform: 'rotateY(180deg)',
                         display: 'flex',
                         flexDirection: 'column',
                       }}
