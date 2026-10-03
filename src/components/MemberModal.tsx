@@ -374,22 +374,22 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                       borderBottom: `1px solid ${T.border}`,
                       background: T.surface,
                     }}>
-                      {/* Logo badge — white so logo renders on dark bg */}
+                      {/* Logo badge */}
                       <div style={{
-                        width: 52, height: 52,
-                        borderRadius: 10,
+                        width: 36, height: 36,
+                        borderRadius: 8,
                         flexShrink: 0,
                         background: '#ffffff',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         overflow: 'hidden',
-                        boxShadow: `0 0 0 1px rgba(255,255,255,0.18), 0 2px 10px rgba(0,0,0,0.5)`,
+                        boxShadow: `0 0 0 1px rgba(0,113,181,0.35), 0 2px 8px rgba(0,0,0,0.45)`,
                       }}>
                         <Image
                           src="/uploads/logo.png"
                           alt="E-Motion Rennteam Logo"
-                          width={42}
-                          height={42}
-                          style={{ objectFit: 'contain', width: 42, height: 42 }}
+                          width={28}
+                          height={28}
+                          style={{ objectFit: 'contain', width: 28, height: 28 }}
                         />
                       </div>
 
@@ -620,11 +620,15 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <p style={{
                             color: T.fg,
-                            fontSize: 15,
+                            fontSize: 13,
                             fontWeight: 800,
                             margin: 0,
-                            letterSpacing: '-0.01em',
-                            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                            letterSpacing: '0.01em',
+                            lineHeight: 1.1,
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical' as const,
+                            overflow: 'hidden',
                             fontFamily: 'var(--font-heading, var(--font-sans, system-ui))',
                             textTransform: 'uppercase',
                           }}>
@@ -745,10 +749,10 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
 
                       {/* ── Action buttons ── */}
                       <motion.div variants={backItem} style={{
-                        flexGrow: 1,
-                        padding: '10px 12px 10px',
+                        flexShrink: 0,
+                        padding: '8px 12px 10px',
                         display: 'flex', flexDirection: 'column',
-                        gap: 6, justifyContent: 'flex-end',
+                        gap: 6,
                       }}>
                         {/* Primary CTA — always accent blue */}
                         <PrimaryButton onClick={(e) => { e.stopPropagation(); downloadVCard(member); }}>
@@ -761,28 +765,24 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                           vCard herunterladen
                         </PrimaryButton>
 
-                        {/* Secondary ghost buttons */}
+                        {/* Secondary ghost buttons — always visible */}
                         <div style={{ display: 'flex', gap: 6 }}>
-                          {showReal && member.email && (
-                            <GhostButton href={googleLink()}>
-                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                strokeWidth="1.8" style={{ width: 11, height: 11 }}>
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                                <circle cx="12" cy="7" r="4" />
-                              </svg>
-                              Google
-                            </GhostButton>
-                          )}
-                          {showReal && member.phone && (
-                            <GhostButton href={`tel:${member.phone}`}>
-                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                strokeWidth="1.8" style={{ width: 11, height: 11 }}>
-                                <rect x="5" y="2" width="14" height="20" rx="2" />
-                                <line x1="12" y1="18" x2="12" y2="18" strokeWidth="2" strokeLinecap="round" />
-                              </svg>
-                              Wallet
-                            </GhostButton>
-                          )}
+                          <GhostButton href={showReal && member.email ? googleLink() : '#'}>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                              strokeWidth="1.8" style={{ width: 11, height: 11 }}>
+                              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                              <circle cx="12" cy="7" r="4" />
+                            </svg>
+                            Google
+                          </GhostButton>
+                          <GhostButton href={showReal && member.phone ? `tel:${member.phone}` : '#'}>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                              strokeWidth="1.8" style={{ width: 11, height: 11 }}>
+                              <rect x="5" y="2" width="14" height="20" rx="2" />
+                              <line x1="12" y1="18" x2="12" y2="18" strokeWidth="2" strokeLinecap="round" />
+                            </svg>
+                            Wallet
+                          </GhostButton>
                         </div>
                       </motion.div>
 
