@@ -4,6 +4,7 @@ import Image from "next/image";
 import { getPage, getVehicles, TEAM_DEPARTMENTS } from "@/lib/content";
 import HeroMedia from "@/components/motion/HeroMedia";
 import HeroContent from "@/components/motion/HeroContent";
+import RainCanvas from "@/components/motion/RainCanvas";
 import Reveal from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import Counter from "@/components/motion/Counter";
@@ -68,6 +69,7 @@ export default function Home() {
           posterSrc="/uploads/ert-14-26-e61-map1-sonnenuntergang.jpg"
           alt="E61 und MAP1 bei Sonnenuntergang auf der Rennstrecke"
         />
+        <RainCanvas className="absolute inset-0 z-[1] h-full w-full pointer-events-none opacity-55 mix-blend-screen" />
 
         <div className="container-page relative pb-24 pt-32 sm:pb-28">
           <HeroContent

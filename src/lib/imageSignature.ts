@@ -1,19 +1,22 @@
-// ⚠️ AI-assisted – magic-number file verification is well-known security
-// practice but the exact byte sequences need to be looked up and verified.
-// (Magic-Number-Prüfung – Byte-Sequenzen wurden mit KI-Hilfe zusammengestellt.)
-
-// Checks if an uploaded file is actually the image type it claims to be.
-// Prüft ob eine hochgeladene Datei wirklich das ist, was sie behauptet zu sein.
-//
-// Why not just trust the Content-Type header? / Warum nicht einfach dem Header vertrauen?
-// Because anyone can upload a file called "photo.jpg" with MIME type "image/jpeg"
-// that actually contains something completely different (e.g. a script or executable).
-// Browsers and attackers can set file.type to whatever they want.
-//
-// Instead we look at the actual first bytes of the file – the "magic numbers".
-// Every image format starts with a specific sequence of bytes that identifies it.
-// (Jedes Bildformat fängt mit einer bestimmten Byte-Folge an – das kann man
-// nicht fälschen ohne die Datei selbst zu verändern.)
+/**
+ * Prüft, ob der tatsächliche Byte-Inhalt einer Datei zu ihrem deklarierten
+ * MIME-Typ passt — anhand von Magic Numbers statt blindem Vertrauen in den
+ * vom Client gesendeten `Content-Type`.
+ * Verifies that a file's actual byte content matches its declared MIME
+ * type, using magic-number signatures instead of trusting the
+ * client-supplied `Content-Type`.
+ *
+ * Warum das wichtig ist: Ein Browser oder Angreifer kann beim Upload
+ * beliebig `file.type` setzen. Die MIME-Prüfung allein (siehe
+ * api/admin/upload/route.ts) fängt nur offensichtlich falsche Uploads —
+ * nicht eine bösartige Datei, die sich mit gefälschtem MIME als Bild tarnt.
+ *
+ * Why this matters: a browser or attacker can set any `file.type` value on
+ * a multipart upload, so the MIME check alone only rejects obviously-wrong
+ * uploads, not a malicious file dressed up with a spoofed image MIME type.
+ * Magic numbers are the first bytes every format mandates — they can't be
+ * faked without breaking the file.
+ */
 
 function matchesSignature(bytes: Uint8Array, signature: number[], offset = 0): boolean {
   if (bytes.length < offset + signature.length) return false;
