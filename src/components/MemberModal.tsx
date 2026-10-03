@@ -290,18 +290,18 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                     }}>
                       {/* Logo mark */}
                       <div style={{
-                        width: 26, height: 26, borderRadius: 6, flexShrink: 0,
-                        background: `linear-gradient(135deg, ${T.accent} 0%, ${T.accent2} 100%)`,
+                        width: 30, height: 30, borderRadius: 6, flexShrink: 0,
+                        background: T.bg,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        boxShadow: `0 0 14px rgba(0,113,181,0.35)`,
+                        overflow: 'hidden',
                       }}>
-                        {/* E-Motion "E" wordmark */}
-                        <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
-                          <rect x="3" y="3"  width="10" height="2" rx="0.5" fill="white" />
-                          <rect x="3" y="9"  width="8"  height="2" rx="0.5" fill="white" />
-                          <rect x="3" y="15" width="10" height="2" rx="0.5" fill="white" />
-                          <rect x="3" y="3"  width="2"  height="14" rx="0.5" fill="white" />
-                        </svg>
+                        <Image
+                          src="/uploads/logo.png"
+                          alt="E-Motion Rennteam Logo"
+                          width={28}
+                          height={28}
+                          style={{ objectFit: 'contain', width: 28, height: 28 }}
+                        />
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{
@@ -619,16 +619,18 @@ export default function MemberModal({ member, onClose }: MemberModalProps) {
                       }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                           <div style={{
-                            width: 13, height: 13, borderRadius: 3,
-                            background: `linear-gradient(135deg, ${T.accent} 0%, ${T.accent2} 100%)`,
+                            width: 16, height: 16, borderRadius: 2,
+                            background: T.bg,
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            overflow: 'hidden',
                           }}>
-                            <svg width="8" height="8" viewBox="0 0 20 20" fill="none">
-                              <rect x="3" y="3"  width="10" height="2" rx="0.5" fill="white" />
-                              <rect x="3" y="9"  width="8"  height="2" rx="0.5" fill="white" />
-                              <rect x="3" y="15" width="10" height="2" rx="0.5" fill="white" />
-                              <rect x="3" y="3"  width="2"  height="14" rx="0.5" fill="white" />
-                            </svg>
+                            <Image
+                              src="/uploads/logo.png"
+                              alt=""
+                              width={14}
+                              height={14}
+                              style={{ objectFit: 'contain', width: 14, height: 14 }}
+                            />
                           </div>
                           <span style={{
                             color: T.muted, fontSize: 7.5, fontWeight: 700,
